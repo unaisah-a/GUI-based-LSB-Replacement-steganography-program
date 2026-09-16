@@ -1,0 +1,31 @@
+# INF2005 ACW1 dependencies.
+#
+# Versions are pinned exactly so that every team member and the demo machine
+# resolve the same builds. Add new entries under your own section rather than
+# editing another member's, and keep this file merge-friendly by appending.
+#
+# Install with:
+#   python -m venv .venv
+#   .venv/Scripts/python -m pip install -r requirements.txt   (Windows)
+#   .venv/bin/python -m pip install -r requirements.txt       (macOS/Linux)
+
+# --- Image steganography and image steganalysis (Member 2) ------------------
+# numpy: vectorised bit and metric arithmetic. Requirement 13.8 sets a
+#   36-million-element budget that rules out Python-level loops.
+# Pillow: PNG decoding and encoding only. BMP is handled directly in
+#   app/stego/image_io.py because Pillow's BMP writer discards the alpha channel
+#   and stores grayscale as an 8-bit palette.
+numpy==2.1.3
+Pillow==11.0.0
+
+# --- Testing (shared) -------------------------------------------------------
+# hypothesis drives the property tests required by Requirement 15.
+pytest==8.3.3
+hypothesis==6.115.5
+
+# --- GUI (Member 4) ---------------------------------------------------------
+# PySide6 is intentionally not pinned here yet. The image layer must not depend
+# on it (Requirement 12.2), so it is added when the GUI work lands.
+
+# --- Cryptography (Member 1) ------------------------------------------------
+# The `cryptography` package will be added with the signature implementation.
