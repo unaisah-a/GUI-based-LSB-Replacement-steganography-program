@@ -20,7 +20,12 @@ env/
 htmlcov/
 
 # IDE
-.vscode/
+#
+# .vscode/settings.json is shared deliberately (it pins the Python env manager
+# for the team), so it is re-included below.
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.swp
 
@@ -59,9 +64,9 @@ keys/demo_private/
 !keys/public/
 !keys/public/*.pem
 
-# Generated evidence artefacts. The folders are kept via .gitkeep so the
-# structure survives, but large screenshots and logs stay out of Git unless a
-# member adds one deliberately with `git add -f`.
-evidence/logs/*
-evidence/results/*
-!evidence/**/.gitkeep
+# evidence/ is deliberately NOT ignored.
+#
+# An earlier version of this file excluded evidence/logs and evidence/results.
+# That was wrong: README section 5 lists evidence/screenshots, evidence/logs and
+# evidence/results as project folders, and the assignment requires this material
+# as submission evidence. Committing it is the point.
