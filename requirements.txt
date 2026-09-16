@@ -1,31 +1,53 @@
 # INF2005 ACW1 dependencies.
 #
-# Versions are pinned exactly so that every team member and the demo machine
-# resolve the same builds. Add new entries under your own section rather than
-# editing another member's, and keep this file merge-friendly by appending.
+# This file is the merge of two versions: the pinned image-layer dependencies
+# and the package list from origin/main. The origin/main version used prose
+# ("PySide6 - Qt bindings for Python"), which pip cannot parse, so those entries
+# have been rewritten as real requirement specifiers and the descriptions moved
+# into comments.
 #
 # Install with:
 #   python -m venv .venv
 #   .venv/Scripts/python -m pip install -r requirements.txt   (Windows)
 #   .venv/bin/python -m pip install -r requirements.txt       (macOS/Linux)
+#
+# Keep this file merge-friendly: add entries under your own section rather than
+# editing someone else's, and leave the section headers in place.
+
+# --- Shared numerics --------------------------------------------------------
+# Used by the image layer (vectorised bit and metric arithmetic; Requirement
+# 13.8 sets a 36-million-element budget that rules out Python loops) and by the
+# audio layer for sample handling.
+numpy==2.1.3
 
 # --- Image steganography and image steganalysis (Member 2) ------------------
-# numpy: vectorised bit and metric arithmetic. Requirement 13.8 sets a
-#   36-million-element budget that rules out Python-level loops.
-# Pillow: PNG decoding and encoding only. BMP is handled directly in
-#   app/stego/image_io.py because Pillow's BMP writer discards the alpha channel
-#   and stores grayscale as an 8-bit palette.
-numpy==2.1.3
+# Pillow is used for PNG only. BMP is encoded and decoded directly in
+# app/stego/image_io.py, because Pillow's BMP writer discards the alpha channel
+# and stores grayscale as an 8-bit palette.
 Pillow==11.0.0
 
+# --- Audio steganography and robust embedding (Member 3) --------------------
+# soundfile: read and write WAV/PCM audio.
+# scipy: scientific computing helpers for audio analysis.
+# TODO(Member 3): replace the open ranges with exact pins, e.g. soundfile==0.12.1,
+# once you confirm the versions in your environment. Everything else here is
+# pinned so the demo machine resolves identical builds.
+soundfile
+scipy
+
+# --- Cryptography and payload security (Member 1) ---------------------------
+# cryptography: RSA key handling, signatures and hashing primitives. Imported by
+# app/crypto/signatures.py, key_manager.py, hashing.py and payload.py.
+# TODO(Member 1): pin this, e.g. cryptography==43.0.1.
+cryptography
+
+# --- GUI and system integration (Member 4) ----------------------------------
+# PySide6: Qt bindings for the desktop GUI.
+# TODO(Member 4): pin this, e.g. PySide6==6.8.0.
+# Note: the image analysis layer must not import PySide6 (Requirement 12.2).
+PySide6
+
 # --- Testing (shared) -------------------------------------------------------
-# hypothesis drives the property tests required by Requirement 15.
+# hypothesis drives the property-based tests required by Requirement 15.
 pytest==8.3.3
 hypothesis==6.115.5
-
-# --- GUI (Member 4) ---------------------------------------------------------
-# PySide6 is intentionally not pinned here yet. The image layer must not depend
-# on it (Requirement 12.2), so it is added when the GUI work lands.
-
-# --- Cryptography (Member 1) ------------------------------------------------
-# The `cryptography` package will be added with the signature implementation.
