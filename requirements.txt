@@ -1,0 +1,6 @@
+PySide6 - Qt bindings for Python
+numpy - Handle audio samples and binary data
+soundfile - Read and write audio files
+scipy - Scientific computing library
+cryptography - Secure communication and data protection
+pytest - Testing framework
