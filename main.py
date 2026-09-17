@@ -1,0 +1,22 @@
+"""Application entry point."""
+
+from __future__ import annotations
+
+import sys
+
+from PySide6.QtWidgets import QApplication
+
+from app.gui.main_window import MainWindow
+
+
+def main() -> int:
+    application = QApplication(sys.argv)
+    application.setApplicationName("Steganographic Media Integrity Lab")
+    application.setOrganizationName("INF2005")
+    window = MainWindow()
+    window.show()
+    return application.exec()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

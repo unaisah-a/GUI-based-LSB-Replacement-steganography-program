@@ -22,6 +22,8 @@ Supports:
 - Manual or passcode-derived start location
 """
 
+import os
+import tempfile
 from pathlib import Path
 from math import ceil
 
@@ -75,21 +77,37 @@ def read_audio(input_path):
 
 
 def write_audio(output_path, samples, sample_rate):
-    """Write stego audio as 16-bit PCM WAV."""
+    """Write stego audio as 16-bit PCM WAV using an atomic replacement."""
     output_path = Path(output_path)
 
     if output_path.suffix.lower() != ".wav":
         raise ValueError("Output file must use the .wav extension.")
 
-    samples = np.asarray(samples, dtype=np.int16)
+    if not output_path.parent.is_dir():
+        raise FileNotFoundError("Audio output directory does not exist.")
 
-    sf.write(
-        str(output_path),
-        samples,
-        sample_rate,
-        format="WAV",
-        subtype=SUPPORTED_SUBTYPE,
+    samples = np.asarray(samples, dtype=np.int16)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{output_path.stem}.",
+        suffix=".wav",
+        dir=str(output_path.parent),
     )
+    os.close(descriptor)
+    try:
+        sf.write(
+            temporary_name,
+            samples,
+            sample_rate,
+            format="WAV",
+            subtype=SUPPORTED_SUBTYPE,
+        )
+        os.replace(temporary_name, output_path)
+    except Exception:
+        try:
+            os.unlink(temporary_name)
+        except FileNotFoundError:
+            pass
+        raise
 
 
 def validate_lsb_count(lsb_count):
@@ -484,3 +502,29 @@ def extract_audio_lsb(
 
     packet = header + payload
     return parse_packet(packet)
+
+
+def embed_audio(
+    input_path,
+    output_path,
+    payload,
+    lsb_count,
+    start_location,
+):
+    """Shared-interface adapter for image/audio integration."""
+    return embed_audio_lsb(
+        input_path,
+        output_path,
+        payload,
+        lsb_count=lsb_count,
+        start_location=start_location,
+    )
+
+
+def extract_audio(input_path, lsb_count, start_location):
+    """Shared-interface adapter for image/audio integration."""
+    return extract_audio_lsb(
+        input_path,
+        lsb_count=lsb_count,
+        start_location=start_location,
+    )

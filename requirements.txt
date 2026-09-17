@@ -32,20 +32,20 @@ Pillow==11.0.0
 # TODO(Member 3): replace the open ranges with exact pins, e.g. soundfile==0.12.1,
 # once you confirm the versions in your environment. Everything else here is
 # pinned so the demo machine resolves identical builds.
-soundfile
-scipy
+soundfile==0.14.0
+scipy==1.18.1
 
 # --- Cryptography and payload security (Member 1) ---------------------------
 # cryptography: RSA key handling, signatures and hashing primitives. Imported by
 # app/crypto/signatures.py, key_manager.py, hashing.py and payload.py.
 # TODO(Member 1): pin this, e.g. cryptography==43.0.1.
-cryptography
+cryptography==50.0.1
 
 # --- GUI and system integration (Member 4) ----------------------------------
 # PySide6: Qt bindings for the desktop GUI.
 # TODO(Member 4): pin this, e.g. PySide6==6.8.0.
 # Note: the image analysis layer must not import PySide6 (Requirement 12.2).
-PySide6
+PySide6==6.11.2
 
 # --- Testing (shared) -------------------------------------------------------
 # hypothesis drives the property-based tests required by Requirement 15.
