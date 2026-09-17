@@ -1,0 +1,196 @@
+{
+  "cases": [
+    {
+      "case": "PNG, short message (57 bytes)",
+      "detail": "57-byte message, depth 3, derived start location",
+      "expected": "AUTHENTIC",
+      "kind": "positive",
+      "media_type": "image",
+      "observed": "AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "PNG, long message (711 bytes)",
+      "detail": "711-byte message, depth 3, derived start location",
+      "expected": "AUTHENTIC",
+      "kind": "positive",
+      "media_type": "image",
+      "observed": "AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "PNG, custom message (359 bytes)",
+      "detail": "359-byte message, depth 3, derived start location",
+      "expected": "AUTHENTIC",
+      "kind": "positive",
+      "media_type": "image",
+      "observed": "AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "WAV, short message (57 bytes)",
+      "detail": "57-byte message, depth 3, derived start location",
+      "expected": "AUTHENTIC",
+      "kind": "positive",
+      "media_type": "audio",
+      "observed": "AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "WAV, long message (711 bytes)",
+      "detail": "711-byte message, depth 3, derived start location",
+      "expected": "AUTHENTIC",
+      "kind": "positive",
+      "media_type": "audio",
+      "observed": "AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "WAV, custom message (359 bytes)",
+      "detail": "359-byte message, depth 3, derived start location",
+      "expected": "AUTHENTIC",
+      "kind": "positive",
+      "media_type": "audio",
+      "observed": "AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "PNG, encrypted custom payload",
+      "detail": "AES-256-GCM under a scrypt-derived key, encrypt-then-sign",
+      "expected": "AUTHENTIC",
+      "kind": "positive",
+      "media_type": "image",
+      "observed": "AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "BMP, manual start location",
+      "detail": "start location 5000, signed into the record, no secret required",
+      "expected": "AUTHENTIC",
+      "kind": "positive",
+      "media_type": "image",
+      "observed": "AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "MKV video, short message (57 bytes)",
+      "detail": "FFV1 in Matroska, depth 2, derived start location over the flat frame domain",
+      "expected": "AUTHENTIC",
+      "kind": "positive",
+      "media_type": "video",
+      "observed": "AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "Image with a corrupted embedded message",
+      "detail": "the signature covers the message, so a change to it fails the signature",
+      "expected": "SIGNATURE_INVALID",
+      "kind": "negative",
+      "media_type": "image",
+      "observed": "SIGNATURE_INVALID",
+      "passed": true
+    },
+    {
+      "case": "Audio with a corrupted verification record",
+      "detail": "one digit of the signed nonce changed, length preserved",
+      "expected": "SIGNATURE_INVALID",
+      "kind": "negative",
+      "media_type": "audio",
+      "observed": "SIGNATURE_INVALID",
+      "passed": true
+    },
+    {
+      "case": "Audio with a corrupted signature",
+      "detail": "one byte of the signature inverted",
+      "expected": "SIGNATURE_INVALID",
+      "kind": "negative",
+      "media_type": "audio",
+      "observed": "SIGNATURE_INVALID",
+      "passed": true
+    },
+    {
+      "case": "Verified with the wrong public key",
+      "detail": "an unrelated RSA key pair",
+      "expected": "SIGNATURE_INVALID",
+      "kind": "negative",
+      "media_type": "image",
+      "observed": "SIGNATURE_INVALID",
+      "passed": true
+    },
+    {
+      "case": "Wrong start-location secret",
+      "detail": "observed PAYLOAD_MISSING; the cause is not distinguishable",
+      "expected": "not AUTHENTIC",
+      "kind": "negative",
+      "media_type": "image",
+      "observed": "not AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "Unprotected cover, no payload present",
+      "detail": "a plain PNG that was never protected",
+      "expected": "PAYLOAD_MISSING",
+      "kind": "negative",
+      "media_type": "image",
+      "observed": "PAYLOAD_MISSING",
+      "passed": true
+    },
+    {
+      "case": "Tampered manifest, caught by the cross-check",
+      "detail": "message_length edited; extraction still works, the comparison catches it",
+      "expected": "TAMPERED",
+      "kind": "negative",
+      "media_type": "image",
+      "observed": "TAMPERED",
+      "passed": true
+    },
+    {
+      "case": "Tampered manifest, breaks the derived start location",
+      "detail": "media_id edited; it feeds the derivation, so nothing is found",
+      "expected": "PAYLOAD_MISSING",
+      "kind": "negative",
+      "media_type": "image",
+      "observed": "PAYLOAD_MISSING",
+      "passed": true
+    },
+    {
+      "case": "Video re-encoded with a lossy codec",
+      "detail": "re-encoded with avc1; observed CANNOT_VERIFY",
+      "expected": "not AUTHENTIC",
+      "kind": "negative",
+      "media_type": "video",
+      "observed": "not AUTHENTIC",
+      "passed": true
+    },
+    {
+      "case": "Wrong message passphrase",
+      "detail": "signature verified, so the record is genuine; decryption failed",
+      "expected": "CANNOT_VERIFY",
+      "kind": "negative",
+      "media_type": "image",
+      "observed": "CANNOT_VERIFY",
+      "passed": true
+    },
+    {
+      "case": "Payload exceeds capacity",
+      "detail": "a 16x16 cover at depth 1 cannot hold the long message",
+      "expected": "refused before writing",
+      "kind": "validation",
+      "media_type": "image",
+      "observed": "refused before writing",
+      "passed": true
+    },
+    {
+      "case": "Same message fits at a greater depth",
+      "detail": "refused at depth 1, accepted at depth 6 on a 48x48 cover",
+      "expected": "AUTHENTIC",
+      "kind": "validation",
+      "media_type": "image",
+      "observed": "AUTHENTIC",
+      "passed": true
+    }
+  ],
+  "passed": 21,
+  "suite": "end-to-end protect and verify",
+  "total": 21
+}

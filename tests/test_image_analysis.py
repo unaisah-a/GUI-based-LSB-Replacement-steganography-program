@@ -10,7 +10,10 @@ import concurrent.futures
 import dataclasses
 import math
 import os
+import pathlib
+import subprocess
 import sys
+import textwrap
 
 import numpy as np
 import pytest
@@ -625,13 +628,35 @@ class TestHistogramCompare:
 
 class TestLayerIndependence:
     def test_no_gui_or_plotting_module_is_imported(self):
-        """Requirement 12.2."""
-        offenders = [
-            name
-            for name in sys.modules
-            if name.startswith(("PySide", "PyQt", "matplotlib", "tkinter"))
-        ]
-        assert offenders == []
+        """Requirement 12.2.
+
+        Checked in a clean subprocess rather than against the ambient
+        ``sys.modules``. The pytest-qt plugin that drives the GUI widget tests
+        imports PySide6 during plugin collection, so an in-process check would
+        report that import and not this layer's imports, which is the opposite of
+        what Requirement 12.2 is about.
+        """
+        probe = textwrap.dedent(
+            """
+            import sys
+            import app.analysis.image_analysis  # noqa: F401
+
+            offenders = sorted(
+                name
+                for name in sys.modules
+                if name.startswith(("PySide", "PyQt", "matplotlib", "tkinter"))
+            )
+            print(",".join(offenders))
+            """
+        )
+        completed = subprocess.run(
+            [sys.executable, "-c", probe],
+            cwd=str(pathlib.Path(__file__).resolve().parent.parent),
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        assert completed.stdout.strip() == ""
 
     @given(image_pair())
     def test_inputs_are_never_modified(self, pair):

@@ -1,0 +1,355 @@
+{
+  "applicable": 10,
+  "attempts": 6,
+  "attempts_that_matched": 2,
+  "cases": [
+    {
+      "applicable": true,
+      "attempted": false,
+      "container": "WAV",
+      "content_unchanged": null,
+      "cover": "cover.wav",
+      "cover_size": 80044,
+      "details": {},
+      "difference": 0,
+      "exact": true,
+      "final_size": 80044,
+      "growth_proportion": 0.0,
+      "inherent": true,
+      "media_type": "audio",
+      "notes": [
+        "Replacing low-order bits changes byte values, not byte counts, so the size is preserved without doing anything. A mismatch here would point at the writer, not at the format."
+      ],
+      "scenario": "WAV, depth 2",
+      "stego": "stego.wav",
+      "stego_size": 80044,
+      "strategy": "none needed: samples are stored at fixed positions and widths"
+    },
+    {
+      "applicable": true,
+      "attempted": false,
+      "container": "BMP",
+      "content_unchanged": null,
+      "cover": "cover_bmp.bmp",
+      "cover_size": 27702,
+      "details": {},
+      "difference": 0,
+      "exact": true,
+      "final_size": 27702,
+      "growth_proportion": 0.0,
+      "inherent": true,
+      "media_type": "image",
+      "notes": [
+        "Replacing low-order bits changes byte values, not byte counts, so the size is preserved without doing anything. A mismatch here would point at the writer, not at the format."
+      ],
+      "scenario": "BMP, depth 3",
+      "stego": "stego.bmp",
+      "stego_size": 27702,
+      "strategy": "none needed: samples are stored at fixed positions and widths"
+    },
+    {
+      "applicable": true,
+      "attempted": false,
+      "container": "PNG",
+      "content_unchanged": null,
+      "cover": "flat.png",
+      "cover_size": 271,
+      "details": {},
+      "difference": 120,
+      "exact": false,
+      "final_size": 391,
+      "growth_proportion": 0.44280442804428044,
+      "inherent": false,
+      "media_type": "image",
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "scenario": "PNG (flat cover), depth 8, baseline",
+      "stego": "stego.png",
+      "stego_size": 391,
+      "strategy": "baseline, before any attempt"
+    },
+    {
+      "applicable": true,
+      "attempted": true,
+      "container": "PNG",
+      "content_unchanged": true,
+      "cover": "noisy.png",
+      "cover_size": 27812,
+      "details": {
+        "exact_level": 0,
+        "output": "matched.png",
+        "padded_bytes": 0,
+        "sizes_by_deflate_level": {
+          "0": 27812,
+          "1": 27731,
+          "2": 27731,
+          "3": 27731,
+          "4": 27722,
+          "5": 27722,
+          "6": 27722,
+          "7": 27722,
+          "8": 27722,
+          "9": 27722
+        },
+        "smallest_level": 4
+      },
+      "difference": 0,
+      "exact": true,
+      "final_size": 27812,
+      "growth_proportion": 0.0,
+      "inherent": false,
+      "media_type": "image",
+      "notes": [
+        "No padding was needed: one of the ten DEFLATE levels happened to produce exactly the cover's length."
+      ],
+      "scenario": "PNG (noise cover), depth 8, attempt",
+      "stego": "stego.png",
+      "stego_size": 27722,
+      "strategy": "re-encoding at DEFLATE level 0"
+    },
+    {
+      "applicable": true,
+      "attempted": false,
+      "container": "PNG",
+      "content_unchanged": null,
+      "cover": "noisy.png",
+      "cover_size": 27812,
+      "details": {},
+      "difference": 0,
+      "exact": true,
+      "final_size": 27812,
+      "growth_proportion": 0.0,
+      "inherent": false,
+      "media_type": "image",
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "scenario": "PNG (noise cover), depth 2, baseline",
+      "stego": "stego.png",
+      "stego_size": 27812,
+      "strategy": "baseline, before any attempt"
+    },
+    {
+      "applicable": true,
+      "attempted": true,
+      "container": "PNG",
+      "content_unchanged": true,
+      "cover": "flat.png",
+      "cover_size": 271,
+      "details": {
+        "exact_level": null,
+        "output": "attempted.png",
+        "padded_bytes": 0,
+        "sizes_by_deflate_level": {
+          "0": 27812,
+          "1": 467,
+          "2": 467,
+          "3": 429,
+          "4": 389,
+          "5": 388,
+          "6": 391,
+          "7": 391,
+          "8": 309,
+          "9": 309
+        },
+        "smallest_level": 8
+      },
+      "difference": 38,
+      "exact": false,
+      "final_size": 309,
+      "growth_proportion": 0.14022140221402213,
+      "inherent": false,
+      "media_type": "image",
+      "notes": [
+        "LSB replacement pushed the low-order bits toward random, and random data does not compress. The smallest of the ten encodings is still 38 bytes over. Bytes cannot be removed from a PNG without changing its pixels, so this file cannot be matched. This is the usual outcome at higher LSB depths."
+      ],
+      "scenario": "PNG (flat cover), depth 8, attempt",
+      "stego": "stego.png",
+      "stego_size": 391,
+      "strategy": "not matched: every encoding is larger than the cover"
+    },
+    {
+      "applicable": true,
+      "attempted": true,
+      "container": "PNG",
+      "content_unchanged": true,
+      "cover": "extremes.png",
+      "cover_size": 6255,
+      "details": {
+        "exact_level": null,
+        "output": "out1.png",
+        "padded_bytes": 0,
+        "sizes_by_deflate_level": {
+          "0": 27812,
+          "1": 7810,
+          "2": 7433,
+          "3": 7250,
+          "4": 6643,
+          "5": 6573,
+          "6": 6495,
+          "7": 6437,
+          "8": 6388,
+          "9": 6395
+        },
+        "smallest_level": 8
+      },
+      "difference": 133,
+      "exact": false,
+      "final_size": 6388,
+      "growth_proportion": 0.02126298960831335,
+      "inherent": false,
+      "media_type": "image",
+      "notes": [
+        "LSB replacement pushed the low-order bits toward random, and random data does not compress. The smallest of the ten encodings is still 133 bytes over. Bytes cannot be removed from a PNG without changing its pixels, so this file cannot be matched. This is the usual outcome at higher LSB depths."
+      ],
+      "scenario": "PNG (two-value cover), depth 1, attempt",
+      "stego": "stego1.png",
+      "stego_size": 6495,
+      "strategy": "not matched: every encoding is larger than the cover"
+    },
+    {
+      "applicable": true,
+      "attempted": true,
+      "container": "PNG",
+      "content_unchanged": true,
+      "cover": "extremes.png",
+      "cover_size": 6255,
+      "details": {
+        "exact_level": null,
+        "output": "out2.png",
+        "padded_bytes": 0,
+        "sizes_by_deflate_level": {
+          "0": 27812,
+          "1": 7899,
+          "2": 7539,
+          "3": 7376,
+          "4": 6759,
+          "5": 6666,
+          "6": 6562,
+          "7": 6486,
+          "8": 6430,
+          "9": 6432
+        },
+        "smallest_level": 8
+      },
+      "difference": 175,
+      "exact": false,
+      "final_size": 6430,
+      "growth_proportion": 0.027977617905675458,
+      "inherent": false,
+      "media_type": "image",
+      "notes": [
+        "LSB replacement pushed the low-order bits toward random, and random data does not compress. The smallest of the ten encodings is still 175 bytes over. Bytes cannot be removed from a PNG without changing its pixels, so this file cannot be matched. This is the usual outcome at higher LSB depths."
+      ],
+      "scenario": "PNG (two-value cover), depth 2, attempt",
+      "stego": "stego2.png",
+      "stego_size": 6562,
+      "strategy": "not matched: every encoding is larger than the cover"
+    },
+    {
+      "applicable": true,
+      "attempted": true,
+      "container": "PNG",
+      "content_unchanged": true,
+      "cover": "extremes.png",
+      "cover_size": 6255,
+      "details": {
+        "exact_level": null,
+        "output": "out4.png",
+        "padded_bytes": 0,
+        "sizes_by_deflate_level": {
+          "0": 27812,
+          "1": 7921,
+          "2": 7519,
+          "3": 7339,
+          "4": 6778,
+          "5": 6687,
+          "6": 6572,
+          "7": 6483,
+          "8": 6444,
+          "9": 6441
+        },
+        "smallest_level": 9
+      },
+      "difference": 186,
+      "exact": false,
+      "final_size": 6441,
+      "growth_proportion": 0.02973621103117506,
+      "inherent": false,
+      "media_type": "image",
+      "notes": [
+        "LSB replacement pushed the low-order bits toward random, and random data does not compress. The smallest of the ten encodings is still 186 bytes over. Bytes cannot be removed from a PNG without changing its pixels, so this file cannot be matched. This is the usual outcome at higher LSB depths."
+      ],
+      "scenario": "PNG (two-value cover), depth 4, attempt",
+      "stego": "stego4.png",
+      "stego_size": 6572,
+      "strategy": "not matched: every encoding is larger than the cover"
+    },
+    {
+      "applicable": true,
+      "attempted": true,
+      "container": "PNG",
+      "content_unchanged": true,
+      "cover": "extremes.png",
+      "cover_size": 6255,
+      "details": {
+        "exact_level": null,
+        "output": "out8.png",
+        "padded_bytes": 30,
+        "sizes_by_deflate_level": {
+          "0": 27812,
+          "1": 7786,
+          "2": 7395,
+          "3": 7206,
+          "4": 6552,
+          "5": 6471,
+          "6": 6364,
+          "7": 6287,
+          "8": 6231,
+          "9": 6225
+        },
+        "smallest_level": 9
+      },
+      "difference": 0,
+      "exact": true,
+      "final_size": 6255,
+      "growth_proportion": 0.0,
+      "inherent": false,
+      "media_type": "image",
+      "notes": [
+        "The padding chunk is ancillary and private, so a conforming decoder skips it and the pixels are unchanged. It is also an unusual feature in an otherwise plain PNG, which makes the file arguably more conspicuous to an analyst than a size mismatch would."
+      ],
+      "scenario": "PNG (two-value cover), depth 8, attempt",
+      "stego": "stego8.png",
+      "stego_size": 6364,
+      "strategy": "DEFLATE level 9 plus a 30-byte stPd padding chunk"
+    },
+    {
+      "applicable": false,
+      "attempted": false,
+      "container": "MKV",
+      "content_unchanged": null,
+      "cover": "clip.mkv",
+      "cover_size": 32616,
+      "details": {},
+      "difference": 0,
+      "exact": true,
+      "final_size": 32616,
+      "growth_proportion": 0.0,
+      "inherent": false,
+      "media_type": "video",
+      "notes": [
+        "A protected clip is re-encoded as FFV1 from the decoded frames, so its size bears no relation to the cover's — the cover may not even have been in a lossless codec. Comparing the two sizes measures the codec change, not the embedding.",
+        "The two sizes happen to be equal here. That is a coincidence of two separate FFV1 encodings, not preservation, and it is not something to rely on."
+      ],
+      "scenario": "MKV (FFV1), depth 2",
+      "stego": "stego.mkv",
+      "stego_size": 32616,
+      "strategy": "not applicable: the output is a full re-encode"
+    }
+  ],
+  "exact": 5,
+  "experiment": "exact file-size preservation",
+  "total": 11
+}

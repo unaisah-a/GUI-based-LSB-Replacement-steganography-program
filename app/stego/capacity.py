@@ -198,7 +198,21 @@ def capacity_report(
         available_samples=available_samples,
         available_capacity_bytes=capacity,
         max_payload_length=max_payload,
-        payload_fits=max_payload > 0,
+        # An earlier version computed this as ``max_payload > 0``, ignoring
+        # payload_length entirely, so a payload far larger than the cover was
+        # still reported as fitting. Embedding was never unsafe, because
+        # embed_image enforces capacity itself, but a GUI pre-flight check
+        # reading this field would have been wrong.
+        #
+        # The comparison is against the *encoded* length, so a zero-length
+        # payload still requires room for the 4-byte header. With no payload
+        # length supplied the report describes the medium rather than a specific
+        # embedding, and the question degrades to whether the header alone fits.
+        payload_fits=(
+            capacity >= LENGTH_HEADER_BYTES
+            if payload_length is None
+            else capacity >= required_encoded
+        ),
         embeddable_channel_count=embeddable_channels,
         payload_length=payload_length,
         required_encoded_length=required_encoded,

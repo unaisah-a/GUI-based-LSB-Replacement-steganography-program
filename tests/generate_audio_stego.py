@@ -1,86 +1,75 @@
+"""Generate the committed demo stego WAV and print its quality report.
+
+Not a test: the file name does not match pytest's ``test_*.py`` pattern, so it is
+never collected. Run it directly after ``create_test_audio.py``:
+
+    .venv\\Scripts\\python tests/generate_audio_stego.py
+
+Updated for the current audio interface. It previously called
+``embed_audio_lsb`` / ``extract_audio_lsb``, which no longer exist, and resolved
+its paths against the working directory.
+
+Note that this exercises the steganography layer on its own, with a raw byte
+payload and no envelope. It is a distortion-measurement utility, not a
+demonstration of the protect workflow; for that see the end-to-end tests, which go
+through signing, the envelope and the companion manifest.
+"""
+
+from __future__ import annotations
+
 from pathlib import Path
 
-from app.stego.audio_stego import (
-    embed_audio_lsb,
-    extract_audio_lsb,
-)
+from app.analysis.audio_analysis import calculate_quality_report
+from app.stego.audio_stego import embed_audio, extract_audio
 
-from app.analysis.audio_analysis import (
-    calculate_quality_report,
-)
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+COVER = REPOSITORY_ROOT / "samples" / "audio" / "original" / "original.wav"
 
-
-# ============================================================
-# SETTINGS
-# ============================================================
-
-lsb_count = 4
-
-payload = b"INF2005 Audio Steganography Test"
-
-start_location = 100
+PAYLOAD = b"INF2005 Audio Steganography Test"
+START_LOCATION = 100
 
 
-# ============================================================
-# FILE PATHS
-# ============================================================
+def main(lsb_count: int = 4) -> None:
+    if not COVER.is_file():
+        raise SystemExit(
+            f"cover not found: {COVER.relative_to(REPOSITORY_ROOT)}. "
+            f"Run tests/create_test_audio.py first."
+        )
 
-input_path = Path(
-    "samples/audio/original/original.wav"
-)
+    stego = (
+        REPOSITORY_ROOT / "samples" / "audio" / "stego" / f"stego_lsb{lsb_count}.wav"
+    )
+    stego.parent.mkdir(parents=True, exist_ok=True)
 
-output_path = Path(
-    f"samples/audio/stego/stego_lsb{lsb_count}.wav"
-)
+    result = embed_audio(
+        str(COVER),
+        str(stego),
+        PAYLOAD,
+        lsb_count,
+        START_LOCATION,
+        # Regenerating the committed sample is the whole point of this script.
+        overwrite=True,
+    )
 
-# Make sure the folder exists.
-output_path.parent.mkdir(
-    parents=True,
-    exist_ok=True
-)
+    print(f"wrote {stego.relative_to(REPOSITORY_ROOT)}")
+    print(f"  depth {result.lsb_count}, start location {result.start_location}")
+    print(
+        f"  {result.payload_length} payload bytes in "
+        f"{result.samples_written} of {result.descriptor.total_samples} samples"
+    )
+    print(f"  capacity at this depth: {result.capacity.max_payload_length} bytes")
 
+    recovered = extract_audio(str(stego), lsb_count, START_LOCATION)
+    if recovered != PAYLOAD:
+        raise SystemExit("round trip failed: the recovered payload differs")
+    print(f"  round trip verified: {recovered.decode('utf-8')!r}")
 
-# ============================================================
-# EMBED PAYLOAD
-# ============================================================
-
-embed_result = embed_audio_lsb(
-    input_path=input_path,
-    output_path=output_path,
-    payload=payload,
-    lsb_count=lsb_count,
-    start_location=start_location
-)
-
-print("\nStego audio created:")
-print(output_path)
-
-
-# ============================================================
-# EXTRACT PAYLOAD
-# ============================================================
-
-extracted_payload = extract_audio_lsb(
-    input_path=output_path,
-    lsb_count=lsb_count,
-    start_location=start_location
-)
-
-print("\nExtracted payload:")
-print(extracted_payload.decode("utf-8"))
+    print("\nquality report")
+    for key, value in calculate_quality_report(
+        str(COVER), str(stego), lsb_count=lsb_count
+    ).items():
+        print(f"  {key}: {value}")
 
 
-# ============================================================
-# QUALITY ANALYSIS
-# ============================================================
-
-report = calculate_quality_report(
-    input_path,
-    output_path,
-    lsb_count=lsb_count
-)
-
-print("\nAudio Quality Report:")
-
-for key, value in report.items():
-    print(f"{key}: {value}")
+if __name__ == "__main__":
+    main()

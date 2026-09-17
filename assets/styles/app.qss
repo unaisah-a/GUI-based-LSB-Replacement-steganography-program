@@ -1,0 +1,216 @@
+/* Application stylesheet.
+ *
+ * Kept deliberately restrained. The interface has to make several distinctions
+ * legible at a glance during a demonstration — a verdict, whether a check passed,
+ * whether a dropped file was accepted — and colour is the fastest way to do that.
+ * Everything else stays close to the platform default so the window does not look
+ * out of place.
+ *
+ * Verdict colours are never the only signal. The verdict name is always shown as
+ * text, and every check reports "yes", "no" or "not established" in words, so the
+ * interface remains readable without relying on colour perception.
+ */
+
+QWidget {
+    font-size: 10pt;
+}
+
+/* --- tabs ---------------------------------------------------------------- */
+
+QTabWidget#mainTabs::pane {
+    border: 1px solid #c3c7cf;
+    border-radius: 4px;
+    top: -1px;
+}
+
+QTabBar::tab {
+    padding: 8px 18px;
+    margin-right: 2px;
+    border: 1px solid #c3c7cf;
+    border-bottom: none;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    background: #eef0f3;
+}
+
+QTabBar::tab:selected {
+    background: #ffffff;
+    font-weight: 600;
+}
+
+QTabBar::tab:hover:!selected {
+    background: #e2e6ec;
+}
+
+/* --- drop zone ----------------------------------------------------------- */
+
+QFrame#dropZone {
+    border: 2px dashed #a9b0bb;
+    border-radius: 8px;
+    background: #f7f8fa;
+}
+
+QFrame#dropZone[state="hover"] {
+    border-color: #2f6fbf;
+    background: #eef4fc;
+}
+
+QFrame#dropZone[state="accepted"] {
+    border-style: solid;
+    border-color: #2f8f4f;
+    background: #f2faf4;
+}
+
+QFrame#dropZone[state="rejected"] {
+    border-style: solid;
+    border-color: #b03030;
+    background: #fdf3f3;
+}
+
+QLabel#dropZonePrompt {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #333a44;
+}
+
+QLabel#dropZoneDetail {
+    color: #5a6270;
+}
+
+/* --- information panels -------------------------------------------------- */
+
+QGroupBox {
+    font-weight: 600;
+    border: 1px solid #c3c7cf;
+    border-radius: 6px;
+    margin-top: 12px;
+    padding: 10px 8px 8px 8px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 10px;
+    padding: 0 4px;
+}
+
+QLabel#fileInfoEmpty,
+QLabel#mediaPreviewMessage {
+    color: #6b7280;
+    font-style: italic;
+}
+
+QLabel#fileInfoValue {
+    font-weight: 400;
+}
+
+QLabel#fileInfoNotice {
+    color: #8a5a00;
+    background: #fff8e6;
+    border: 1px solid #e6cf8a;
+    border-radius: 4px;
+    padding: 6px;
+}
+
+/* --- verdicts ------------------------------------------------------------ */
+
+QLabel#verdictBanner {
+    font-size: 16pt;
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-radius: 6px;
+    padding: 10px;
+    color: #4b5563;
+    background: #eef0f3;
+    border: 1px solid #c3c7cf;
+}
+
+QLabel#verdictBanner[verdict="authentic"] {
+    color: #14532d;
+    background: #e6f6ec;
+    border: 1px solid #2f8f4f;
+}
+
+QLabel#verdictBanner[verdict="failed"] {
+    color: #7f1d1d;
+    background: #fdeaea;
+    border: 1px solid #b03030;
+}
+
+QLabel#verdictBanner[verdict="unknown"] {
+    color: #78350f;
+    background: #fdf6e7;
+    border: 1px solid #c99a3a;
+}
+
+QLabel#verdictDescription {
+    color: #4b5563;
+}
+
+QLabel#verdictReason {
+    color: #1f2937;
+}
+
+QLabel#verdictNotes,
+QLabel#inertNotice {
+    color: #6b7280;
+    font-size: 9pt;
+}
+
+QLabel#flagValue {
+    font-weight: 600;
+}
+
+QLabel#flagValue[flag="yes"] {
+    color: #14532d;
+}
+
+QLabel#flagValue[flag="no"] {
+    color: #7f1d1d;
+}
+
+/* --- recovered payload --------------------------------------------------- */
+
+QPlainTextEdit#payloadView {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 9pt;
+    background: #fbfbfc;
+    border: 1px solid #c3c7cf;
+    border-radius: 4px;
+}
+
+/* --- media preview ------------------------------------------------------- */
+
+QLabel#mediaPreviewTitle {
+    font-weight: 600;
+    color: #333a44;
+}
+
+QLabel#mediaPreviewImage {
+    border: 1px solid #c3c7cf;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+QLabel#mediaPreviewCaption {
+    color: #5a6270;
+    font-size: 9pt;
+}
+
+/* --- pending tabs -------------------------------------------------------- */
+
+QLabel#pendingHeading {
+    font-size: 15pt;
+    font-weight: 700;
+    color: #333a44;
+}
+
+QLabel#pendingSummary {
+    color: #4b5563;
+}
+
+QLabel#pendingAlternative {
+    color: #6b7280;
+    font-size: 9pt;
+    font-style: italic;
+}

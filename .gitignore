@@ -43,6 +43,10 @@ tmp/
 # Logs
 *.log
 
+# Captured test-run output (pytest stdout redirected to a file so long runs can
+# be inspected without flooding a terminal).
+.pytest_out.txt
+
 # Private keys
 #
 # README section 22 suggests `keys/private/`, but the folder created by the

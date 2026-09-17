@@ -1,0 +1,111 @@
+{
+  "cases": [
+    {
+      "changed_percentage": 50.05668934240363,
+      "changed_samples": 22075,
+      "lsb_depth": 1,
+      "max_absolute_difference": 1.0,
+      "mse": 0.5005668934240363,
+      "payload_bytes": 5508,
+      "psnr_db": 93.31411239501631,
+      "rmse": 0.7075075218144583,
+      "snr_db": 84.28320459108987,
+      "theoretical_max_difference": 1,
+      "within_expected_lsb_bound": true
+    },
+    {
+      "changed_percentage": 75.07482993197279,
+      "changed_samples": 33108,
+      "lsb_depth": 2,
+      "max_absolute_difference": 3.0,
+      "mse": 2.46875283446712,
+      "payload_bytes": 11021,
+      "psnr_db": 86.38395750682898,
+      "rmse": 1.5712265382391937,
+      "snr_db": 77.35304970290255,
+      "theoretical_max_difference": 3,
+      "within_expected_lsb_bound": true
+    },
+    {
+      "changed_percentage": 87.47845804988663,
+      "changed_samples": 38578,
+      "lsb_depth": 3,
+      "max_absolute_difference": 7.0,
+      "mse": 10.542448979591837,
+      "payload_bytes": 16533,
+      "psnr_db": 80.07931854368879,
+      "rmse": 3.2469137622659208,
+      "snr_db": 71.04841073976236,
+      "theoretical_max_difference": 7,
+      "within_expected_lsb_bound": true
+    },
+    {
+      "changed_percentage": 93.6575963718821,
+      "changed_samples": 41303,
+      "lsb_depth": 4,
+      "max_absolute_difference": 15.0,
+      "mse": 43.26292517006803,
+      "payload_bytes": 22046,
+      "psnr_db": 73.9475748189437,
+      "rmse": 6.577455828059055,
+      "snr_db": 64.91666701501727,
+      "theoretical_max_difference": 15,
+      "within_expected_lsb_bound": true
+    },
+    {
+      "changed_percentage": 96.83446712018142,
+      "changed_samples": 42704,
+      "lsb_depth": 5,
+      "max_absolute_difference": 31.0,
+      "mse": 172.0097732426304,
+      "payload_bytes": 27558,
+      "psnr_db": 67.95320238952817,
+      "rmse": 13.115249644693401,
+      "snr_db": 58.92229458560174,
+      "theoretical_max_difference": 31,
+      "within_expected_lsb_bound": true
+    },
+    {
+      "changed_percentage": 98.51020408163265,
+      "changed_samples": 43443,
+      "lsb_depth": 6,
+      "max_absolute_difference": 63.0,
+      "mse": 690.8569841269841,
+      "payload_bytes": 33071,
+      "psnr_db": 61.91485209891692,
+      "rmse": 26.284158425313603,
+      "snr_db": 52.883944294990485,
+      "theoretical_max_difference": 63,
+      "within_expected_lsb_bound": true
+    },
+    {
+      "changed_percentage": 99.13378684807256,
+      "changed_samples": 43718,
+      "lsb_depth": 7,
+      "max_absolute_difference": 127.0,
+      "mse": 2773.0484580498864,
+      "payload_bytes": 38583,
+      "psnr_db": 55.8791590349537,
+      "rmse": 52.65974229000638,
+      "snr_db": 46.84825123102727,
+      "theoretical_max_difference": 127,
+      "within_expected_lsb_bound": true
+    },
+    {
+      "changed_percentage": 99.64399092970521,
+      "changed_samples": 43943,
+      "lsb_depth": 8,
+      "max_absolute_difference": 255.0,
+      "mse": 11205.195782312925,
+      "payload_bytes": 44096,
+      "psnr_db": 49.814539131539206,
+      "rmse": 105.85459736030799,
+      "snr_db": 40.78363132761278,
+      "theoretical_max_difference": 255,
+      "within_expected_lsb_bound": true
+    }
+  ],
+  "cover": "1 second of 16-bit PCM mono at 44.1 kHz, 440 Hz tone",
+  "experiment": "audio distortion against LSB depth",
+  "occupancy": "full capacity at each depth"
+}

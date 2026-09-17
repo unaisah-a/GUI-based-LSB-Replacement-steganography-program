@@ -27,6 +27,12 @@ import pytest
 from hypothesis import HealthCheck, settings
 from hypothesis import strategies as st
 
+# Qt must run without a display for the GUI tests to work on a build machine or over
+# a remote session. Set before anything imports PySide6, because the platform plugin
+# is chosen when the first QApplication is created and cannot be changed afterwards.
+# `setdefault` so a developer can override it to watch the widgets appear.
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
 from app.stego import image_io
 from app.stego.capacity import LENGTH_HEADER_BYTES, embeddable_channel_count
 
@@ -259,3 +265,179 @@ class ScratchDirectory:
 @pytest.fixture()
 def scratch():
     return ScratchDirectory
+
+
+# --------------------------------------------------------------------------- #
+# Audio cover generation
+# --------------------------------------------------------------------------- #
+#
+# The audio layer works on 16-bit PCM WAV. These helpers mirror the image
+# helpers above: deterministic content, written into a caller-supplied temporary
+# directory, never into the repository. `samples/audio/` holds committed demo
+# media and must not be read by tests, because a test that depends on the
+# process working directory fails as soon as pytest is invoked from elsewhere.
+
+AUDIO_SAMPLE_RATE = 44_100
+AUDIO_SUBTYPE = "PCM_16"
+PCM16_PEAK = 32_767
+
+AUDIO_PATTERNS = ("tone", "noise", "silence", "extremes", "ramp")
+
+
+def make_audio(
+    frame_count: int,
+    channels: int = 1,
+    pattern: str = "tone",
+    seed: int = 0,
+) -> np.ndarray:
+    """Build a deterministic int16 sample array.
+
+    Returns shape ``(frame_count,)`` for mono and ``(frame_count, channels)``
+    otherwise, matching what ``soundfile.read(always_2d=False)`` produces.
+    """
+    rng = np.random.default_rng(seed)
+    if pattern == "tone":
+        time = np.arange(frame_count, dtype=np.float64) / AUDIO_SAMPLE_RATE
+        mono = np.rint(0.5 * PCM16_PEAK * np.sin(2 * np.pi * 440.0 * time))
+    elif pattern == "noise":
+        mono = rng.integers(-PCM16_PEAK, PCM16_PEAK + 1, frame_count)
+    elif pattern == "silence":
+        mono = np.zeros(frame_count)
+    elif pattern == "extremes":
+        # -32768 and 32767 exercise the sign boundary of int16 arithmetic, which
+        # is where a naive bit mask written for unsigned samples goes wrong.
+        mono = rng.choice(np.array([-32768, 32767]), size=frame_count)
+    elif pattern == "ramp":
+        mono = np.linspace(-PCM16_PEAK, PCM16_PEAK, frame_count)
+    else:  # pragma: no cover - guarded by the strategy
+        raise ValueError(f"unknown audio pattern {pattern!r}")
+
+    mono = np.clip(mono, -32768, 32767).astype(np.int16)
+    if channels == 1:
+        return mono
+    # Offset each channel so a channel-ordering bug cannot hide behind identical
+    # channels, while staying inside the int16 range.
+    stacked = np.stack(
+        [np.clip(mono.astype(np.int32) // (index + 1), -32768, 32767) for index in range(channels)],
+        axis=1,
+    )
+    return stacked.astype(np.int16)
+
+
+def write_audio_file(
+    directory: str,
+    samples: np.ndarray,
+    name: str = "cover",
+    sample_rate: int = AUDIO_SAMPLE_RATE,
+) -> str:
+    """Write *samples* as a 16-bit PCM WAV inside *directory* and return the path."""
+    import soundfile as sf
+
+    path = os.path.join(directory, f"{name}.wav")
+    sf.write(path, np.asarray(samples, dtype=np.int16), sample_rate, subtype=AUDIO_SUBTYPE)
+    return path
+
+
+@pytest.fixture()
+def wav_factory(tmp_path):
+    """Return a callable writing deterministic WAV covers into this test's directory."""
+
+    def _make(
+        frame_count: int = 4_096,
+        channels: int = 1,
+        pattern: str = "tone",
+        seed: int = 0,
+        name: str = "cover",
+        sample_rate: int = AUDIO_SAMPLE_RATE,
+    ) -> str:
+        samples = make_audio(frame_count, channels, pattern, seed)
+        return write_audio_file(str(tmp_path), samples, name, sample_rate)
+
+    return _make
+
+
+# --------------------------------------------------------------------------- #
+# Video cover generation
+# --------------------------------------------------------------------------- #
+#
+# Real clips, not header stubs: the video layer's correctness is entirely about
+# whether a codec preserves pixels, and a fake file cannot test that. They are
+# small on purpose — 32x24 for eight frames is 18 432 samples, enough to hold a
+# few hundred payload bytes at depth 1 and still encode in a few milliseconds.
+#
+# Frames are generated per-index so that a frame-ordering bug cannot hide behind
+# identical frames, which is the video equivalent of the per-channel offset in
+# make_audio.
+
+VIDEO_WIDTH = 32
+VIDEO_HEIGHT = 24
+VIDEO_FRAME_COUNT = 8
+VIDEO_FRAME_RATE = 10.0
+
+VIDEO_PATTERNS = ("noise", "gradient", "flat", "extremes")
+
+
+def make_video_frames(
+    frame_count: int = VIDEO_FRAME_COUNT,
+    height: int = VIDEO_HEIGHT,
+    width: int = VIDEO_WIDTH,
+    pattern: str = "noise",
+    seed: int = 0,
+) -> list[np.ndarray]:
+    """Build a deterministic list of 8-bit BGR frames."""
+    frames = []
+    for index in range(frame_count):
+        # A distinct seed per frame, so frame N's content depends on N.
+        frames.append(make_cover(height, width, 3, pattern, seed + index * 101))
+    return frames
+
+
+def write_video_file(
+    directory: str,
+    frames: list[np.ndarray],
+    name: str = "cover",
+    frame_rate: float = VIDEO_FRAME_RATE,
+) -> str:
+    """Write *frames* as a lossless FFV1 Matroska clip and return the path.
+
+    FFV1 rather than anything else because it is the only lossless codec the
+    application writes, and because a cover that is already FFV1 keeps the test
+    focused on the embedding rather than on transcoding.
+    """
+    import cv2
+
+    path = os.path.join(directory, f"{name}.mkv")
+    height, width = frames[0].shape[:2]
+    writer = cv2.VideoWriter(
+        path, cv2.VideoWriter_fourcc(*"FFV1"), float(frame_rate), (width, height)
+    )
+    if not writer.isOpened():  # pragma: no cover - environment guard
+        raise RuntimeError(
+            "the installed OpenCV build cannot write FFV1; the video tests need a "
+            "lossless encoder"
+        )
+    try:
+        for frame in frames:
+            writer.write(np.ascontiguousarray(frame, dtype=np.uint8))
+    finally:
+        writer.release()
+    return path
+
+
+@pytest.fixture()
+def video_factory(tmp_path):
+    """Return a callable writing deterministic lossless clips into this test's dir."""
+
+    def _make(
+        frame_count: int = VIDEO_FRAME_COUNT,
+        height: int = VIDEO_HEIGHT,
+        width: int = VIDEO_WIDTH,
+        pattern: str = "noise",
+        seed: int = 0,
+        name: str = "cover",
+        frame_rate: float = VIDEO_FRAME_RATE,
+    ) -> str:
+        frames = make_video_frames(frame_count, height, width, pattern, seed)
+        return write_video_file(str(tmp_path), frames, name, frame_rate)
+
+    return _make

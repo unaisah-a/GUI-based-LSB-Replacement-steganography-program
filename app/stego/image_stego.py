@@ -41,7 +41,7 @@ from typing import Final
 import numpy as np
 import numpy.typing as npt
 
-from app.stego import image_io
+from app.stego import image_io, paths
 from app.stego.bit_utils import (
     bits_to_bytes,
     bytes_to_bits,
@@ -163,51 +163,12 @@ def measure_capacity(
 # --------------------------------------------------------------------------- #
 
 
-def _assert_readable(path: str | os.PathLike[str]) -> None:
-    """Check existence then readability, without decoding.
-
-    Requirement 14.6 puts these first, ahead of the output-path check, so that a
-    missing input is reported before anything about the destination.
-    """
-    text = os.fspath(path)
-    name = safe_path(path)
-    if not os.path.exists(text):
-        raise FileError(f"input file not found: {name}")
-    if os.path.isdir(text):
-        raise FileError(f"input path is a directory, not a file: {name}")
-    try:
-        with open(text, "rb") as handle:
-            handle.read(1)
-    except PermissionError as exc:
-        raise FileError(f"read access denied for input file: {name}") from exc
-    except OSError as exc:
-        raise FileError(
-            f"input file could not be read: {name} "
-            f"({exc.strerror or type(exc).__name__})"
-        ) from exc
-
-
-def _assert_distinct_paths(
-    input_path: str | os.PathLike[str], output_path: str | os.PathLike[str]
-) -> None:
-    """Reject an output path that resolves to the input file (Requirement 2.15).
-
-    Embedding in place would destroy the cover object, and Requirement 2.12
-    requires the cover file to be left byte-for-byte unchanged.
-    """
-    source = os.fspath(input_path)
-    target = os.fspath(output_path)
-    same = os.path.realpath(source) == os.path.realpath(target)
-    if not same and os.path.exists(target):
-        try:
-            same = os.path.samefile(source, target)
-        except OSError:
-            same = False
-    if same:
-        raise ValidationError(
-            f"output path must differ from the input path, both resolve to "
-            f"{safe_path(source)}"
-        )
+# The filesystem checks are shared with the audio and video layers, so that all
+# three reject an in-place write, an occupied output path and an unreadable input
+# identically. Aliased rather than called through the module so the existing call
+# sites and their tests are unchanged.
+_assert_readable = paths.assert_readable
+_assert_distinct_paths = paths.assert_distinct_paths
 
 
 def _validate_payload(payload: object) -> bytes:
@@ -288,7 +249,7 @@ def embed_image(
     # Requirement 14.6 ordering.
     _assert_readable(input_path)
     _assert_distinct_paths(input_path, output_path)
-    image_io._check_output_writable(output_path, overwrite)
+    image_io.check_output_writable(output_path, overwrite)
     data = _validate_payload(payload)
     depth = validate_lsb_depth(lsb_count)
 

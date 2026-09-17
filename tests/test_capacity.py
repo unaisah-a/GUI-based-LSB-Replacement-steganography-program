@@ -118,6 +118,63 @@ class TestPayloadLengthAccounting:
         assert report.capacity_used_percent == 100.0
 
 
+class TestPayloadFits:
+    """``payload_fits`` must actually consider the supplied payload length.
+
+    An earlier version computed ``payload_fits = max_payload > 0``, ignoring
+    ``payload_length`` entirely, so a payload far larger than the cover was still
+    reported as fitting. Embedding was never unsafe, because
+    :func:`app.stego.image_stego.embed_image` enforces capacity itself, but a GUI
+    pre-flight check reading this field would have been wrong.
+    """
+
+    def test_payload_below_capacity_fits(self):
+        report = cap.capacity_report(800, 1, 0, payload_length=50)
+        assert report.max_payload_length == 96
+        assert report.payload_fits is True
+
+    def test_payload_exactly_at_capacity_fits(self):
+        report = cap.capacity_report(800, 1, 0, payload_length=96)
+        assert report.max_payload_length == 96
+        assert report.payload_fits is True
+
+    def test_payload_one_byte_over_capacity_does_not_fit(self):
+        report = cap.capacity_report(800, 1, 0, payload_length=97)
+        assert report.max_payload_length == 96
+        assert report.payload_fits is False
+
+    def test_grossly_oversized_payload_does_not_fit(self):
+        report = cap.capacity_report(800, 1, 0, payload_length=10_000_000)
+        assert report.payload_fits is False
+
+    def test_zero_length_payload_fits_whenever_the_header_fits(self):
+        report = cap.capacity_report(800, 1, 0, payload_length=0)
+        assert report.payload_fits is True
+
+    def test_zero_length_payload_does_not_fit_without_room_for_the_header(self):
+        report = cap.capacity_report(8, 1, 0, payload_length=0)
+        assert report.available_capacity_bytes < cap.LENGTH_HEADER_BYTES
+        assert report.payload_fits is False
+
+    def test_without_a_payload_length_the_flag_describes_the_medium(self):
+        assert cap.capacity_report(800, 1, 0).payload_fits is True
+        assert cap.capacity_report(8, 1, 0).payload_fits is False
+
+    @given(st.integers(0, 4000), st.integers(1, 8), st.integers(0, 600))
+    def test_flag_always_agrees_with_the_reported_maximum(
+        self, samples, depth, payload_length
+    ):
+        report = cap.capacity_report(samples, depth, 0, payload_length=payload_length)
+        expected = report.available_capacity_bytes >= payload_length + cap.LENGTH_HEADER_BYTES
+        assert report.payload_fits is expected
+
+    def test_start_location_reduces_what_fits(self):
+        near = cap.capacity_report(800, 1, 0, payload_length=96)
+        far = cap.capacity_report(800, 1, 400, payload_length=96)
+        assert near.payload_fits is True
+        assert far.payload_fits is False
+
+
 class TestPositionCounts:
     """Requirement 7.3 and 7.4."""
 

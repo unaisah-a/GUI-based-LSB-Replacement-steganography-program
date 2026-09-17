@@ -14,9 +14,19 @@ Scope boundaries, stated explicitly because this layer is one part of a five-mem
 The layer conforms to the shared interfaces agreed in the team planning reference:
 
 ```python
-def embed_image(input_path: str, output_path: str, payload: bytes, lsb_count: int, start_location: int): ...
-def extract_image(input_path: str, lsb_count: int, start_location: int) -> bytes: ...
+def embed_image(input_path: str, output_path: str, payload: bytes, lsb_count: int,
+                start_location: int, *, overwrite: bool = False) -> EmbedResult: ...
+def extract_image(input_path: str, lsb_count: int, start_location: int, *,
+                  manifest_payload_length: int | None = None) -> bytes: ...
 ```
+
+The agreed positional shape is unchanged: every caller written against the original
+signature still calls both functions correctly. The two keyword-only parameters are
+additive and both default to the original behaviour — `overwrite` carries the output-path
+occupancy decision of Requirement 6.6, and `manifest_payload_length` carries the optional
+cross-check of Requirement 4.7. `embed_image` returns an `EmbedResult` describing what was
+written rather than returning nothing; the original signature left the return type
+unstated.
 
 The extraction interface accepts no payload-length argument. Requirement 4 therefore records the team decision that the encoded bit stream begins with a fixed-width length header, so that the extractor can determine the payload length from the cover object alone. The remaining extraction parameters, the format version, and the recorded payload length live in the companion manifest produced by other layers, not in the encoded bit stream.
 
@@ -30,6 +40,22 @@ Alpha-channel samples are treated asymmetrically across this layer, and the asym
 - Quality comparison (Requirement 8) excludes alpha samples from the overall MSE and PSNR, to keep the headline distortion figures aligned with the samples that embedding can touch, and reports the alpha-channel MSE and PSNR as separately labelled per-channel values.
 
 This layer provides no confidentiality and no authenticity guarantee. Concealment of a payload location is not encryption, and the steganalysis indicators in Requirement 11 are heuristics, not reliable detectors.
+
+## Amendments
+
+This specification was written before implementation. Where the implemented behaviour
+was deliberately changed afterwards, the criterion is amended here rather than left to
+disagree with the code, and the change is recorded below.
+
+| Date | Criterion | Change |
+|---|---|---|
+| 2026-09-17 | Requirement 5.4 | The Payload_Fits_Flag was specified as *maximum Payload length greater than 0*. That expression ignores the supplied Payload length, so a Payload far larger than the cover was reported as fitting. The criterion now compares the required Encoded_Stream length against the available Capacity, and defines the no-Payload-length case separately. Embedding was never unsafe — Requirement 6 enforces Capacity independently — but a caller reading the flag as a pre-flight check was misled. |
+| 2026-09-17 | Introduction, interface block | The stated signatures gained two keyword-only parameters and a declared return type. The agreed positional shape is unchanged; the additions are `overwrite` (Requirement 6.6) and `manifest_payload_length` (Requirement 4.7), both defaulting to the original behaviour. |
+
+No other criterion changed. In particular, the Encoded_Stream of Requirement 4.5 is still
+the bare 4-byte Length_Header followed by the Payload, with no marker byte: the removal of
+the audio layer's `b"INF2005"` marker during integration moved that marker into the
+payload envelope above this layer and left this layer's stream exactly as specified.
 
 ## Glossary
 
@@ -46,6 +72,7 @@ This layer provides no confidentiality and no authenticity guarantee. Concealmen
 - **Capacity**: The maximum Encoded_Stream length in bytes that a given image can carry at a given LSB_Depth from a given Start_Location. Capacity therefore counts the 4 Length_Header bytes and is distinct from Max_Payload_Length.
 - **Available_Capacity**: The Capacity computed from the Embeddable_Byte positions at or after a supplied Start_Location.
 - **Max_Payload_Length**: The greater of 0 and the Available_Capacity minus the 4 Length_Header bytes. This is the largest Payload that fits, as distinct from Capacity.
+- **Payload_Fits_Flag**: The boolean the Capacity_Calculator reports alongside its measurements, answering whether the Encoded_Stream the caller asked about fits the Available_Capacity. Where the caller supplies no Payload length the question has no specific Payload to refer to and degrades to whether the Length_Header alone fits (see Requirement 5.4).
 - **Required_Position_Count**: The number of consecutive Embeddable_Byte positions an Encoded_Stream occupies at a given LSB_Depth, equal to the Encoded_Stream bit count divided by the LSB_Depth, rounded up.
 - **Successful_Embedding**: An embedding operation that raises no error and writes a complete Stego_Object.
 - **Companion_Manifest**: The record produced by other layers that carries the format version, the extraction parameters, and the recorded Payload length. This layer neither creates nor validates the Companion_Manifest, and reads a manifest Payload length only when a caller supplies it (see Requirement 4).
@@ -156,11 +183,11 @@ This layer provides no confidentiality and no authenticity guarantee. Concealmen
 1. THE Capacity_Calculator SHALL compute the total embeddable bit count as width multiplied by height multiplied by embeddable channel count multiplied by LSB_Depth, where the embeddable channel count is 1 for a grayscale image, 3 for an RGB image, and 3 for an RGBA image because alpha-channel samples are excluded from the Byte_Stream.
 2. THE Capacity_Calculator SHALL compute Capacity in bytes as the total embeddable bit count divided by 8, rounded down to the nearest integer, and SHALL define Capacity as the maximum Encoded_Stream length in bytes, that is the Length_Header bytes plus the Payload bytes.
 3. WHEN a caller supplies a Start_Location from 0 to the total Embeddable_Byte count minus 1 inclusive, THE Capacity_Calculator SHALL compute the available Capacity in bytes as the total Embeddable_Byte count minus the Start_Location, multiplied by the LSB_Depth, divided by 8, rounded down to the nearest integer; Start_Location values outside that range are handled by the validation rules of Requirement 7.
-4. THE Capacity_Calculator SHALL report the embeddable channel count, the total Embeddable_Byte count, the supplied LSB_Depth, the available Capacity in bytes, the maximum Payload length in bytes, and a payload-fits flag that is true exactly when the maximum Payload length is greater than 0.
+4. THE Capacity_Calculator SHALL report the embeddable channel count, the total Embeddable_Byte count, the supplied LSB_Depth, the available Capacity in bytes, the maximum Payload length in bytes, and a Payload_Fits_Flag computed as follows: WHERE the caller supplies a Payload length, the Payload_Fits_Flag SHALL be true exactly when the required Encoded_Stream length, being that Payload length plus the 4 Length_Header bytes, is less than or equal to the available Capacity; WHERE the caller supplies no Payload length, the Payload_Fits_Flag SHALL be true exactly when the available Capacity is greater than or equal to the 4 Length_Header bytes. The flag SHALL NOT be computed as the maximum Payload length being greater than 0, because that expression ignores the supplied Payload length and therefore reports a Payload larger than the image as fitting.
 5. FOR ALL images, FOR ALL Start_Location values, and FOR ALL LSB_Depth values n from 2 to 8, the available Capacity reported at LSB_Depth n SHALL be greater than or equal to the available Capacity reported at LSB_Depth n minus 1 for the same image and Start_Location (non-decreasing metamorphic property); the property is non-decreasing rather than strictly increasing because rounding the bit count down to whole bytes can leave the reported Capacity unchanged between adjacent depths when fewer than 8 Embeddable_Byte positions remain.
 6. THE Capacity_Calculator SHALL expose the capacity arithmetic as functions whose parameters are the total embeddable sample count as an integer, the LSB_Depth as an integer, and the Start_Location as an integer, and SHALL accept no file path, no sample array, and no media-type argument, so that the audio layer supplies its frame count multiplied by its channel count as the total embeddable sample count and reuses the same implementation.
 7. THE Capacity_Calculator SHALL compute the maximum Payload length in bytes as the greater of 0 and the available Capacity minus the 4 Length_Header bytes.
-8. IF the available Capacity is less than 4 bytes, THEN THE Capacity_Calculator SHALL report a maximum Payload length of 0, a payload-fits flag of false, and a capacity-used percentage of not applicable, and SHALL report these values without raising an error, because reporting that no Payload fits is a measurement result rather than an invalid request.
+8. IF the available Capacity is less than 4 bytes, THEN THE Capacity_Calculator SHALL report a maximum Payload length of 0, a Payload_Fits_Flag of false, and a capacity-used percentage of not applicable, and SHALL report these values without raising an error, because reporting that no Payload fits is a measurement result rather than an invalid request.
 9. WHERE the caller supplies a Payload length and the available Capacity is greater than or equal to 4 bytes, THE Capacity_Calculator SHALL report the capacity-used percentage as the required Encoded_Stream length divided by the available Capacity multiplied by 100, rounded to one decimal place and not capped at 100 percent, so that the GUI layer displays capacity use without repeating the arithmetic.
 
 ### Requirement 6: Capacity Enforcement Before Writing

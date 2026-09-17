@@ -39,6 +39,7 @@ import numpy as np
 import numpy.typing as npt
 from PIL import Image, UnidentifiedImageError
 
+from app.stego import paths
 from app.stego.errors import DecodeError, FileError, ValidationError, safe_path
 
 __all__ = [
@@ -51,6 +52,8 @@ __all__ = [
     "ImageDescriptor",
     "load_image",
     "save_image",
+    "encode_image",
+    "check_output_writable",
     "describe_only",
 ]
 
@@ -633,30 +636,18 @@ def encode_image(array: npt.NDArray[np.uint8], container_format: str) -> bytes:
     )
 
 
-def _check_output_writable(path: str | os.PathLike[str], overwrite: bool) -> None:
+def check_output_writable(path: str | os.PathLike[str], overwrite: bool) -> None:
     """Validate the output location before any sample is modified.
 
     Requirement 14.5 (directory must exist and be writable) and Requirement 6.6
     (an occupied output path is an error unless overwrite is enabled).
-    """
-    text = os.fspath(path)
-    name = safe_path(path)
-    directory = os.path.dirname(os.path.abspath(text))
 
-    if not os.path.isdir(directory):
-        raise FileError(
-            f"output directory does not exist for {name}"
-        )
-    if not os.access(directory, os.W_OK):
-        raise FileError(
-            f"output directory is not writable for {name}"
-        )
-    if os.path.isdir(text):
-        raise FileError(f"output path is a directory, not a file: {name}")
-    if os.path.exists(text) and not overwrite:
-        raise FileError(
-            f"output path is already occupied: {name}; pass overwrite=True to replace it"
-        )
+    Kept as a name in this module because :func:`save_image` and
+    :func:`app.stego.image_stego.embed_image` both call it, but the implementation
+    now lives in :mod:`app.stego.paths` so that the audio and video layers apply
+    exactly the same checks.
+    """
+    paths.check_output_writable(path, overwrite)
 
 
 def save_image(
@@ -681,7 +672,7 @@ def save_image(
     spaced at least 100 ms apart before giving up. The temporary file is removed
     on every failure path (Requirement 6.7).
     """
-    _check_output_writable(path, overwrite)
+    check_output_writable(path, overwrite)
     payload = encode_image(array, container_format)
 
     text = os.fspath(path)

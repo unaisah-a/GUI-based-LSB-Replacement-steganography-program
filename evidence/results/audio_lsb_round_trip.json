@@ -1,0 +1,97 @@
+{
+  "cases": [
+    {
+      "cover_frames": 44100,
+      "distortion_bound": 1,
+      "lsb_depth": 1,
+      "max_sample_change": 1,
+      "passed": true,
+      "payload_length": 22,
+      "payload_recovered": true,
+      "samples_written": 208,
+      "start_location": 100
+    },
+    {
+      "cover_frames": 44100,
+      "distortion_bound": 3,
+      "lsb_depth": 2,
+      "max_sample_change": 3,
+      "passed": true,
+      "payload_length": 22,
+      "payload_recovered": true,
+      "samples_written": 104,
+      "start_location": 100
+    },
+    {
+      "cover_frames": 44100,
+      "distortion_bound": 7,
+      "lsb_depth": 3,
+      "max_sample_change": 7,
+      "passed": true,
+      "payload_length": 22,
+      "payload_recovered": true,
+      "samples_written": 70,
+      "start_location": 100
+    },
+    {
+      "cover_frames": 44100,
+      "distortion_bound": 15,
+      "lsb_depth": 4,
+      "max_sample_change": 15,
+      "passed": true,
+      "payload_length": 22,
+      "payload_recovered": true,
+      "samples_written": 52,
+      "start_location": 100
+    },
+    {
+      "cover_frames": 44100,
+      "distortion_bound": 31,
+      "lsb_depth": 5,
+      "max_sample_change": 31,
+      "passed": true,
+      "payload_length": 22,
+      "payload_recovered": true,
+      "samples_written": 42,
+      "start_location": 100
+    },
+    {
+      "cover_frames": 44100,
+      "distortion_bound": 63,
+      "lsb_depth": 6,
+      "max_sample_change": 58,
+      "passed": true,
+      "payload_length": 22,
+      "payload_recovered": true,
+      "samples_written": 35,
+      "start_location": 100
+    },
+    {
+      "cover_frames": 44100,
+      "distortion_bound": 127,
+      "lsb_depth": 7,
+      "max_sample_change": 112,
+      "passed": true,
+      "payload_length": 22,
+      "payload_recovered": true,
+      "samples_written": 30,
+      "start_location": 100
+    },
+    {
+      "cover_frames": 44100,
+      "distortion_bound": 255,
+      "lsb_depth": 8,
+      "max_sample_change": 199,
+      "passed": true,
+      "payload_length": 22,
+      "payload_recovered": true,
+      "samples_written": 26,
+      "start_location": 100
+    }
+  ],
+  "cover_format": "WAV PCM_16",
+  "encoded_stream": "4-byte big-endian payload length, then the payload",
+  "experiment": "audio LSB round trip at every selectable depth",
+  "passed": 8,
+  "total": 8
+}
