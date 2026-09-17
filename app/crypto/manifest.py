@@ -9,13 +9,52 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from app.crypto.payload import (
+    FORMAT_VERSION,
+    MAX_ENVELOPE_BYTES,
+    MIN_ENVELOPE_BYTES,
+)
+
 
 MANIFEST_VERSION = 1
-PAYLOAD_FORMAT_VERSION = 1
+PAYLOAD_FORMAT_VERSION = FORMAT_VERSION
+MAX_MANIFEST_BYTES = 1_048_576
+MAX_MEDIA_ID_BYTES = 1_024
+MAX_NONCE_BYTES = 256
+MAX_CARRIER_PAYLOAD_BYTES = MAX_ENVELOPE_BYTES * 3
 
 
 class ManifestError(ValueError):
     """A manifest is missing, malformed, or contains unsafe values."""
+
+
+def _require_int(value: object, field: str, *, minimum: int, maximum: int) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise ManifestError(f"{field} must be an integer")
+    if not minimum <= value <= maximum:
+        raise ManifestError(f"{field} is outside the supported range")
+    return value
+
+
+def _require_text(value: object, field: str, *, maximum_bytes: int) -> str:
+    if not isinstance(value, str) or not value:
+        raise ManifestError(f"{field} must be non-empty text")
+    try:
+        encoded = value.encode("utf-8")
+    except UnicodeEncodeError as exc:
+        raise ManifestError(f"{field} is not valid Unicode text") from exc
+    if len(encoded) > maximum_bytes:
+        raise ManifestError(f"{field} exceeds the supported size")
+    return value
+
+
+def _reject_duplicate_pairs(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    for key, item in pairs:
+        if key in value:
+            raise ManifestError(f"manifest contains duplicate field {key!r}")
+        value[key] = item
+    return value
 
 
 @dataclass(frozen=True)
@@ -34,21 +73,45 @@ class Manifest:
     payload_format: int = PAYLOAD_FORMAT_VERSION
 
     def validate(self) -> "Manifest":
+        _require_int(
+            self.manifest_version,
+            "manifest_version",
+            minimum=0,
+            maximum=(1 << 31) - 1,
+        )
         if self.manifest_version != MANIFEST_VERSION:
             raise ManifestError(
                 f"manifest version {self.manifest_version} is unsupported"
             )
+        _require_int(
+            self.payload_format,
+            "payload_format",
+            minimum=0,
+            maximum=(1 << 31) - 1,
+        )
         if self.payload_format != PAYLOAD_FORMAT_VERSION:
             raise ManifestError(
                 f"payload format {self.payload_format} is unsupported"
             )
-        if self.media_type not in {"image", "audio", "video"}:
+        if not isinstance(self.media_type, str) or self.media_type not in {
+            "image",
+            "audio",
+            "video",
+        }:
             raise ManifestError("media_type must be image, audio, or video")
-        if not self.media_id or not self.nonce:
-            raise ManifestError("media_id and nonce must not be empty")
-        if isinstance(self.lsb_count, bool) or not 1 <= self.lsb_count <= 8:
-            raise ManifestError("lsb_count must be an integer from 1 to 8")
-        if self.start_method not in {"manual", "hmac-sha256"}:
+        _require_text(
+            self.media_id, "media_id", maximum_bytes=MAX_MEDIA_ID_BYTES
+        )
+        nonce = _require_text(self.nonce, "nonce", maximum_bytes=MAX_NONCE_BYTES)
+        try:
+            nonce.encode("ascii")
+        except UnicodeEncodeError as exc:
+            raise ManifestError("nonce must contain ASCII text") from exc
+        _require_int(self.lsb_count, "lsb_count", minimum=1, maximum=8)
+        if not isinstance(self.start_method, str) or self.start_method not in {
+            "manual",
+            "hmac-sha256",
+        }:
             raise ManifestError("start_method must be manual or hmac-sha256")
         if self.start_method == "manual":
             if (
@@ -63,20 +126,19 @@ class Manifest:
             raise ManifestError(
                 "a derived start location must not be disclosed in the manifest"
             )
-        if (
-            isinstance(self.payload_length, bool)
-            or not isinstance(self.payload_length, int)
-            or self.payload_length <= 0
-            or self.payload_length > 64 * 1024 * 1024
-        ):
-            raise ManifestError("payload_length is outside the supported range")
-        if self.carrier_payload_length is not None and (
-            isinstance(self.carrier_payload_length, bool)
-            or not isinstance(self.carrier_payload_length, int)
-            or self.carrier_payload_length <= 0
-            or self.carrier_payload_length > 192 * 1024 * 1024
-        ):
-            raise ManifestError("carrier_payload_length is outside the supported range")
+        _require_int(
+            self.payload_length,
+            "payload_length",
+            minimum=MIN_ENVELOPE_BYTES,
+            maximum=MAX_ENVELOPE_BYTES,
+        )
+        if self.carrier_payload_length is not None:
+            _require_int(
+                self.carrier_payload_length,
+                "carrier_payload_length",
+                minimum=1,
+                maximum=MAX_CARRIER_PAYLOAD_BYTES,
+            )
         fingerprint = self.public_key_fingerprint
         if (
             not isinstance(fingerprint, str)
@@ -84,7 +146,10 @@ class Manifest:
             or any(character not in "0123456789abcdef" for character in fingerprint)
         ):
             raise ManifestError("public_key_fingerprint must be 64 lower-case hex digits")
-        if self.robustness not in {"none", "repetition-3"}:
+        if not isinstance(self.robustness, str) or self.robustness not in {
+            "none",
+            "repetition-3",
+        }:
             raise ManifestError("robustness mode is unsupported")
         if self.robustness == "none" and self.carrier_payload_length not in {
             None,
@@ -125,6 +190,8 @@ class Manifest:
     def from_dict(cls, value: dict[str, Any]) -> "Manifest":
         if not isinstance(value, dict):
             raise ManifestError("manifest root must be a JSON object")
+        if any(not isinstance(key, str) for key in value):
+            raise ManifestError("manifest field names must be text")
         allowed = {
             "manifest_version",
             "payload_format",
@@ -139,6 +206,12 @@ class Manifest:
             "public_key_fingerprint",
             "robustness",
         }
+        required = allowed - {"start_location", "carrier_payload_length"}
+        missing = required - set(value)
+        if missing:
+            raise ManifestError(
+                "manifest is missing required fields: " + ", ".join(sorted(missing))
+            )
         unknown = set(value) - allowed
         if unknown:
             raise ManifestError(
@@ -174,13 +247,20 @@ def save_manifest(manifest: Manifest, path: str | os.PathLike[str]) -> None:
 
 def load_manifest(path: str | os.PathLike[str]) -> Manifest:
     try:
-        raw = Path(path).read_bytes()
-    except OSError as exc:
+        with Path(path).open("rb") as stream:
+            raw = stream.read(MAX_MANIFEST_BYTES + 1)
+    except (OSError, TypeError, ValueError) as exc:
         raise ManifestError("manifest file could not be read") from exc
-    if len(raw) > 1_048_576:
+    if len(raw) > MAX_MANIFEST_BYTES:
         raise ManifestError("manifest exceeds the 1 MiB safety limit")
     try:
-        value = json.loads(raw.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        value = json.loads(
+            raw.decode("utf-8"),
+            object_pairs_hook=_reject_duplicate_pairs,
+            parse_constant=lambda value: (_ for _ in ()).throw(
+                ManifestError(f"manifest contains invalid JSON constant {value}")
+            ),
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as exc:
         raise ManifestError("manifest is not valid UTF-8 JSON") from exc
     return Manifest.from_dict(value)

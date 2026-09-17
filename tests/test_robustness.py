@@ -46,6 +46,31 @@ def test_recovery_sidecar_rejects_different_protected_file(tmp_path):
         restore_original(protected, sidecar, tmp_path / "restored.bin", key)
 
 
+def test_recovery_helpers_require_explicit_overwrite_and_reject_collisions(tmp_path):
+    original = tmp_path / "original.bin"
+    protected = tmp_path / "protected.bin"
+    sidecar = tmp_path / "recovery.smir"
+    restored = tmp_path / "restored.bin"
+    original.write_bytes(b"original")
+    protected.write_bytes(b"protected")
+    sidecar.write_bytes(b"existing")
+    restored.write_bytes(b"existing restored")
+    key = generate_encryption_key()
+
+    with pytest.raises(FileExistsError):
+        create_recovery_sidecar(original, protected, sidecar, key)
+    create_recovery_sidecar(original, protected, sidecar, key, overwrite=True)
+    with pytest.raises(FileExistsError):
+        restore_original(protected, sidecar, restored, key)
+    restore_original(protected, sidecar, restored, key, overwrite=True)
+    assert restored.read_bytes() == original.read_bytes()
+
+    with pytest.raises(ValueError, match="differ"):
+        create_recovery_sidecar(original, protected, original, key, overwrite=True)
+    with pytest.raises(ValueError, match="differ"):
+        restore_original(protected, sidecar, sidecar, key, overwrite=True)
+
+
 def test_png_ancillary_padding_reaches_exact_size_without_pixel_change(tmp_path):
     source = tmp_path / "image.png"
     padded = tmp_path / "padded.png"
@@ -59,3 +84,16 @@ def test_png_ancillary_padding_reaches_exact_size_without_pixel_change(tmp_path)
     assert result.exact
     assert padded.stat().st_size == target
     assert np.array_equal(decoded, array)
+
+
+def test_png_padding_requires_explicit_overwrite(tmp_path):
+    source = tmp_path / "image.png"
+    output = tmp_path / "padded.png"
+    array = np.arange(16 * 16 * 3, dtype=np.uint8).reshape(16, 16, 3)
+    image_io.save_image(array, source, image_io.PNG)
+    output.write_bytes(b"existing")
+
+    with pytest.raises(FileExistsError):
+        pad_png_to_size(source, source.stat().st_size + 100, output)
+    pad_png_to_size(source, source.stat().st_size + 100, output, overwrite=True)
+    assert output.stat().st_size == source.stat().st_size + 100

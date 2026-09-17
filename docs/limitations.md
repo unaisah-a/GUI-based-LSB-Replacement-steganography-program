@@ -12,3 +12,16 @@
   to payload encryption.
 - Basic LSB embedding is fragile against operations such as
   resampling, compression and deliberate sample modification.
+
+## Payload confidentiality boundary
+
+- AES-256-GCM encrypts the stored message, but the signed record contains the
+  SHA-256 hash of the recovered plaintext. That visible hash can confirm guesses
+  of short or predictable messages. Encryption therefore protects the message
+  bytes but does not make low-entropy message content resistant to offline
+  guessing. Use messages with sufficient entropy or include unpredictable
+  context when that threat matters.
+- Envelope version 1 binds interpretation by requiring the unauthenticated
+  encryption header flag to agree with the signed encryption metadata. Invalid,
+  missing, duplicate, non-canonical or wrongly typed controlling fields are
+  rejected before the application acts on them.

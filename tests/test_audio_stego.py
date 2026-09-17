@@ -98,3 +98,31 @@ def test_audio_lsb_round_trip(tmp_path, lsb_count):
     # ----------------------------------------
 
     assert extracted_payload == payload
+
+
+def test_audio_extraction_cross_checks_manifest_payload_length(tmp_path):
+    original_path = tmp_path / "original.wav"
+    stego_path = tmp_path / "stego.wav"
+    create_test_wav(original_path)
+    payload = b"manifest-bounded audio payload"
+    embed_audio_lsb(
+        input_path=original_path,
+        output_path=stego_path,
+        payload=payload,
+        lsb_count=3,
+        start_location=100,
+    )
+
+    assert extract_audio_lsb(
+        input_path=stego_path,
+        lsb_count=3,
+        start_location=100,
+        manifest_payload_length=len(payload),
+    ) == payload
+    with pytest.raises(ValueError, match="manifest payload length"):
+        extract_audio_lsb(
+            input_path=stego_path,
+            lsb_count=3,
+            start_location=100,
+            manifest_payload_length=len(payload) + 1,
+        )

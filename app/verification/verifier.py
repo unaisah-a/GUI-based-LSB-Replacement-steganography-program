@@ -5,10 +5,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from cryptography.exceptions import InvalidTag
+from cryptography.hazmat.primitives.asymmetric import rsa
 
 from app.crypto.key_manager import public_key_fingerprint
 from app.crypto.manifest import Manifest, ManifestError, load_manifest
 from app.crypto.payload import (
+    MAX_SIGNATURE_BYTES,
     PayloadFormatError,
     message_hash_is_valid,
     parse_envelope,
@@ -70,6 +72,7 @@ def _extract(media_path: str | Path, manifest: Manifest, start: int) -> bytes:
             str(media_path),
             lsb_count=manifest.lsb_count,
             start_location=start,
+            manifest_payload_length=manifest.embedded_payload_length,
         )
     raise ValueError("video verification is not implemented yet")
 
@@ -119,6 +122,23 @@ def verify_media(
         result.add("Manifest", False, str(exc))
         return result.result(Verdict.CANNOT_VERIFY, "The manifest could not be validated.")
     result.add("Manifest", True, "The companion manifest is well formed.")
+
+    if not isinstance(public_key, rsa.RSAPublicKey):
+        result.add("Trusted key", False, "The supplied key is not an RSA public key.")
+        return result.result(
+            Verdict.CANNOT_VERIFY,
+            "A supported RSA public key is required for verification.",
+        )
+    if (
+        public_key.key_size < 2048
+        or (public_key.key_size + 7) // 8 > MAX_SIGNATURE_BYTES
+    ):
+        result.add("Trusted key", False, "The RSA public-key size is unsupported.")
+        return result.result(
+            Verdict.CANNOT_VERIFY,
+            "The trusted public key is outside the supported size range.",
+        )
+    result.add("Trusted key", True, f"Loaded a {public_key.key_size}-bit RSA public key.")
 
     try:
         start, _carrier = resolve_start_location(media_path, manifest, start_secret)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 from PySide6.QtWidgets import (
@@ -31,9 +32,11 @@ from app.crypto.key_manager import (
 )
 from app.gui.widgets import DropZone, FileInfoPanel, MediaPreview
 from app.services.media import inspect_carrier
-from app.services.protection import ProtectionOptions, protect_media
-from app.services.size_preservation import compare_file_sizes, pad_png_to_size
-from app.robustness.recovery import create_recovery_sidecar
+from app.services.protection import (
+    ProtectionOptions,
+    estimate_protection_capacity,
+    protect_media,
+)
 
 
 class ProtectTab(QWidget):
@@ -146,6 +149,14 @@ class ProtectTab(QWidget):
         )
         self.lsb_count.valueChanged.connect(self._update_capacity)
         self.message.textChanged.connect(self._update_capacity)
+        self.private_key_path.textChanged.connect(self._update_capacity)
+        self.key_password.textChanged.connect(self._update_capacity)
+        self.media_id.textChanged.connect(self._update_capacity)
+        self.robustness.currentIndexChanged.connect(self._update_capacity)
+        self.start_method.currentIndexChanged.connect(self._update_capacity)
+        self.start_value.textChanged.connect(self._update_capacity)
+        self.encrypt.toggled.connect(self._update_capacity)
+        self.encryption_key.textChanged.connect(self._update_capacity)
 
     @staticmethod
     def _add_picker(layout, row, label, editor, callback):
@@ -244,20 +255,59 @@ class ProtectTab(QWidget):
             else "Separate start-location secret"
         )
 
+    def _payload_options(self) -> ProtectionOptions:
+        method = self.start_method.currentData()
+        if method == "manual":
+            start_location = int(self.start_value.text())
+            start_secret = None
+        else:
+            start_location = None
+            start_secret = self.start_value.text()
+        encryption_key = (
+            decode_key(self.encryption_key.text().strip())
+            if self.encrypt.isChecked()
+            else None
+        )
+        return ProtectionOptions(
+            media_id=self.media_id.text().strip(),
+            lsb_count=self.lsb_count.value(),
+            start_method=method,
+            start_secret=start_secret,
+            start_location=start_location,
+            encryption_key=encryption_key,
+            robustness=self.robustness.currentData(),
+            metadata={"application": "INF2005 ACW1"},
+        )
+
     def _update_capacity(self):
         path = self.input_path.text().strip()
         if not path or not Path(path).is_file():
+            self.capacity.setText("Select a cover object to estimate capacity.")
             return
         try:
-            carrier = inspect_carrier(path)
-            raw_capacity = (
-                carrier.total_samples * self.lsb_count.value() // 8
-                - carrier.carrier_header_bytes
+            key_path = self.private_key_path.text().strip()
+            if not key_path:
+                self.capacity.setText(
+                    "Choose a private signing key for an exact signed-envelope estimate."
+                )
+                return
+            private_key = load_private_key_from_pem(
+                key_path, self.key_password.text() or None
             )
-            message_bytes = len(self.message.toPlainText().encode("utf-8"))
+            estimate = estimate_protection_capacity(
+                path,
+                self.message.toPlainText().encode("utf-8"),
+                private_key,
+                self._payload_options(),
+            )
+            carrier = estimate.carrier
+            outcome = "fits" if estimate.fits else "does not fit"
             self.capacity.setText(
-                f"Carrier maximum before signed-envelope overhead: "
-                f"{max(0, raw_capacity):,} bytes. Message: {message_bytes:,} bytes."
+                f"Exact signed envelope: {estimate.envelope_length:,} bytes; stored "
+                f"payload: {estimate.embedded_payload_length:,} bytes; carrier framing: "
+                f"{carrier.carrier_header_bytes} bytes. Requires "
+                f"{carrier.required_samples:,} of {carrier.available_samples:,} available "
+                f"samples from index {carrier.start_location:,}: {outcome}."
             )
         except Exception as exc:
             self.capacity.setText(str(exc))
@@ -268,16 +318,10 @@ class ProtectTab(QWidget):
                 self.private_key_path.text().strip(),
                 self.key_password.text() or None,
             )
-            method = self.start_method.currentData()
-            if method == "manual":
-                start_location = int(self.start_value.text())
-                start_secret = None
-            else:
-                start_location = None
-                start_secret = self.start_value.text()
-            encryption_key = (
-                decode_key(self.encryption_key.text().strip())
-                if self.encrypt.isChecked()
+            options = self._payload_options()
+            recovery_key = (
+                decode_key(self.recovery_key.text().strip())
+                if self.create_recovery.isChecked()
                 else None
             )
             result = protect_media(
@@ -286,49 +330,26 @@ class ProtectTab(QWidget):
                 self.manifest_path.text().strip(),
                 self.message.toPlainText().encode("utf-8"),
                 private_key,
-                ProtectionOptions(
-                    media_id=self.media_id.text().strip(),
-                    lsb_count=self.lsb_count.value(),
-                    start_method=method,
-                    start_secret=start_secret,
-                    start_location=start_location,
-                    encryption_key=encryption_key,
-                    robustness=self.robustness.currentData(),
-                    metadata={"application": "INF2005 ACW1"},
+                replace(
+                    options,
+                    preserve_size=self.preserve_size.isChecked(),
+                    recovery_key=recovery_key,
                 ),
             )
         except Exception as exc:
             QMessageBox.critical(self, "Protection failed", str(exc))
             self.status.setText(f"Protection failed: {exc}")
             return
-        self.output_preview.set_file(result.output_path)
         notes = []
-        if self.preserve_size.isChecked():
-            original_size = Path(self.input_path.text().strip()).stat().st_size
-            output = Path(result.output_path)
-            if output.suffix.lower() == ".png":
-                try:
-                    size_result = pad_png_to_size(output, original_size)
-                    notes.append(f"size preservation: {size_result.method}")
-                except ValueError as exc:
-                    notes.append(f"exact PNG size unavailable: {exc}")
-            else:
-                size_result = compare_file_sizes(self.input_path.text(), output)
-                notes.append(
-                    "file size preserved" if size_result.exact else "file size differs"
-                )
-        if self.create_recovery.isChecked():
-            recovery_path = f"{result.output_path}.recovery.smir"
-            create_recovery_sidecar(
-                self.input_path.text().strip(),
-                result.output_path,
-                recovery_path,
-                decode_key(self.recovery_key.text().strip()),
-            )
-            notes.append(f"recovery sidecar: {Path(recovery_path).name}")
+        if result.size_preservation is not None:
+            notes.append(f"size preservation: {result.size_preservation.method}")
+        if result.recovery is not None:
+            notes.append(f"recovery sidecar: {Path(result.recovery.output_path).name}")
+        self.output_preview.set_file(result.output_path)
         suffix = " " + "; ".join(notes) + "." if notes else ""
         self.status.setText(
-            f"Protected {result.media_type} created. Embedded {result.payload_length:,} "
+            f"Protected {result.media_type} created. Embedded "
+            f"{result.embedded_payload_length:,} "
             f"bytes from sample {result.start_location:,}. Manifest saved beside it."
             f"{suffix}"
         )

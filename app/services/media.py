@@ -8,7 +8,25 @@ from pathlib import Path
 from app.stego import image_io
 from app.stego.audio_stego import HEADER_BYTES as AUDIO_HEADER_BYTES
 from app.stego.audio_stego import audio_to_samples, read_audio
+from app.stego.bit_utils import validate_lsb_depth
 from app.stego.capacity import LENGTH_HEADER_BYTES, required_position_count
+
+
+@dataclass(frozen=True)
+class CarrierCapacity:
+    """Exact carrier cost for one already-encoded payload."""
+
+    total_samples: int
+    lsb_count: int
+    start_location: int
+    carrier_header_bytes: int
+    payload_length: int
+    encoded_length: int
+    required_samples: int
+    available_samples: int
+    highest_valid_start_location: int
+    max_payload_length: int
+    fits: bool
 from app.stego.image_stego import embeddable_stream
 
 
@@ -22,6 +40,37 @@ class CarrierInfo:
     def required_samples(self, payload_length: int, lsb_count: int) -> int:
         return required_position_count(
             payload_length + self.carrier_header_bytes, lsb_count
+        )
+
+    def capacity(
+        self, payload_length: int, lsb_count: int, start_location: int = 0
+    ) -> CarrierCapacity:
+        """Return the single capacity contract used by services and the GUI."""
+        if isinstance(payload_length, bool) or not isinstance(payload_length, int):
+            raise TypeError("payload_length must be a non-negative integer")
+        if payload_length < 0:
+            raise ValueError("payload_length must be a non-negative integer")
+        if isinstance(start_location, bool) or not isinstance(start_location, int):
+            raise TypeError("start_location must be a non-negative integer")
+        if start_location < 0:
+            raise ValueError("start_location must be a non-negative integer")
+        depth = validate_lsb_depth(lsb_count)
+        encoded_length = payload_length + self.carrier_header_bytes
+        required = required_position_count(encoded_length, depth)
+        available = max(0, self.total_samples - start_location)
+        byte_capacity = (available * depth) // 8
+        return CarrierCapacity(
+            total_samples=self.total_samples,
+            lsb_count=depth,
+            start_location=start_location,
+            carrier_header_bytes=self.carrier_header_bytes,
+            payload_length=payload_length,
+            encoded_length=encoded_length,
+            required_samples=required,
+            available_samples=available,
+            highest_valid_start_location=self.total_samples - required,
+            max_payload_length=max(0, byte_capacity - self.carrier_header_bytes),
+            fits=required <= available,
         )
 
 

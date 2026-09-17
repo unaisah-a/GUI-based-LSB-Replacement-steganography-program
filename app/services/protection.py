@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import os
+import tempfile
+from dataclasses import dataclass, field, is_dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -10,8 +12,18 @@ from app.crypto.key_manager import public_key_fingerprint
 from app.crypto.manifest import Manifest, save_manifest
 from app.crypto.payload import BuiltEnvelope, build_envelope
 from app.crypto.start_location import derive_start_location
-from app.services.media import CarrierInfo, inspect_carrier
+from app.robustness.recovery import (
+    MAX_ORIGINAL_BYTES,
+    RecoveryResult,
+    create_recovery_sidecar,
+)
 from app.robustness.redundancy import encode_repetition3
+from app.services.media import CarrierCapacity, CarrierInfo, inspect_carrier
+from app.services.size_preservation import (
+    SizePreservationResult,
+    compare_file_sizes,
+    pad_png_to_size,
+)
 from app.stego.audio_stego import embed_audio_lsb
 from app.stego.image_stego import embed_image
 
@@ -27,6 +39,9 @@ class ProtectionOptions:
     metadata: dict[str, Any] = field(default_factory=dict)
     encryption_key: bytes | None = None
     robustness: str = "none"
+    preserve_size: bool = False
+    recovery_key: bytes | None = None
+    recovery_path: str | Path | None = None
     overwrite: bool = False
 
 
@@ -44,29 +59,202 @@ class ProtectionResult:
     encrypted: bool
     carrier_result: object
     record: dict[str, Any]
+    size_preservation: SizePreservationResult | None = None
+    recovery: RecoveryResult | None = None
+
+
+@dataclass(frozen=True)
+class ProtectionCapacity:
+    """Exact signed-envelope and carrier cost for one protection request."""
+
+    media_type: str
+    envelope_length: int
+    embedded_payload_length: int
+    encrypted: bool
+    robustness: str
+    carrier: CarrierCapacity
+
+    @property
+    def fits(self) -> bool:
+        return self.carrier.fits
+
+    @property
+    def start_location(self) -> int:
+        return self.carrier.start_location
+
+    @property
+    def required_samples(self) -> int:
+        return self.carrier.required_samples
+
+
+@dataclass(frozen=True)
+class _PreparedProtection:
+    carrier: CarrierInfo
+    envelope: BuiltEnvelope
+    carrier_payload: bytes
+    capacity: ProtectionCapacity
+
+
+class PublicationError(RuntimeError):
+    """A complete protected-media bundle could not be published safely."""
 
 
 def _validate_paths(
     input_path: str | Path,
     output_path: str | Path,
     manifest_path: str | Path,
-    overwrite: bool,
-) -> tuple[Path, Path, Path]:
+    options: ProtectionOptions,
+) -> tuple[Path, Path, Path, Path | None]:
+    if not isinstance(options.overwrite, bool):
+        raise TypeError("overwrite must be a boolean")
+    if not isinstance(options.preserve_size, bool):
+        raise TypeError("preserve_size must be a boolean")
     source = Path(input_path).resolve()
     output = Path(output_path).resolve()
     manifest = Path(manifest_path).resolve()
-    if source == output or source == manifest or output == manifest:
-        raise ValueError("input, output, and manifest paths must be different")
     if not source.is_file():
         raise FileNotFoundError(f"cover object not found: {source.name}")
-    for destination in (output, manifest):
+    if options.recovery_path is not None and options.recovery_key is None:
+        raise ValueError("recovery_path requires a recovery_key")
+    if options.recovery_key is not None:
+        if not isinstance(options.recovery_key, bytes) or len(options.recovery_key) != 32:
+            raise ValueError("recovery key must contain exactly 32 bytes")
+        if source.stat().st_size > MAX_ORIGINAL_BYTES:
+            raise ValueError(
+                f"{source.name} exceeds the {MAX_ORIGINAL_BYTES:,}-byte recovery limit"
+            )
+        recovery = Path(
+            options.recovery_path
+            if options.recovery_path is not None
+            else f"{output}.recovery.smir"
+        ).resolve()
+    else:
+        recovery = None
+
+    named_paths: list[tuple[str, Path]] = [
+        ("input", source),
+        ("protected output", output),
+        ("manifest", manifest),
+    ]
+    if recovery is not None:
+        named_paths.append(("recovery sidecar", recovery))
+    for index, (first_name, first) in enumerate(named_paths):
+        for second_name, second in named_paths[index + 1 :]:
+            if _paths_alias(first, second):
+                raise ValueError(f"{first_name} and {second_name} paths must be different")
+
+    for destination in (output, manifest, recovery):
+        if destination is None:
+            continue
         if not destination.parent.is_dir():
             raise FileNotFoundError(
                 f"output directory does not exist: {destination.parent.name}"
             )
-        if destination.exists() and not overwrite:
+        if destination.is_dir():
+            raise IsADirectoryError(f"output path is a directory: {destination.name}")
+        if not os.access(destination.parent, os.W_OK):
+            raise PermissionError(
+                f"output directory is not writable: {destination.parent.name}"
+            )
+        if destination.exists() and not options.overwrite:
             raise FileExistsError(f"output already exists: {destination.name}")
-    return source, output, manifest
+    return source, output, manifest, recovery
+
+
+def _paths_alias(first: Path, second: Path) -> bool:
+    if first == second:
+        return True
+    if first.exists() and second.exists():
+        try:
+            return os.path.samefile(first, second)
+        except OSError:
+            return False
+    return False
+
+
+def _staging_path(destination: Path) -> Path:
+    descriptor, name = tempfile.mkstemp(
+        prefix=f".{destination.name}.stage-",
+        suffix=destination.suffix,
+        dir=str(destination.parent),
+    )
+    os.close(descriptor)
+    os.unlink(name)
+    return Path(name)
+
+
+def _backup_path(destination: Path) -> Path:
+    descriptor, name = tempfile.mkstemp(
+        prefix=f".{destination.name}.backup-", dir=str(destination.parent)
+    )
+    os.close(descriptor)
+    os.unlink(name)
+    return Path(name)
+
+
+def _replace_path(source: Path, destination: Path) -> None:
+    os.replace(source, destination)
+
+
+def _remove_path(path: Path) -> None:
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def _publish_bundle(staged: dict[Path, Path], overwrite: bool) -> None:
+    backups: dict[Path, Path] = {}
+    published: list[Path] = []
+    try:
+        for destination in staged:
+            if destination.exists():
+                if not overwrite:
+                    raise FileExistsError(
+                        f"output appeared during processing: {destination.name}"
+                    )
+                backup = _backup_path(destination)
+                _replace_path(destination, backup)
+                backups[destination] = backup
+        for destination, temporary in staged.items():
+            _replace_path(temporary, destination)
+            published.append(destination)
+    except Exception as exc:
+        rollback_errors: list[str] = []
+        for destination in reversed(published):
+            try:
+                _remove_path(destination)
+            except OSError as rollback_exc:
+                rollback_errors.append(str(rollback_exc))
+        for destination, backup in reversed(tuple(backups.items())):
+            try:
+                if destination.exists():
+                    _remove_path(destination)
+                _replace_path(backup, destination)
+            except OSError as rollback_exc:
+                rollback_errors.append(str(rollback_exc))
+        if rollback_errors:
+            raise PublicationError(
+                "bundle publication failed and rollback was incomplete: "
+                + "; ".join(rollback_errors)
+            ) from exc
+        raise PublicationError("bundle publication failed; previous files were restored") from exc
+    else:
+        for backup in backups.values():
+            _remove_path(backup)
+    finally:
+        for temporary in staged.values():
+            _remove_path(temporary)
+
+
+def _carrier_result_at(carrier_result: object, output: Path) -> object:
+    if is_dataclass(carrier_result) and hasattr(carrier_result, "output_path"):
+        return replace(carrier_result, output_path=str(output))
+    if isinstance(carrier_result, dict):
+        result = dict(carrier_result)
+        result["output_path"] = str(output)
+        return result
+    return carrier_result
 
 
 def _make_envelope(
@@ -90,18 +278,13 @@ def _make_envelope(
     )
 
 
-def _resolve_start(
+def _assess_capacity(
     carrier: CarrierInfo,
     envelope: BuiltEnvelope,
     carrier_payload_length: int,
     options: ProtectionOptions,
-) -> tuple[int, int]:
-    required = carrier.required_samples(carrier_payload_length, options.lsb_count)
-    if required > carrier.total_samples:
-        raise ValueError(
-            f"protected payload needs {required} samples but the cover has "
-            f"{carrier.total_samples}; reduce the payload or LSB depth overhead"
-        )
+) -> ProtectionCapacity:
+    at_zero = carrier.capacity(carrier_payload_length, options.lsb_count)
     if options.start_method == "manual":
         if options.start_location is None:
             raise ValueError("manual start mode requires start_location")
@@ -109,23 +292,68 @@ def _resolve_start(
     elif options.start_method == "hmac-sha256":
         if options.start_secret is None:
             raise ValueError("derived start mode requires a start-location secret")
-        record = envelope.record
-        start = derive_start_location(
-            options.start_secret,
-            total_samples=carrier.total_samples,
-            required_samples=required,
-            media_type=carrier.media_type,
-            media_id=options.media_id,
-            nonce=str(record["nonce"]),
-            lsb_count=options.lsb_count,
-        )
+        if not at_zero.fits:
+            start = 0
+        else:
+            record = envelope.record
+            start = derive_start_location(
+                options.start_secret,
+                total_samples=carrier.total_samples,
+                required_samples=at_zero.required_samples,
+                media_type=carrier.media_type,
+                media_id=options.media_id,
+                nonce=str(record["nonce"]),
+                lsb_count=options.lsb_count,
+            )
     else:
         raise ValueError("start_method must be manual or hmac-sha256")
-    if start < 0 or start + required > carrier.total_samples:
+    report = carrier.capacity(carrier_payload_length, options.lsb_count, start)
+    return ProtectionCapacity(
+        media_type=carrier.media_type,
+        envelope_length=len(envelope.data),
+        embedded_payload_length=carrier_payload_length,
+        encrypted=envelope.encrypted,
+        robustness=options.robustness,
+        carrier=report,
+    )
+
+
+def _prepare_protection(
+    input_path: str | Path,
+    message: bytes,
+    private_key,
+    options: ProtectionOptions,
+) -> _PreparedProtection:
+    carrier = inspect_carrier(input_path)
+    envelope = _make_envelope(message, options, private_key, carrier.media_type)
+    if options.robustness == "none":
+        carrier_payload = envelope.data
+    elif options.robustness == "repetition-3":
+        carrier_payload = encode_repetition3(envelope.data)
+    else:
+        raise ValueError("robustness must be none or repetition-3")
+    capacity = _assess_capacity(carrier, envelope, len(carrier_payload), options)
+    return _PreparedProtection(carrier, envelope, carrier_payload, capacity)
+
+
+def estimate_protection_capacity(
+    input_path: str | Path,
+    message: bytes,
+    private_key,
+    options: ProtectionOptions,
+) -> ProtectionCapacity:
+    """Build the actual envelope and report its exact carrier cost without writing."""
+    return _prepare_protection(input_path, message, private_key, options).capacity
+
+
+def _require_capacity(capacity: ProtectionCapacity) -> None:
+    report = capacity.carrier
+    if not report.fits:
         raise ValueError(
-            f"start location {start} leaves too little capacity for {required} samples"
+            f"protected payload needs {report.required_samples} samples from start "
+            f"{report.start_location}, but only {report.available_samples} are "
+            "available; reduce the payload, start location, or robustness overhead"
         )
-    return start, required
 
 
 def protect_media(
@@ -136,42 +364,21 @@ def protect_media(
     private_key,
     options: ProtectionOptions,
 ) -> ProtectionResult:
-    """Create a signed payload, embed it, and export its companion manifest."""
-    source, output, manifest_path_value = _validate_paths(
-        input_path, output_path, manifest_path, options.overwrite
+    """Create and transactionally publish a protected-media bundle."""
+    source, output, manifest_path_value, recovery_path_value = _validate_paths(
+        input_path, output_path, manifest_path, options
     )
-    carrier = inspect_carrier(source)
-    envelope = _make_envelope(message, options, private_key, carrier.media_type)
-    if options.robustness == "none":
-        carrier_payload = envelope.data
-    elif options.robustness == "repetition-3":
-        carrier_payload = encode_repetition3(envelope.data)
-    else:
-        raise ValueError("robustness must be none or repetition-3")
-    start, required = _resolve_start(
-        carrier, envelope, len(carrier_payload), options
-    )
-
-    if carrier.media_type == "image":
-        carrier_result = embed_image(
-            str(source),
-            str(output),
-            carrier_payload,
-            options.lsb_count,
-            start,
-            overwrite=options.overwrite,
-        )
-    else:
-        carrier_result = embed_audio_lsb(
-            str(source),
-            str(output),
-            carrier_payload,
-            lsb_count=options.lsb_count,
-            start_location=start,
-        )
+    prepared = _prepare_protection(source, message, private_key, options)
+    carrier = prepared.carrier
+    envelope = prepared.envelope
+    carrier_payload = prepared.carrier_payload
+    capacity = prepared.capacity
+    _require_capacity(capacity)
+    start = capacity.start_location
+    required = capacity.required_samples
 
     fingerprint = public_key_fingerprint(private_key.public_key())
-    manifest = Manifest(
+    manifest_value = Manifest(
         media_type=carrier.media_type,
         media_id=options.media_id,
         nonce=str(envelope.record["nonce"]),
@@ -184,13 +391,63 @@ def protect_media(
         ),
         public_key_fingerprint=fingerprint,
         robustness=options.robustness,
-    )
+    ).validate()
+
+    destinations = [output, manifest_path_value]
+    if recovery_path_value is not None:
+        destinations.append(recovery_path_value)
+    staged: dict[Path, Path] = {}
+    size_result: SizePreservationResult | None = None
+    recovery_result: RecoveryResult | None = None
     try:
-        save_manifest(manifest, manifest_path_value)
+        for destination in destinations:
+            staged[destination] = _staging_path(destination)
+        staged_output = staged[output]
+        if carrier.media_type == "image":
+            carrier_result = embed_image(
+                str(source),
+                str(staged_output),
+                carrier_payload,
+                options.lsb_count,
+                start,
+                overwrite=False,
+            )
+        else:
+            carrier_result = embed_audio_lsb(
+                str(source),
+                str(staged_output),
+                carrier_payload,
+                lsb_count=options.lsb_count,
+                start_location=start,
+            )
+
+        if options.preserve_size:
+            if output.suffix.lower() == ".png":
+                try:
+                    size_result = pad_png_to_size(
+                        staged_output, source.stat().st_size
+                    )
+                except ValueError as exc:
+                    comparison = compare_file_sizes(source, staged_output)
+                    size_result = replace(
+                        comparison,
+                        method=f"unavailable: {exc}",
+                    )
+            else:
+                size_result = compare_file_sizes(source, staged_output)
+
+        save_manifest(manifest_value, staged[manifest_path_value])
+        if recovery_path_value is not None:
+            recovery_result = create_recovery_sidecar(
+                source,
+                staged_output,
+                staged[recovery_path_value],
+                options.recovery_key,
+            )
+        _publish_bundle(staged, options.overwrite)
     except Exception:
-        # This output was created by this call, so roll it back if its required
-        # companion manifest cannot be written.
-        output.unlink(missing_ok=True)
+        for temporary in staged.values():
+            _remove_path(temporary)
         raise
 
     return ProtectionResult(
@@ -204,6 +461,16 @@ def protect_media(
         total_samples=carrier.total_samples,
         public_key_fingerprint=fingerprint,
         encrypted=envelope.encrypted,
-        carrier_result=carrier_result,
+        carrier_result=_carrier_result_at(carrier_result, output),
         record=envelope.record,
+        size_preservation=(
+            replace(size_result, output_path=str(output))
+            if size_result is not None
+            else None
+        ),
+        recovery=(
+            replace(recovery_result, output_path=str(recovery_path_value))
+            if recovery_result is not None
+            else None
+        ),
     )

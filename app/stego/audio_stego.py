@@ -25,15 +25,12 @@ Supports:
 import os
 import tempfile
 from pathlib import Path
-from math import ceil
 
 import numpy as np
 import soundfile as sf
 
-try:
-    from app.crypto.start_location import calculate_audio_start_location
-except ImportError:
-    calculate_audio_start_location = None
+from app.crypto.start_location import calculate_audio_start_location
+from app.stego.capacity import required_position_count
 
 
 MAGIC = b"INF2005"
@@ -63,6 +60,8 @@ def read_audio(input_path):
             f"Unsupported WAV subtype '{info.subtype}'. "
             "Only 16-bit PCM WAV (PCM_16) is supported."
         )
+    if info.samplerate <= 0 or info.channels <= 0 or info.frames <= 0:
+        raise ValueError("WAV metadata declares no usable PCM samples.")
 
     samples, sample_rate = sf.read(
         str(input_path),
@@ -72,11 +71,16 @@ def read_audio(input_path):
 
     if samples.size == 0:
         raise ValueError("Audio file contains no samples.")
+    expected_shape = (
+        (info.frames,) if info.channels == 1 else (info.frames, info.channels)
+    )
+    if samples.shape != expected_shape or sample_rate != info.samplerate:
+        raise ValueError("Decoded WAV properties disagree with its container metadata.")
 
     return samples, sample_rate
 
 
-def write_audio(output_path, samples, sample_rate):
+def write_audio(output_path, samples, sample_rate, *, overwrite=False):
     """Write stego audio as 16-bit PCM WAV using an atomic replacement."""
     output_path = Path(output_path)
 
@@ -85,8 +89,20 @@ def write_audio(output_path, samples, sample_rate):
 
     if not output_path.parent.is_dir():
         raise FileNotFoundError("Audio output directory does not exist.")
+    if output_path.is_dir():
+        raise IsADirectoryError("Audio output path is a directory.")
+    if not isinstance(overwrite, bool):
+        raise TypeError("overwrite must be a boolean")
+    if output_path.exists() and not overwrite:
+        raise FileExistsError(f"Audio output already exists: {output_path.name}")
+    if isinstance(sample_rate, bool) or not isinstance(sample_rate, (int, np.integer)):
+        raise TypeError("sample_rate must be a positive integer")
+    if sample_rate <= 0:
+        raise ValueError("sample_rate must be a positive integer")
 
     samples = np.asarray(samples, dtype=np.int16)
+    if samples.size == 0 or samples.ndim not in {1, 2}:
+        raise ValueError("Audio samples must be a non-empty mono or multi-channel array.")
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{output_path.stem}.",
         suffix=".wav",
@@ -101,6 +117,8 @@ def write_audio(output_path, samples, sample_rate):
             format="WAV",
             subtype=SUPPORTED_SUBTYPE,
         )
+        if output_path.exists() and not overwrite:
+            raise FileExistsError(f"Audio output already exists: {output_path.name}")
         os.replace(temporary_name, output_path)
     except Exception:
         try:
@@ -234,7 +252,20 @@ def samples_required_for_packet(packet_size_bytes, lsb_count):
     if packet_size_bytes < 0:
         raise ValueError("packet_size_bytes cannot be negative")
 
-    return ceil((packet_size_bytes * 8) / lsb_count)
+    return required_position_count(packet_size_bytes, lsb_count)
+
+
+def _paths_alias(first, second):
+    first = Path(first).resolve()
+    second = Path(second).resolve()
+    if first == second:
+        return True
+    if first.exists() and second.exists():
+        try:
+            return os.path.samefile(first, second)
+        except OSError:
+            return False
+    return False
 
 
 def calculate_capacity(input_path, lsb_count=1, start_location=0):
@@ -339,6 +370,8 @@ def embed_audio_lsb(
     lsb_count=1,
     start_location=None,
     passcode=None,
+    *,
+    overwrite=False,
 ):
     """
     Embed payload bytes using LSB replacement.
@@ -349,6 +382,13 @@ def embed_audio_lsb(
 
     if not isinstance(payload, bytes):
         raise TypeError("payload must be bytes")
+    if not isinstance(overwrite, bool):
+        raise TypeError("overwrite must be a boolean")
+    if _paths_alias(input_path, output_path):
+        raise ValueError("Audio output must differ from the input file.")
+    destination = Path(output_path)
+    if destination.exists() and not overwrite:
+        raise FileExistsError(f"Audio output already exists: {destination.name}")
 
     samples, sample_rate = read_audio(input_path)
     original_shape = samples.shape
@@ -408,7 +448,7 @@ def embed_audio_lsb(
         sample_index += 1
 
     stego_audio = samples_to_audio(stego_samples, original_shape)
-    write_audio(output_path, stego_audio, sample_rate)
+    write_audio(output_path, stego_audio, sample_rate, overwrite=overwrite)
 
     capacity = calculate_capacity(
         input_path,
@@ -437,6 +477,8 @@ def extract_audio_lsb(
     lsb_count=1,
     start_location=None,
     passcode=None,
+    *,
+    manifest_payload_length=None,
 ):
     """
     Extract a payload from a stego WAV.
@@ -492,6 +534,17 @@ def extract_audio_lsb(
         raise ValueError(
             "Embedded payload length is invalid or the audio payload is corrupted."
         )
+    if manifest_payload_length is not None:
+        if (
+            isinstance(manifest_payload_length, bool)
+            or not isinstance(manifest_payload_length, int)
+            or manifest_payload_length < 0
+        ):
+            raise TypeError("manifest_payload_length must be a non-negative integer")
+        if payload_length != manifest_payload_length:
+            raise ValueError(
+                "Embedded payload length disagrees with the manifest payload length."
+            )
 
     payload_bits = _read_bits(
         bit_stream,
@@ -510,6 +563,8 @@ def embed_audio(
     payload,
     lsb_count,
     start_location,
+    *,
+    overwrite=False,
 ):
     """Shared-interface adapter for image/audio integration."""
     return embed_audio_lsb(
@@ -518,13 +573,17 @@ def embed_audio(
         payload,
         lsb_count=lsb_count,
         start_location=start_location,
+        overwrite=overwrite,
     )
 
 
-def extract_audio(input_path, lsb_count, start_location):
+def extract_audio(
+    input_path, lsb_count, start_location, *, manifest_payload_length=None
+):
     """Shared-interface adapter for image/audio integration."""
     return extract_audio_lsb(
         input_path,
         lsb_count=lsb_count,
         start_location=start_location,
+        manifest_payload_length=manifest_payload_length,
     )

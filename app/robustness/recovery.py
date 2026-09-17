@@ -36,8 +36,33 @@ def _read_limited(path: str | os.PathLike[str], limit: int) -> bytes:
     return source.read_bytes()
 
 
-def _atomic_write(path: Path, data: bytes) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
+def _paths_alias(first: Path, second: Path) -> bool:
+    first = first.resolve()
+    second = second.resolve()
+    if first == second:
+        return True
+    if first.exists() and second.exists():
+        try:
+            return os.path.samefile(first, second)
+        except OSError:
+            return False
+    return False
+
+
+def _validate_output(path: Path, inputs: tuple[Path, ...], overwrite: bool) -> None:
+    if not isinstance(overwrite, bool):
+        raise TypeError("overwrite must be a boolean")
+    if any(_paths_alias(path, source) for source in inputs):
+        raise ValueError("recovery output must differ from every input file")
+    if not path.parent.is_dir():
+        raise FileNotFoundError("recovery output directory does not exist")
+    if path.is_dir():
+        raise IsADirectoryError(f"recovery output is a directory: {path.name}")
+    if path.exists() and not overwrite:
+        raise FileExistsError(f"recovery output already exists: {path.name}")
+
+
+def _atomic_write(path: Path, data: bytes, *, overwrite: bool) -> None:
     descriptor, temporary = tempfile.mkstemp(
         prefix=f".{path.name}.", dir=str(path.parent)
     )
@@ -46,6 +71,8 @@ def _atomic_write(path: Path, data: bytes) -> None:
             stream.write(data)
             stream.flush()
             os.fsync(stream.fileno())
+        if path.exists() and not overwrite:
+            raise FileExistsError(f"recovery output already exists: {path.name}")
         os.replace(temporary, path)
     except Exception:
         try:
@@ -60,10 +87,18 @@ def create_recovery_sidecar(
     protected_path: str | os.PathLike[str],
     sidecar_path: str | os.PathLike[str],
     key: bytes,
+    *,
+    overwrite: bool = False,
 ) -> RecoveryResult:
     """Encrypt an exact original file and bind it to one protected output."""
     if not isinstance(key, bytes) or len(key) != 32:
         raise ValueError("recovery key must contain exactly 32 bytes")
+    original_source = Path(original_path).resolve()
+    protected_source = Path(protected_path).resolve()
+    destination = Path(sidecar_path).resolve()
+    if _paths_alias(original_source, protected_source):
+        raise ValueError("original and protected paths must be different")
+    _validate_output(destination, (original_source, protected_source), overwrite)
     original = _read_limited(original_path, MAX_ORIGINAL_BYTES)
     protected = _read_limited(protected_path, MAX_ORIGINAL_BYTES)
     original_hash = hashlib.sha256(original).digest()
@@ -82,9 +117,9 @@ def create_recovery_sidecar(
         original_hash,
         length,
     ) + ciphertext
-    _atomic_write(Path(sidecar_path), sidecar)
+    _atomic_write(destination, sidecar, overwrite=overwrite)
     return RecoveryResult(
-        str(sidecar_path),
+        str(destination),
         original_hash.hex(),
         protected_hash.hex(),
         length,
@@ -96,10 +131,18 @@ def restore_original(
     sidecar_path: str | os.PathLike[str],
     output_path: str | os.PathLike[str],
     key: bytes,
+    *,
+    overwrite: bool = False,
 ) -> RecoveryResult:
     """Restore and validate the byte-for-byte original from its sidecar."""
     if not isinstance(key, bytes) or len(key) != 32:
         raise ValueError("recovery key must contain exactly 32 bytes")
+    protected_source = Path(protected_path).resolve()
+    sidecar_source = Path(sidecar_path).resolve()
+    destination = Path(output_path).resolve()
+    if _paths_alias(protected_source, sidecar_source):
+        raise ValueError("protected and recovery sidecar paths must be different")
+    _validate_output(destination, (protected_source, sidecar_source), overwrite)
     sidecar = _read_limited(sidecar_path, MAX_ORIGINAL_BYTES + HEADER.size + 16)
     if len(sidecar) < HEADER.size + 16:
         raise ValueError("recovery sidecar is truncated")
@@ -125,10 +168,7 @@ def restore_original(
         raise ValueError("recovery sidecar authentication failed") from exc
     if len(original) != length or hashlib.sha256(original).digest() != original_hash:
         raise ValueError("restored original failed its length or hash check")
-    destination = Path(output_path)
-    if destination.resolve() == Path(protected_path).resolve():
-        raise ValueError("restored output must not overwrite the protected file")
-    _atomic_write(destination, original)
+    _atomic_write(destination, original, overwrite=overwrite)
     return RecoveryResult(
         str(destination),
         original_hash.hex(),

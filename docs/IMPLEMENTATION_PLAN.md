@@ -2,21 +2,21 @@
 
 ## 1. Review baseline and instructions for resuming
 
-This document reconciles the agreed whole-project plan in the conversation with the repository as inspected on 2026-09-17. It is a continuation plan, not a request to replace the existing implementation.
+This document reconciles the agreed whole-project plan in the conversation with the repository as inspected and resumed on 2026-09-17. It is a continuation plan, not a request to replace the existing implementation.
 
-- Reviewed HEAD: `b6934de` — `feat: Implement core application structure and GUI integration`.
-- The working tree was clean before this document was created. The earlier build is now committed; do not assume its changes remain uncommitted.
-- Validation run during this review: `.venv\Scripts\python.exe -m pytest -q` — **380 passed in 14.24 seconds**.
+- Current HEAD: `0cda95e` — `feat: Add implementation plan documentation`. R01 and R02 are implemented in the current working tree and remain uncommitted at this handoff.
+- R02 acceptance review on 2026-09-17: the focused transaction/recovery/GUI/verification run was **34 passed in 2.22 seconds**. The repository run was **451 passed, 1 failed in 14.44 seconds**. The remaining failure is the pre-existing RGB-versus-alpha metric inconsistency recorded under R09 below, exposed by Hypothesis with an alpha-only difference.
+- The local audit environment uses Python 3.14-compatible package versions. Installing the exact requirements file attempted to build `numpy==2.1.3` from source because that pin has no Python 3.14 wheel; clean installation of the pinned set therefore remains an R12/R13 concern.
 - The suite includes a subprocess-based, offscreen GUI construction test. Passing it does not establish successful interactive workflows, playback, responsiveness, visual layout, or completion of optional features.
-- `ffmpeg` and `ffprobe` were not discoverable on PATH during this review. This does not rule out an installation elsewhere.
+- `ffmpeg` and `ffprobe` are currently discoverable on PATH. Their availability has not yet been exercised by this branch because R10 remains unimplemented.
 - No applicable `AGENTS.md` was found in the repository search.
-- This review changes only this Markdown document. Application code, tests, dependencies, media, and existing documentation are not being implemented or rewritten.
+- R01 hardens the security boundaries. R02 adds staged bundle publication, overwrite rollback, optional artifact orchestration, path collision checks, and focused fault-injection coverage.
 
 Preserve the existing image layer, audio layer, security primitives, services, widgets, tests, and passing behaviour. Resume with the focused integration and validation tasks below. Empty files are not evidence that equivalent functionality is absent elsewhere.
 
 ### Source precedence and agreed scope
 
-1. User instructions in this conversation define authorised work. The latest request is review and documentation only.
+1. User instructions in this conversation define authorised work. The latest request authorises R02 only; later tasks remain pending.
 2. The assignment brief defines assessed requirements: `INF2005-ACW1-spec_v5-f2f.pdf`, previously read in full from `C:\Users\ginli\OneDrive\SIT\Year 2 Tri 1\Cyber Security Fundamentals\Project\`.
 3. [The repository README](../README.md) supplies team context and proposed engineering choices. It explicitly remains a planning reference, not the submission README.
 4. The user selected the **full README roadmap**, implemented by the assistant, rather than a team work schedule. Extensions remain in the agreed build scope even though they are individually optional for assessment.
@@ -102,7 +102,7 @@ Preserve distinct envelope length (`payload_length`) and redundancy-expanded car
 
 ### Remaining architecture work
 
-Move optional post-processing out of GUI handlers into the application service, introduce worker execution with cancellation/progress, and expose reusable compare/attack orchestration. Keep existing analysis functions; do not duplicate them merely to fill scaffold files. UI success must continue to say **“Message and signed record verified.”** Treat uncertain extraction failures as `CANNOT_VERIFY`, not a proven wrong-start cause.
+Introduce worker execution with cancellation/progress and expose reusable compare/attack orchestration. Optional size/recovery processing now belongs to the protection service's staged transaction. Keep existing analysis functions; do not duplicate them merely to fill scaffold files. UI success must continue to say **“Message and signed record verified.”** Treat uncertain extraction failures as `CANNOT_VERIFY`, not a proven wrong-start cause.
 
 ## 4. Completed work to preserve
 
@@ -110,7 +110,7 @@ Move optional post-processing out of GUI handlers into the application service, 
 
 | Completed slice | Implementation and evidence |
 | --- | --- |
-| Baseline environment | Local `.venv`, pinned direct dependencies, and working pytest invocation. Original baseline was 357 passing tests; current baseline is 380. |
+| Baseline environment | Local `.venv` and working pytest invocation. Original baselines were 357 and then 380 passing tests; the post-R01 suite is 430 passing tests. Exact pinned installation on Python 3.14 remains unresolved under R12/R13. |
 | Image carrier | Substantial PNG/BMP I/O, capacity, bit utilities, LSB embedding/extraction, alpha handling, atomic image writes, and extensive property/example tests. |
 | Image analysis backend | Quality metrics, bit planes, difference images, histograms, and multiple statistical indicators already implemented and tested. |
 | Audio carrier baseline | PCM-16 WAV read/write, depths 1–8, embedding/extraction, non-zero starts, common API wrappers, and atomic single-file output. |
@@ -123,33 +123,31 @@ Move optional post-processing out of GUI handlers into the application service, 
 | Repetition primitive | Byte triplication, bitwise majority decoder, signed robustness choice and expanded capacity accounting. Unit and image integration recovery tests pass. |
 | Recovery primitive | AES-GCM sidecar, binding to protected-file hash, original length/hash checks, byte-exact restoration and wrong-protected-file rejection tests. |
 | PNG padding primitive | Legal private ancillary chunk with CRC, exact target sizing when possible, and unchanged decoded pixels test. |
+| R01 security boundaries | Manifest and envelope parsing now enforce exact types, required/supported versions, duplicate-free canonical JSON, signed-record schema, encryption flag/metadata agreement, bounded lengths, RSA key types/sizes, and signed/manifest/carrier length relationships. WAV extraction now performs the same manifest-length cross-check as image extraction. Malformed verification inputs remain structured failures. Focused tests: 73 passed; full suite: 430 passed. |
+| R02 transactional publication | Protection stages media, manifest, optional size processing, and recovery sidecar before publishing the complete bundle. Existing destinations are backed up and restored on publication failure; aliases and collisions are rejected before embedding; recovery and PNG helpers require explicit overwrite permission. Recovery binds to final post-processed bytes and expected PNG size inability is reported in the successful result. Fault-injection coverage exercises every stage and GUI propagation. Focused tests: 34 passed. |
 
 ## 5. Partially completed work and specific inconsistencies
 
-These are observed gaps in the interrupted state. Not every issue can be attributed solely to the interruption; some predate it. None were repaired during this review.
+These are the remaining observed gaps after completing R01 and R02. Not every issue can be attributed solely to the interruption; some predate it.
 
 | Files / area | Observed incomplete or inconsistent behaviour | Follow-up |
 | --- | --- | --- |
-| `app/gui/protect_tab.py` | Latest recovery/size integration runs after the main `try/except` and after protection has saved files. Recovery key decoding, sidecar creation, and some size-operation errors can escape with partial outputs left behind. Preview is loaded before post-processing. | R02, R04, R07 |
 | `app/gui/protect_tab.py` | Capacity display excludes signed/encryption/redundancy overhead and does not account for manual start. Success reports envelope bytes as embedded bytes even under repetition. | R03, R04 |
 | GUI workflow tabs | Protection, verification, comparison, and attacks execute synchronously; no worker/progress/cancel mechanism. File/message handling is text-only on Protect. Verify cannot save recovered files or display/play recovered non-text payloads. | R04 |
 | `app/gui/verify_tab.py`, `widgets/result_panel.py` | Key fingerprints exist in backend checks but there is no convenient fingerprint review flow. Previously displayed results are not systematically cleared when input or a new operation fails. | R04 |
-| `app/services/protection.py` | Writes media before validating/saving the final manifest. On manifest-save failure it unlinks output, including when `overwrite=True` replaced a pre-existing file. Multi-file publication is not failure-safe. | R02 |
-| `app/crypto/manifest.py` | Incomplete type validation: in-memory review confirmed LSB value `1.5` is accepted. Wrong types in membership/comparison checks can raise errors other than `ManifestError`. The manifest is read fully before its size limit is checked; version fields can default when absent. | R01 |
-| `app/crypto/payload.py` | Parser checks framing lengths but not a complete signed-record schema or consistency between header encryption flag and signed encryption metadata. In-memory review confirmed flipping the encryption flag leaves the signature valid. This does **not** establish an overall authenticity bypass: the later message hash can still fail. | R01 |
-| `payload.py`, `manifest.py`, `verifier.py` | Build/parse limits differ (e.g. 64 MiB plaintext versus total envelope limit); build-time record size and required metadata validation need alignment. Audio extraction lacks the image path's manifest-length cross-check; extracted envelope length is not explicitly checked against the signed declared length. | R01, R03 |
 | `app/verification/verifier.py` | Robust mode still invokes ordinary carrier header parsing. A damaged image length header or audio magic/length can stop extraction before majority decoding, contrary to the agreed manifest-bounded robust read. | R05 |
 | `app/attacks/payload_attacks.py` | Attack positions use unexpanded `manifest.payload_length`. For robust mode, “near boundary” is inaccurate; outside-region calculation at start zero can target inside the redundant region. | R05, R06 |
 | `app/crypto/start_location.py`, `signatures.py` | “Compatibility” wrappers retain callable shapes but changed legacy HMAC input strings and signature domain/PSS settings. Old saved artifacts are not necessarily wire-compatible. Establish fixtures and document migration rather than claiming backward compatibility. | R03 |
 | `app/services/size_preservation.py` | PNG padding and size comparison exist; compression-setting search does not. WAV/BMP handling compares byte counts rather than preserving original container layout. Padding has no explicit large-target allocation bound. | R08 |
-| `app/robustness/recovery.py` | Backend restore exists, but no GUI restore route. Creation lacks input/sidecar path collision checks; restore protects only the protected-file path. Existing destinations can be replaced without an explicit overwrite policy. | R02, R07 |
+| `app/robustness/recovery.py` | Backend create/restore now has collision checks and explicit overwrite control, but no GUI restore route or storage-overhead presentation exists. | R07 |
 | `app/gui/steganalysis_tab.py` | Only textual image quality/LSB proportions and audio metrics are exposed. Existing bit-plane, difference, histogram, and richer indicators are not presented; waveform views/export and full media comparison remain absent. | R09 |
+| `app/analysis/image_analysis.py`, `tests/test_image_analysis.py` | Quality comparison excludes alpha from MSE but uses full-array equality for `pixel_identical`; an alpha-only difference therefore reports non-identical pixels with zero MSE. Hypothesis now retains this failing example. | R09 |
 | `app/gui/attack_tab.py` | Two attacks only; no seed/severity controls, remaining negative scenarios, paired automatic verification, or report export. | R06 |
 | `app/gui/video_tab.py`, `app/stego/video_stego.py` | Tab is explanatory text; stego module is empty. Carrier inspection supports only image/audio and verifier explicitly rejects video despite schema accepting a video type. | R10 |
-| `tests/test_gui.py` | Construction-only smoke test. Does not drive file selection, key creation, protect, verify, failures, optional outputs, restoration, or cancellation. | R04, R12 |
+| GUI tests | Construction and R02 service-error propagation are covered offscreen. Tests still do not drive key creation, successful protect/verify workflows, restoration, or cancellation. | R04, R12 |
 | `tests/test_audio_quality.py` | Import-time report/printing script, not an assertion-based test. | R03, R09 |
-| `README.md`, `docs/architecture.md`, `docs/limitations.md` | README remains planning context; architecture and limitations describe audio only, not the implemented service/security workflow. | R13 |
-| `requirements.txt` | Direct dependencies are pinned, but comments still instruct members to pin already-pinned packages. Fresh installation and video setup have not been validated for release. | R12, R13 |
+| `README.md`, `docs/architecture.md`, `docs/limitations.md` | README remains planning context; architecture remains audio-only, while limitations now adds the R01 plaintext-hash/confidentiality boundary but is not yet a complete system document. | R13 |
+| `requirements.txt` | Direct dependencies are pinned, but comments still instruct members to pin already-pinned packages. On Python 3.14, `numpy==2.1.3` has no compatible wheel and falls back to a source build. Fresh pinned installation and video setup have not been validated for release. | R12, R13 |
 | Samples/evidence/keys | Only earlier audio originals/stego and audio reports exist. No completed signed sample matrix, transfer bundle, committed public demo key, screenshots, or extension evidence. | R11, R12 |
 
 ### Empty scaffold inventory
@@ -167,9 +165,9 @@ Do not fill placeholders just to make every file non-empty. Extend existing owne
 
 ## 6. Remaining tasks, dependencies, and acceptance criteria
 
-All items below are pending implementation, including completion of partial features. IDs provide a stable order for future turns. Add regression tests alongside each correction; do not defer correctness testing to the final milestone.
+R01 and R02 are complete. R03–R13 remain pending, including completion of partial features. IDs provide a stable order for future turns. Add regression tests alongside each correction; do not defer correctness testing to the final milestone.
 
-### R01 — Harden envelope, manifest, and verification boundaries
+### R01 — Harden envelope, manifest, and verification boundaries — COMPLETE
 
 **Depends on:** preserved core services; no other pending task.
 
@@ -177,17 +175,31 @@ Validate exact field types and supported versions, signed-record schema, encrypt
 
 **Acceptance:** mutation tests for every controlling field, truncated/oversized lengths, floats/bools/lists in scalar fields, missing versions, duplicate JSON keys, invalid encodings, inconsistent encryption settings, and unsuitable keys produce justified failures without crashes or unsafe allocations. Header-flag changes cannot silently change interpretation. Build-time output is always accepted by the corresponding bounded parser. Audio/image lengths agree with manifest and signed record. No malformed case returns `AUTHENTIC`.
 
-### R02 — Make output publication and path handling failure-safe
+**Completion evidence:** `tests/test_security_boundaries.py` covers record/manifest field mutations, missing and unsupported versions, duplicate keys, invalid UTF-8, framing limits, encryption flag/nonce inconsistencies, unsuitable keys, builder/parser agreement, and structured malformed-payload failure. `tests/test_audio_stego.py` covers the new WAV manifest-length check; the existing image tests retain the equivalent image check. `docs/limitations.md` records the visible plaintext-hash guessing boundary. Review runs completed with 73 focused tests and 430 total tests passing. No wire-format version bump was needed because version-1 builders already emit the canonical schema and the formerly unauthenticated encryption flag is now strictly cross-checked against signed metadata.
 
-**Depends on:** R01.
+### R02 — Make output publication and path handling failure-safe — COMPLETE
+
+**Objective:** make protection and optional-artifact publication transactional so a reported success always represents one complete, mutually consistent bundle and any failure preserves inputs and prior destinations.
+
+**Likely files:** `app/services/protection.py`, `app/gui/protect_tab.py`, `app/robustness/recovery.py`, `app/services/size_preservation.py`, and focused service/GUI/failure-injection tests. A small service-level staging/publication helper may be added if it keeps transaction handling out of GUI callbacks.
+
+**Depends on:** completed R01 validation and the existing atomic single-file image, manifest, recovery, and PNG writers. Coordinate path/output contracts needed later by R07 and R08 without implementing those feature expansions during R02.
 
 Preflight output paths and optional settings before embedding; stage artifacts and publish under a clear overwrite policy. Preserve existing output files on failures, including overwrite rollback. Extend distinct-path checks to manifests, recovery files, original/protected files, and source aliases where applicable. Keep single-file atomic writers.
 
-**Acceptance:** injected manifest/sidecar/write failures leave original inputs and pre-existing destinations unchanged; new incomplete outputs are not presented as a complete successful bundle. Same-path/alias cases are rejected. Temporary files are cleaned. Invalid recovery settings fail before protection writes. Optional size failure is reported accurately without pretending the core signature failed.
+**Acceptance:** injected media, manifest, sidecar, post-processing, and final-publication failures leave original inputs and pre-existing destinations unchanged; new incomplete outputs are removed and never presented as a complete successful bundle. A documented overwrite policy applies consistently to every artifact. Same-path and filesystem-alias collisions among source, protected output, manifest, recovery sidecar, and other optional outputs are rejected before embedding. Invalid recovery/size settings fail before protection writes. Temporary and backup files are cleaned after success and failure. Optional size-preservation failure is reported separately without pretending that signing or embedding failed. Regression tests exercise new destinations, existing destinations with overwrite both disabled and enabled, injected failures at each publication step, and GUI error propagation.
+
+**Completion evidence:** `app/services/protection.py` now validates every destination and optional setting before embedding, generates all artifacts under same-directory staging names, creates recovery from the final post-processed protected bytes, and publishes with backup/rollback semantics. `overwrite=False` rejects any existing artifact; `overwrite=True` applies to the whole bundle and restores prior files if publication fails. Direct recovery and PNG-padding writers now reject path aliases and require explicit overwrite permission. `tests/test_protection_transaction.py`, `tests/test_robustness.py`, and `tests/test_protect_tab.py` cover new/existing destinations, collision and invalid-setting preflight, media/manifest/postprocess/sidecar/publish failures, cleanup, final-byte recovery binding, conditional size reporting, and GUI error handling. The focused R02-adjacent run passes 34 tests.
+
+**Acceptance review:** complete for the defined runtime-failure scope. Media, manifest, post-processing, sidecar, and final-publication faults are injected in focused tests. Staged generation leaves new and existing destinations untouched; final-publication faults remove newly published artifacts and restore backups. Existing destinations are rejected before embedding when overwrite is disabled and replaced as one bundle when enabled. Same-path and hard-link aliases, invalid recovery keys/paths, and invalid size flags reject before embedding. Successful and failed transactions clean their normal staging/backup files; if operating-system rollback itself fails, the service reports an incomplete rollback and deliberately retains any unrecovered backup rather than deleting the last copy. Conditional PNG size failure remains a successful protection result with a separate `unavailable:` method, and recovery hashes the final post-processed output. The GUI passes optional settings to the service, catches transaction errors, and does not preview failed output. No R02 application-code change was required by this review.
 
 ### R03 — Finish carrier integration, capacity, and compatibility checks
 
-**Depends on:** R01; use R02 publication behaviour.
+**Objective:** provide one exact carrier-capacity contract used by the protection service and GUI, complete image/audio boundary coverage, harden PCM-16 WAV validation and property preservation, and establish the supported compatibility boundary for retained APIs and saved artifacts.
+
+**Likely files:** `app/services/media.py`, `app/services/protection.py`, `app/gui/protect_tab.py`, `app/stego/capacity.py`, `app/stego/image_stego.py`, `app/stego/audio_stego.py`, `app/crypto/start_location.py`, `app/crypto/signatures.py`, `tests/test_verification.py`, `tests/test_audio_stego.py`, `tests/test_audio_quality.py`, and focused capacity/compatibility tests or fixtures.
+
+**Depends on:** completed R01 validation and R02 transactional publication. Preserve the current carrier framing and use R02 staging so all new capacity or validation failures occur before final output publication.
 
 Provide one exact capacity calculation for services/UI, including manual offset, carrier framing, signature, encryption and triplication. Harden audio validation and preserve PCM properties; reuse shared bit helpers where it does not alter existing framing. Record legacy API versus saved-format compatibility separately.
 
@@ -275,13 +287,13 @@ Preserve the current planning README under project documentation and replace the
 
 ## 7. Recommended resumption order and final handoff
 
-1. **Protect existing work:** retain the reviewed baseline and 380 passing tests. Do not restart scaffolding or rewrite tested media/analysis modules.
-2. **Repair integration boundaries:** R01 -> R02 -> R03. Add targeted regression tests for the concrete issues in section 5.
+1. **Protect existing work:** retain the reviewed baseline and completed R01/R02 slices. Do not restart scaffolding or rewrite tested media/analysis modules.
+2. **Repair integration boundaries:** R01 and R02 are complete; implement R03 next. Add targeted regression tests for the concrete issues in section 5.
 3. **Finish core user workflows:** R04, then complete R05/R06; produce initial image/audio demo bundles through R11.
 4. **Complete remaining roadmap:** R08 and R07 with final-byte binding coordinated; R09; then R10 once the core is stable.
 5. **Release evidence and handoff:** complete R11 -> R12 -> R13. Documentation can be drafted earlier but final claims must follow verification.
 
-The next implementation action should be R01, not rebuilding the GUI or image/audio carrier layers. R02's failure-safe publication must precede adding more optional output artifacts.
+The next single implementation action should be **R03: finish carrier integration, capacity, and compatibility checks**. Its objective, dependencies, and acceptance criteria are recorded above. Likely files are `app/services/media.py`, `app/services/protection.py`, `app/gui/protect_tab.py`, `app/stego/audio_stego.py`, `tests/test_verification.py`, `tests/test_audio_stego.py`, and focused capacity/compatibility tests. Do not begin R04 or extension work while R03 remains incomplete.
 
 No user-supplied cover media or payload is needed to resume: synthetic covers and required messages can be prepared by the implementer. The team must eventually supply identifiers, actual contributions/signatures, the demo date, and participants/devices for the real A-to-B demonstration. These external inputs do not block code completion.
 

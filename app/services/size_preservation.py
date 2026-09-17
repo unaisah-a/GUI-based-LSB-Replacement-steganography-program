@@ -29,6 +29,8 @@ def pad_png_to_size(
     png_path: str | os.PathLike[str],
     target_size: int,
     output_path: str | os.PathLike[str] | None = None,
+    *,
+    overwrite: bool = False,
 ) -> SizePreservationResult:
     """Add a private ancillary PNG chunk when legal padding can reach a target."""
     source = Path(png_path)
@@ -62,6 +64,18 @@ def pad_png_to_size(
     destination = Path(output_path) if output_path else source
     if not destination.parent.is_dir():
         raise FileNotFoundError("PNG output directory does not exist")
+    in_place = destination.resolve() == source.resolve()
+    if not in_place and destination.exists():
+        try:
+            aliases_source = os.path.samefile(source, destination)
+        except OSError:
+            aliases_source = False
+        if aliases_source:
+            raise ValueError("PNG output must not alias the input file")
+        if not overwrite:
+            raise FileExistsError(f"PNG output already exists: {destination.name}")
+    if destination.is_dir():
+        raise IsADirectoryError(f"PNG output is a directory: {destination.name}")
     descriptor, temporary = tempfile.mkstemp(
         prefix=f".{destination.name}.", dir=str(destination.parent)
     )
@@ -70,6 +84,8 @@ def pad_png_to_size(
             stream.write(padded)
             stream.flush()
             os.fsync(stream.fileno())
+        if not in_place and destination.exists() and not overwrite:
+            raise FileExistsError(f"PNG output already exists: {destination.name}")
         os.replace(temporary, destination)
     except Exception:
         try:
