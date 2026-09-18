@@ -49,9 +49,8 @@ from typing import Any, Mapping
 
 from app.crypto import manifest as manifest_module
 from app.crypto import payload as payload_module
-from app.crypto import signatures, start_location
+from app.crypto import start_location
 from app.crypto.envelope import ErrorCorrectionParameters, VerificationRecord
-from app.crypto.errors import StartLocationError
 from app.robustness import error_correction
 from app.stego import media
 from app.stego.errors import CapacityError

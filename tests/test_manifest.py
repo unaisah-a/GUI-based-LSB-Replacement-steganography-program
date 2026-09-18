@@ -18,7 +18,7 @@ from app.crypto import key_manager, manifest as manifest_module, payload, signat
 from app.crypto.encryption import MIN_SCRYPT_N
 from app.crypto.envelope import EncryptionParameters, ErrorCorrectionParameters
 from app.crypto.errors import EncryptionError, ManifestError, RecordError
-from app.utils import constants, file_utils
+from app.utils import constants
 
 FAST_SCRYPT = {"scrypt_n": MIN_SCRYPT_N, "scrypt_r": 8, "scrypt_p": 1}
 SECRET_PASSPHRASE = "shared out of band"
@@ -984,37 +984,3 @@ class TestRemovedPayloadFunctions:
 
     def test_parse_payload_block_is_gone(self):
         assert not hasattr(payload, "parse_payload_block")
-
-
-class TestEnvelopeLengthPrediction:
-    def test_prediction_matches_a_real_unencrypted_payload(self, key_pair):
-        private_key, _ = key_pair
-        message = b"x" * 200
-        prepared = payload.prepare_payload(
-            message,
-            private_key,
-            media_id="IMG-001",
-            media_type=constants.MEDIA_IMAGE,
-            lsb_depth=3,
-        )
-        predicted = payload.predict_envelope_length(
-            len(message), private_key, record=prepared.record, encrypted=False
-        )
-        assert predicted == prepared.envelope_length
-
-    def test_prediction_matches_a_real_encrypted_payload(self, key_pair):
-        private_key, _ = key_pair
-        message = b"x" * 200
-        prepared = payload.prepare_payload(
-            message,
-            private_key,
-            media_id="IMG-001",
-            media_type=constants.MEDIA_IMAGE,
-            lsb_depth=3,
-            passphrase=SECRET_PASSPHRASE,
-            **FAST_SCRYPT,
-        )
-        predicted = payload.predict_envelope_length(
-            len(message), private_key, record=prepared.record, encrypted=True
-        )
-        assert predicted == prepared.envelope_length

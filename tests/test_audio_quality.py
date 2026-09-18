@@ -1,10 +1,6 @@
 """Tests for the audio quality metrics in :mod:`app.analysis.audio_analysis`.
 
-This file previously contained no tests at all. It computed a quality report and
-printed it at **import** time, using paths relative to the process working
-directory, so pytest executed it during collection and the whole session failed
-whenever pytest was invoked from anywhere but the repository root. Everything
-here now generates its own audio inside ``tmp_path`` and asserts.
+Every test generates its own audio inside ``tmp_path``.
 """
 
 from __future__ import annotations
@@ -137,11 +133,6 @@ class TestLsbBound:
 # Evidence: distortion against depth
 # --------------------------------------------------------------------------- #
 #
-# The committed artefact this replaces was a pasted terminal capture from one machine,
-# for one depth, produced by a command that no longer exists. It carried another
-# developer's local paths and could not be reproduced. Generating a sweep from a real
-# run is both more useful and cannot go stale.
-#
 # The sweep is also the evidence behind a claim the demonstration makes out loud: that
 # audible distortion rises with depth. One depth cannot show a trend.
 
@@ -155,7 +146,6 @@ class TestDistortionAgainstDepth:
         depth, because a fixed small payload would touch fewer samples at a greater
         depth and confound the comparison.
         """
-        import json
         from pathlib import Path
 
         from app.stego import audio_stego

@@ -37,9 +37,8 @@ import numpy as np
 from app.attacks.base import AttackError, AttackOutcome, copy_for_attack
 from app.crypto import envelope as envelope_module
 from app.crypto import signatures
-from app.crypto.errors import CryptoError
 from app.stego import media
-from app.utils import constants, file_utils
+from app.utils import file_utils
 from app.verification import verdicts
 
 __all__ = [

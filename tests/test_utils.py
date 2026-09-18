@@ -6,14 +6,12 @@ content-based media identification with atomic file writes, and logging setup.
 
 from __future__ import annotations
 
-import logging
 import os
 import subprocess
 import sys
 import textwrap
 from pathlib import Path
 
-import numpy as np
 import pytest
 
 from app.stego import bit_utils, capacity, image_io
@@ -68,11 +66,9 @@ class TestConstantsInternalConsistency:
             for container in containers:
                 assert container in constants.CONTAINER_EXTENSIONS
 
-    def test_repetition_factors_are_odd(self):
+    def test_default_repetition_factor_is_odd(self):
         """An even factor could tie a majority vote, leaving the result arbitrary."""
-        for factor in constants.ECC_REPETITION_FACTORS:
-            assert factor % 2 == 1
-        assert constants.ECC_REPETITION_DEFAULT_FACTOR in constants.ECC_REPETITION_FACTORS
+        assert constants.ECC_REPETITION_DEFAULT_FACTOR % 2 == 1
 
     def test_verdict_tuple_covers_every_named_verdict(self):
         named = {

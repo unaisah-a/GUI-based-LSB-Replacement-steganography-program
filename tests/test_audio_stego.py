@@ -1,10 +1,7 @@
 """Tests for WAV LSB embedding and extraction.
 
 Deliberately mirrors ``tests/test_image_stego.py``: the same properties, the same
-boundary cases, the same error categories. The audio layer previously had one
-parametrised round-trip test, which is why several of its defects went unnoticed —
-an in-place write that destroyed the cover, a silently overwritten output, and a
-rejection of numpy integers that the image layer accepted.
+boundary cases, the same error categories.
 
 The last class, ``TestCrossMediaParity``, is the one that keeps the two halves
 honest: it asserts that both layers produce the same bit ordering, the same encoded
@@ -48,10 +45,8 @@ PAYLOAD = b"INF2005 Audio LSB Test"
 # Evidence
 # --------------------------------------------------------------------------- #
 #
-# The round-trip table in evidence/results/ used to be maintained by hand, and it went
-# stale: it described a b"INF2005" magic packet and a "passcode" parameter that this
-# layer no longer has. Generating it from the run that proves it is the only way to keep
-# a committed artefact honest, so that is what happens here.
+# The round-trip table in evidence/results/ is generated from the run that proves it,
+# so the committed artefact cannot drift from the code.
 
 _ROUND_TRIP: list[dict[str, object]] = []
 
@@ -300,7 +295,7 @@ class TestRoundTrip:
         assert audio_stego.extract_audio(stego, 2, 0) == PAYLOAD
 
     def test_numpy_integers_are_accepted(self, tmp_path):
-        """Previously rejected on audio but accepted on images."""
+        """Parity with the image layer, which accepts numpy integers."""
         cover = write_audio_file(str(tmp_path), make_audio(2_000))
         stego = str(tmp_path / "stego.wav")
 
@@ -586,7 +581,7 @@ class TestFileErrors:
             )
 
     def test_embedding_in_place_is_refused(self, tmp_path):
-        """This used to destroy the cover object."""
+        """Embedding in place would destroy the cover object."""
         cover = write_audio_file(str(tmp_path), make_audio(4_000))
         with pytest.raises(ValidationError, match="must differ"):
             audio_stego.embed_audio(cover, cover, PAYLOAD, 1, 0)
@@ -600,7 +595,7 @@ class TestFileErrors:
         assert Path(cover).read_bytes() == before
 
     def test_occupied_output_is_refused(self, tmp_path):
-        """This used to overwrite silently."""
+        """An existing file is never silently overwritten."""
         cover = write_audio_file(str(tmp_path), make_audio(4_000))
         stego = tmp_path / "stego.wav"
         stego.write_bytes(b"existing content")

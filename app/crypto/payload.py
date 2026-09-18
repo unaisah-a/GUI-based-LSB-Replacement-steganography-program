@@ -34,12 +34,6 @@ What this module does not do
 It does not decide verdicts. :func:`recover_message` returns the plaintext and
 whether its digest matched; mapping that onto ``AUTHENTIC`` or ``TAMPERED`` is
 :mod:`app.verification.verifier`'s job.
-
-The superseded ``build_payload_block`` and ``parse_payload_block`` that used to
-live here have been removed. They produced an unversioned envelope whose JSON was
-serialised without ``sort_keys``, so re-serialising a parsed record could yield
-different bytes and break its own signature. :mod:`app.crypto.envelope` replaces
-them with a versioned, canonically serialised format.
 """
 
 from __future__ import annotations
@@ -215,30 +209,6 @@ def prepare_payload(
         stored_message_length=len(stored_message),
         encrypted=recorded_encryption is not None,
         flags=record.flags,
-    )
-
-
-def predict_envelope_length(
-    message_length: int,
-    private_key_or_public_key: Any,
-    *,
-    record: VerificationRecord,
-    encrypted: bool,
-) -> int:
-    """Estimate the envelope length for a message of *message_length* bytes.
-
-    Useful for a capacity read-out that updates as the user types, before any
-    signing has happened. The record's serialised length is taken from a
-    representative record, so the result is exact whenever that record has the
-    same field widths as the one that will finally be signed.
-    """
-    stored = message_length + (
-        encryption_module.OVERHEAD_BYTES if encrypted else 0
-    )
-    return envelope_module.envelope_length_for(
-        len(record.to_bytes()),
-        stored,
-        signatures.signature_size_bytes(private_key_or_public_key),
     )
 
 

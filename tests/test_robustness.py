@@ -87,7 +87,7 @@ class TestFactorValidation:
             redundancy.validate_factor(True)
 
     def test_every_offered_factor_is_valid(self):
-        for factor in constants.ECC_REPETITION_FACTORS:
+        for factor in (3, 5, 7, 9):
             assert redundancy.validate_factor(factor) == factor
 
 

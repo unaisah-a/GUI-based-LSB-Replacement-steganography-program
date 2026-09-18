@@ -97,9 +97,6 @@ LENGTH_HEADER_BYTES: Final[int] = 4
 IMAGE_SAMPLE_WIDTH_BITS: Final[int] = 8
 AUDIO_SAMPLE_WIDTH_BITS: Final[int] = 16
 
-AUDIO_SUBTYPE: Final[str] = "PCM_16"
-AUDIO_FORMAT: Final[str] = "WAV"
-
 
 # --------------------------------------------------------------------------- #
 # Start-location derivation
@@ -194,7 +191,6 @@ ECC_REPETITION: Final[str] = "repetition"
 ECC_SCHEMES: Final[tuple[str, ...]] = (ECC_NONE, ECC_REPETITION)
 
 #: Repetition factors must be odd so a majority vote can never tie.
-ECC_REPETITION_FACTORS: Final[tuple[int, ...]] = (3, 5, 7, 9)
 ECC_REPETITION_DEFAULT_FACTOR: Final[int] = 3
 
 

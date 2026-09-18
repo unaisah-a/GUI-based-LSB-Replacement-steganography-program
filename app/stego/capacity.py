@@ -188,7 +188,7 @@ def capacity_report(
         # Requirement 5.9: report the percentage only when the header itself
         # fits, and do not cap it at 100 so that an oversized payload is visibly
         # oversized.
-        if capacity >= LENGTH_HEADER_BYTES and capacity > 0:
+        if capacity >= LENGTH_HEADER_BYTES:
             used_percent = round(required_encoded / capacity * 100, 1)
 
     return CapacityReport(
@@ -198,12 +198,6 @@ def capacity_report(
         available_samples=available_samples,
         available_capacity_bytes=capacity,
         max_payload_length=max_payload,
-        # An earlier version computed this as ``max_payload > 0``, ignoring
-        # payload_length entirely, so a payload far larger than the cover was
-        # still reported as fitting. Embedding was never unsafe, because
-        # embed_image enforces capacity itself, but a GUI pre-flight check
-        # reading this field would have been wrong.
-        #
         # The comparison is against the *encoded* length, so a zero-length
         # payload still requires room for the 4-byte header. With no payload
         # length supplied the report describes the medium rather than a specific

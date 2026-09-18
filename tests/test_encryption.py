@@ -350,7 +350,7 @@ class TestEncryptThenSign:
         )
 
         parsed = env.parse_envelope(envelope)
-        assert parsed.encrypted_flag is True
+        assert parsed.flags & constants.ENVELOPE_FLAG_ENCRYPTED
         assert signatures.verify_envelope_signature(parsed, public_key) is True
 
         recovered = encryption.decrypt_message(

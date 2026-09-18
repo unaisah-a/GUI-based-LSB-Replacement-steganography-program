@@ -88,64 +88,6 @@ def load_audio(audio_path):
 
 
 # ============================================================
-# BASIC AUDIO INFORMATION
-# ============================================================
-
-def get_audio_info(audio_path):
-    """
-    Return basic information about a WAV file.
-
-    Notes:
-        total_frames:
-            Number of time-domain frames.
-
-        total_scalar_samples:
-            Total individual sample values across all channels.
-
-            Example:
-                44,100 stereo frames =
-                88,200 scalar samples.
-
-        audio_stego.py embeds data into scalar samples after
-        flattening the channel data.
-    """
-
-    samples, sample_rate = load_audio(
-        audio_path
-    )
-
-    if samples.ndim == 1:
-        channels = 1
-        total_frames = samples.shape[0]
-
-    else:
-        channels = samples.shape[1]
-        total_frames = samples.shape[0]
-
-    total_scalar_samples = int(
-        samples.size
-    )
-
-    duration_seconds = (
-        total_frames / sample_rate
-    )
-
-    return {
-        "sample_rate": sample_rate,
-        "channels": channels,
-        "total_frames": int(total_frames),
-        "total_scalar_samples":
-            total_scalar_samples,
-        "duration_seconds":
-            float(duration_seconds),
-        "minimum_sample":
-            float(np.min(samples)),
-        "maximum_sample":
-            float(np.max(samples))
-    }
-
-
-# ============================================================
 # ALIGN AUDIO
 # ============================================================
 

@@ -91,14 +91,14 @@ class TestFormatDetection:
         reloaded, descriptor = image_io.load_image(path)
         assert descriptor.container_format == image_io.PNG
         assert descriptor.extension_format == image_io.BMP
-        assert descriptor.format_matches_extension is False
         assert np.array_equal(array, reloaded)
 
     def test_matching_extension_is_reported(self, workspace):
         path = write_cover(
             workspace, make_cover(5, 5, 3, "noise", 1), image_io.PNG, "cover"
         )
-        assert image_io.describe_only(path).format_matches_extension is True
+        descriptor = image_io.describe_only(path)
+        assert descriptor.extension_format == descriptor.container_format
 
     def test_unknown_extension_is_not_fatal(self, workspace):
         array = make_cover(5, 5, 3, "noise", 1)

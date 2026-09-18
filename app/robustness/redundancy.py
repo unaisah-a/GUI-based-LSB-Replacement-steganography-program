@@ -43,7 +43,6 @@ from __future__ import annotations
 
 import numpy as np
 
-from app.utils import constants
 
 __all__ = [
     "encoded_length",
@@ -116,16 +115,9 @@ def repetition_encode(data: bytes, factor: int) -> bytes:
             f"data must be bytes-like, got {type(data).__name__}"
         )
     count = validate_factor(factor)
-    payload = bytes(data)
-
-    if not payload:
-        return b""
-    if count == 1:
-        return payload
-
-    bits = np.unpackbits(np.frombuffer(payload, dtype=np.uint8))
-    # np.tile lays the copies end to end, which is the interleaving described above.
-    return np.packbits(np.tile(bits, count)).tobytes()
+    # Whole copies laid end to end, which is the interleaving described above. The
+    # payload is a whole number of bytes, so repeating the bytes repeats the bits.
+    return bytes(data) * count
 
 
 def repetition_decode(encoded: bytes, factor: int) -> tuple[bytes, np.ndarray]:

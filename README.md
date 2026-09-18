@@ -62,8 +62,9 @@ on a headless machine set `QT_QPA_PLATFORM=offscreen` first.
 Committed sample files live in [`samples/`](samples/). Each stego file has a
 `.manifest.json` beside it and was signed with the sample key in
 [`keys/public/samples_public.pem`](keys/public/). The start-location secret for all of
-them is `demo-start-secret`. Regenerate them with
-`python scripts/generate_samples.py`.
+them is `demo-start-secret`. When you verify, attack or inspect a committed sample,
+select that key in the public-key field (the tabs default to your own demo key).
+Regenerate the samples with `python scripts/generate_samples.py`.
 
 1. **Create a key pair.** Open *Keys → Generate demo key pair*. This writes a private
    key to `keys/demo_private/` (git-ignored, unencrypted, demo use only) and a public

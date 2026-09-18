@@ -140,11 +140,6 @@ class ImageDescriptor:
     bmp_bottom_up: bool | None = None
 
     @property
-    def format_matches_extension(self) -> bool:
-        """Requirement 1.2: whether content format and extension agree."""
-        return self.extension_format == self.container_format
-
-    @property
     def shape(self) -> tuple[int, int, int]:
         return (self.height, self.width, self.channel_count)
 

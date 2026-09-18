@@ -12,7 +12,6 @@ import json
 import math
 import os
 
-import numpy as np
 import pytest
 
 from app.analysis import quality_metrics

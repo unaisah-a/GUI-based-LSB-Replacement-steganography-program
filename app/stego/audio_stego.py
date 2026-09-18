@@ -1,64 +1,20 @@
 """LSB replacement embedding and extraction for 16-bit PCM WAV cover objects.
 
-This layer is the audio counterpart of :mod:`app.stego.image_stego` and is
-deliberately built the same way: the same shared bit primitives, the same capacity
-arithmetic, the same error hierarchy, the same encoded-stream format, the same
-validation order, and the same public signature shape::
+The audio counterpart of :mod:`app.stego.image_stego`, with the same encoded-stream
+format, validation order, error hierarchy and public signature::
 
     embed_audio(input_path, output_path, payload, lsb_count, start_location)
     extract_audio(input_path, lsb_count, start_location) -> bytes
 
-What changed from the previous implementation, and why
------------------------------------------------------
-The audio half used to be an independent implementation with its own conventions.
-Every difference below was a real problem for a caller trying to treat the two
-media uniformly, so all of them were resolved in favour of the image layer's
-behaviour:
+PCM samples are signed, so the sample array is *reinterpreted* with
+``view(np.uint16)`` rather than cast: LSB replacement must operate on the
+two's-complement bit pattern, and a cast would change the numbers. See
+``docs/architecture.md`` section 3.
 
-* **Names.** ``embed_audio_lsb`` / ``extract_audio_lsb`` did not match the agreed
-  interface, so a GUI written against it would fail to import.
-* **The ``b"INF2005"`` magic marker.** Removed. A payload marker now lives in the
-  shared envelope inside the payload (:mod:`app.crypto.envelope`), which gives
-  both media the same "is there a payload here?" signal instead of giving audio a
-  private one and images none. The encoded stream here is now exactly the image
-  layer's: a 4-byte big-endian length header followed by the payload.
-* **The ``passcode`` parameter.** Removed. Deriving a start location from a secret
-  is a cryptographic operation and belongs in
-  :mod:`app.crypto.start_location`. This layer carries opaque bytes to a
-  caller-supplied index and holds no key material.
-* **Return type and errors.** Returns a frozen dataclass rather than a dict, and
-  raises from :mod:`app.stego.errors` rather than raising bare ``ValueError`` and
-  ``TypeError``, so one ``except StegoError`` handles both media.
-* **Missing safety checks.** ``embed_audio(path, path, ...)`` destroyed the cover,
-  and an occupied output path was silently overwritten. Both are now refused, via
-  the shared checks in :mod:`app.stego.paths`, and the write is atomic.
-* **Speed.** Bits were read and written by a per-sample, per-bit Python loop. All
-  bit handling is now vectorised through :mod:`app.stego.bit_utils`, which the old
-  code did not import at all despite that module documenting itself as shared.
-* **Numeric strictness.** ``isinstance(x, int)`` rejected a ``numpy`` integer, so a
-  value that had passed through numpy — a derived start location, for instance —
-  failed on audio while working on images.
-
-Signed samples
---------------
-The one genuine difference from the image layer is that PCM samples are signed
-16-bit integers, while the shared bit helpers operate on unsigned samples. The
-array is therefore *reinterpreted* with ``view(np.uint16)`` rather than converted:
-a view preserves the two's-complement bit pattern, which is what LSB replacement
-must operate on. A cast would change the numbers. Concretely, ``-1`` is
-``0xFFFF``; clearing its three low bits gives ``0xFFF8``, which is ``-8`` — the
-correct result of replacing three low bits, and nothing a signed-arithmetic
-implementation would produce naturally.
-
-Security boundary
------------------
-This module carries opaque bytes. It performs no hashing, signing, signature
-verification or encryption, and returns no verdict. The 4-byte length header is
-unauthenticated, a non-zero start location conceals rather than encrypts, and an
-extraction failure does not identify its cause: a wrong depth, a wrong start
-location, an absent payload and sample corruption produce indistinguishable bit
-streams, and a mismatched read can decode a plausible length and return wrong
-bytes with no error at all. Never treat a returned byte sequence as verified.
+This module carries opaque bytes and returns no verdict. The length header is
+unauthenticated, and a mismatched depth or start location can decode a plausible
+length and return wrong bytes with no error. Never treat a returned byte sequence as
+verified.
 """
 
 from __future__ import annotations
@@ -93,7 +49,6 @@ from app.stego.errors import (
     CapacityError,
     DecodeError,
     ExtractionError,
-    FileError,
     ValidationError,
     safe_path,
 )
@@ -366,8 +321,7 @@ def _validate_start_location(start_location: object, total_samples: int) -> int:
 
     ``True`` silently meaning index 1 would hide a caller mistake. Accepting
     ``np.integer`` matters because a start location may arrive from numpy-derived
-    arithmetic; the previous implementation rejected those on audio while the image
-    layer accepted them.
+    arithmetic.
     """
     if isinstance(start_location, bool) or not isinstance(
         start_location, (int, np.integer)

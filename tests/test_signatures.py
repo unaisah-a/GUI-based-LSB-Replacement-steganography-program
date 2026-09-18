@@ -17,7 +17,7 @@ import os
 from pathlib import Path
 
 import pytest
-from cryptography.hazmat.primitives.asymmetric import ec, rsa
+from cryptography.hazmat.primitives.asymmetric import ec
 
 from app.crypto import envelope as env
 from app.crypto import key_manager, signatures

@@ -1,9 +1,8 @@
 """Generate the committed demo WAV cover in ``samples/audio/original/``.
 
-Not a test: the file name does not match pytest's ``test_*.py`` pattern, so it is
-never collected. Run it directly to regenerate the sample media:
+Run directly, or let ``generate_samples.py`` call it when the cover is missing:
 
-    .venv\\Scripts\\python tests/create_test_audio.py
+    .venv\\Scripts\\python scripts/create_test_audio.py
 
 Paths are resolved from this file's location rather than the working directory, so
 the sample lands in the repository regardless of where the command is run.

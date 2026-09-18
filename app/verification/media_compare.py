@@ -28,7 +28,7 @@ a way that misleads:
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from app.analysis import quality_metrics

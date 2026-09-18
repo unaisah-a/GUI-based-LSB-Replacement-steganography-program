@@ -33,7 +33,7 @@ from app.analysis.size_preservation import (
     PADDING_CHUNK_TYPE,
     SizeResult,
 )
-from app.stego import audio_stego, image_io, image_stego, media, video_stego
+from app.stego import audio_stego, image_io, image_stego, video_stego
 from app.stego.errors import ValidationError
 from app.utils import constants, file_utils
 from conftest import (

@@ -26,26 +26,11 @@ changes the location rather than silently producing a location that still
 "works". The domain string and scheme version provide domain separation, so a
 future scheme cannot produce colliding locations.
 
-What replaced what, and why
----------------------------
-This module previously held two incompatible derivations, both of which had to go:
-
-* ``calculate_start_location`` reduced modulo ``cover_capacity - payload_len``,
-  which made the location depend on the payload length. The extractor cannot know
-  the payload length before locating the payload, so the value was not
-  reproducible by a receiver. Its units were bytes, while both stego layers index
-  samples.
-* ``calculate_audio_start_location`` fixed the reproducibility problem by
-  excluding the payload length, but confined the result to the first quarter of
-  the file for no stated reason, applied only to audio, and lived behind a
-  ``try/except ImportError`` inside the audio stego layer — putting key-derived
-  behaviour inside a layer that is supposed to carry opaque bytes.
-
-The circularity that broke the first version is resolved by the companion
-manifest rather than by dropping an input: the manifest publishes
-``envelope_length``, so a receiver knows it before extraction. It is not a secret,
-and it is implied by the signed bytes, so a receiver can recompute it from the
-parsed envelope and compare.
+How a receiver reproduces the location
+--------------------------------------
+``envelope_length`` is an input, so the receiver needs it before extraction. The
+companion manifest publishes it. It is not a secret, and it is implied by the signed
+bytes, so the verifier recomputes it from the parsed envelope and compares.
 
 What this does and does not provide
 -----------------------------------

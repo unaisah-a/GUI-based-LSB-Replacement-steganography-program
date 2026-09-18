@@ -136,9 +136,6 @@ class DropZone(QFrame):
         self.setProperty("state", "")
         self._restyle()
 
-    def set_media_types(self, media_types: Iterable[str] | None) -> None:
-        self._media_types = tuple(media_types) if media_types else None
-
     # -- selection --------------------------------------------------------- #
 
     def open_file_dialog(self) -> None:

@@ -27,8 +27,7 @@ import pytest
 
 pytest.importorskip("PySide6", reason="PySide6 is required for the interface tests")
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QLabel, QTabWidget
+from PySide6.QtWidgets import QTabWidget
 
 from app.crypto.errors import ManifestError
 from app.gui.main_window import MainWindow

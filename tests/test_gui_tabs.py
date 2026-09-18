@@ -29,7 +29,7 @@ from app.crypto.encryption import MIN_SCRYPT_N
 from app.gui.protect_tab import ProtectTab
 from app.gui.verify_tab import VerifyTab
 from app.stego import image_io, media
-from app.utils import constants, file_utils
+from app.utils import constants
 from app.verification import verdicts
 from app.verification.protect import protect_media
 from conftest import make_audio, make_cover, write_audio_file, write_cover

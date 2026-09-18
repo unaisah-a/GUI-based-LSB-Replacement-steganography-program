@@ -62,9 +62,7 @@ from app.stego.capacity import (
 from app.stego.errors import (
     CapacityError,
     ExtractionError,
-    FileError,
     ValidationError,
-    safe_path,
 )
 from app.stego.image_io import ImageDescriptor
 

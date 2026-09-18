@@ -399,7 +399,7 @@ class TestErrorCorrectionParameterValidation:
         with pytest.raises(RecordError, match="odd"):
             env.VerificationRecord.from_dict(self._with_ecc(factor=4))
 
-    @pytest.mark.parametrize("factor", constants.ECC_REPETITION_FACTORS)
+    @pytest.mark.parametrize("factor", (3, 5, 7, 9))
     def test_every_offered_factor_is_accepted(self, factor):
         record = env.VerificationRecord.from_dict(self._with_ecc(factor=factor))
         assert record.ecc.factor == factor
@@ -519,10 +519,6 @@ class TestEnvelopeRoundTrip:
     def test_flags_survive_the_round_trip(self, flags):
         parsed = env.parse_envelope(make_envelope(flags=flags))
         assert parsed.flags == flags
-        assert parsed.encrypted_flag is bool(
-            flags & constants.ENVELOPE_FLAG_ENCRYPTED
-        )
-        assert parsed.ecc_flag is bool(flags & constants.ENVELOPE_FLAG_ECC)
 
     def test_empty_message_round_trips(self):
         parsed = env.parse_envelope(make_envelope(message=b""))

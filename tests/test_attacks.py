@@ -17,7 +17,6 @@ Two results are asserted deliberately even though they are unflattering:
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
 import pytest
@@ -30,7 +29,6 @@ from app.stego import image_io
 from app.utils import constants
 from app.verification import verdicts
 from app.verification.protect import protect_media
-from app.verification.verifier import verify_media
 from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 FAST_SCRYPT = {"scrypt_n": MIN_SCRYPT_N, "scrypt_r": 8, "scrypt_p": 1}

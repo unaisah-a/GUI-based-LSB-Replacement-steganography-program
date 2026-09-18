@@ -1,69 +1,24 @@
 """LSB replacement embedding and extraction for video cover objects.
 
-The third medium, built on the same primitives as :mod:`app.stego.image_stego` and
-:mod:`app.stego.audio_stego`, with the same public signature shape::
+Same public signature shape as the image and audio layers::
 
     embed_video(input_path, output_path, payload, lsb_count, start_location)
     extract_video(input_path, lsb_count, start_location) -> bytes
 
-One flat sample domain, not a frame-selection scheme
-----------------------------------------------------
-The obvious design for video is to pick a set of "carrier frames" and embed inside
-them, keyed by something the receiver also knows. That was rejected, because it
-would have needed the stego layer to know about keys and nonces — exactly the
-boundary the image and audio layers keep — and it would have added new fields to
-the manifest for something the existing machinery already does.
+A clip is one flat sample domain: every channel value of every frame, in decode
+order, then row-major within a frame, then across the three colour channels. A start
+location indexes that domain exactly as it indexes an image, so the keyed
+start-location derivation already places the payload at an unpredictable frame and
+offset, and a payload longer than one frame runs on into the next.
 
-Instead a clip is treated as one continuous sample domain: every pixel of every
-frame, in decode order, then row-major within each frame, then across the three
-colour channels. That single change makes video fall out of the existing design
-with no new concepts at all:
+Output is always FFV1 in Matroska, because only a lossless codec preserves LSB data.
+Frames are streamed one at a time in both directions. :func:`embed_video` counts the
+frames it actually decodes rather than trusting the container, and reads its own
+output back to confirm the payload survives before moving the file into place. The
+reasoning behind each of these is in ``docs/architecture.md`` section 3.
 
-* ``total_samples`` is ``frame_count * height * width * 3``,
-* ``start_location`` indexes that domain exactly as it indexes an image's pixels,
-* the existing keyed derivation in :mod:`app.crypto.start_location` therefore
-  already scatters the payload to an unpredictable frame *and* offset within it,
-* and a payload longer than one frame simply runs on into the next.
-
-So "which frames carry the payload" is decided by the same secret that decides
-where in an image the payload starts, and no separate mechanism was needed.
-
-Losslessness is the whole problem
----------------------------------
-LSB replacement survives only if every pixel is preserved bit for bit, and almost
-every video codec in common use is lossy. Output is therefore always **FFV1 in a
-Matroska container**, regardless of what the cover was: FFV1 is mathematically
-lossless and is present in the FFmpeg build that ships with ``opencv-python``, so
-no external binary is required.
-
-The cover's own codec does not have to be lossless — its frames are decoded to
-pixels either way — but two container-level properties do have to survive, and
-they are checked rather than assumed:
-
-*Frame count.* The sample domain is measured in frames, so the sender and the
-receiver must count the same number. Containers routinely report a frame count
-that differs from what actually decodes, so :func:`embed_video` counts the frames
-it really reads and refuses to continue if the container lied.
-
-*The written file.* A codec that quietly re-quantised the pixels would produce a
-file that looks fine and verifies as ``PAYLOAD_MISSING`` later, with nothing to
-point at. Rather than trust the codec, :func:`embed_video` reads its own output
-back and confirms the payload extracts identically before the file is moved into
-place. That costs an extra decode pass; silent corruption of a demonstration
-artefact costs more.
-
-Memory
-------
-Frames are streamed one at a time in both directions, so a clip is never fully
-resident. A ten-second 1080p clip is around 1.8 GB of raw samples, which is why
-holding the whole decoded array — the simplest implementation — was not an option.
-
-Security boundary
------------------
-As with the other two media, this module carries opaque bytes. No hashing,
-signing, verification or encryption, no key material, and no verdict. The 4-byte
-length header is unauthenticated, and an extraction failure does not identify its
-cause. Never treat a returned byte sequence as verified.
+This module carries opaque bytes and returns no verdict. Never treat a returned byte
+sequence as verified.
 """
 
 from __future__ import annotations

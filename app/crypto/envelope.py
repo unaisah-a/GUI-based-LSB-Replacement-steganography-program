@@ -1,26 +1,7 @@
 """The versioned payload envelope, and the verification record it carries.
 
-Where the envelope sits
------------------------
-The envelope is the **payload** that the steganography layer embeds. It is not
-part of the stego framing. Both the image and the audio layer write a bare 4-byte
-big-endian length header followed by opaque bytes, and those opaque bytes are an
-envelope::
-
-    stego framing (per medium)   [4-byte length][ ................. ]
-    envelope (shared)                           [magic|ver|flags|...]
-
-Keeping the magic and version here rather than in the stego layers preserves the
-image specification's rule that the encoded stream carries no format-version,
-type or marker byte (Requirement 4.5), while still giving image, audio and video
-one shared, versioned, self-describing format. It also means the "is there a
-payload here at all?" check is identical for every medium, which the audio layer
-previously provided for itself with a private ``b"INF2005"`` marker and the image
-layer did not provide at all.
-
-Byte layout
------------
-::
+The envelope is the payload the stego layer embeds. The stego framing, a bare 4-byte
+length header, sits outside it and knows nothing about it. Byte layout::
 
     offset  size  field
     0       8     magic          b"INF2005E"
@@ -33,37 +14,15 @@ Byte layout
     18+R+M  4     signature_len  big-endian uint32
     22+R+M  S     signature      RSA-PSS over bytes [0, 18+R+M)
 
-The signature covers the magic, version, flags, both length fields and both
-section bodies. Two consequences worth stating:
+The signature covers everything before the signature length, so the framing, the
+flags and both sections are authenticated, and the total envelope length is fixed by
+the signed bytes. When encryption is on, the message section is ciphertext and the
+signature covers it (encrypt-then-sign); the record's ``message_hash`` is always the
+digest of the plaintext.
 
-* The framing is authenticated, not just the record. An attacker cannot change
-  the declared record length, flip the encrypted flag, or swap the message for a
-  different one of the same length without invalidating the signature.
-* Because the signature is computed over everything that precedes it, the total
-  envelope length is fully determined by the signed bytes plus the signature
-  size. A receiver can therefore recompute the expected envelope length and
-  compare it with the length recorded in the companion manifest, which is how a
-  manifest-level length claim gets authenticated without being inside the
-  signature.
-
-Encrypt-then-sign
------------------
-When encryption is enabled, the ``message`` section holds ciphertext and the
-signature is computed over that ciphertext. Verification therefore happens
-*before* decryption: a file signed with the wrong key is rejected as an invalid
-signature and never reaches the cipher. The record's ``message_hash`` is the
-digest of the **plaintext**, so the baseline message-integrity check of the
-project's security design is preserved: verify the signature, decrypt, hash the
-recovered plaintext, compare with the signed digest.
-
-Trust boundary
---------------
-:func:`parse_envelope` performs *structural* validation only. It decodes the
-record's JSON so a caller can inspect it, but it draws no conclusion from the
-contents, because at parse time nothing has been authenticated yet. Turning that
-dictionary into a :class:`VerificationRecord` and acting on its values is a
-separate step that belongs after the signature check. The verifier is written in
-that order.
+:func:`parse_envelope` validates structure only. Nothing in the record can be trusted
+until the signature has verified, so build a :class:`VerificationRecord` from it only
+after that. The design rationale is in ``docs/architecture.md`` section 2.
 """
 
 from __future__ import annotations
@@ -661,14 +620,6 @@ class ParsedEnvelope:
     #: The byte range the signature is computed over.
     signed_region: bytes
     total_length: int
-
-    @property
-    def encrypted_flag(self) -> bool:
-        return bool(self.flags & constants.ENVELOPE_FLAG_ENCRYPTED)
-
-    @property
-    def ecc_flag(self) -> bool:
-        return bool(self.flags & constants.ENVELOPE_FLAG_ECC)
 
 
 def _read_section(data: bytes, offset: int, name: str) -> tuple[bytes, int]:

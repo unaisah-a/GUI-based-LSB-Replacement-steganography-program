@@ -1,14 +1,7 @@
 """Tests for the cryptography layer.
 
-Starts with import smoke tests. Two modules in this package previously contained
-unterminated string literals used as docstrings (``payload.py`` line 8 and
-``signatures.py`` line 9, each a single-quoted ``"..."`` string spread over two
-physical lines), which made them raise ``SyntaxError`` on import. Nothing in the
-repository imported them, so the breakage went unnoticed. These tests fail loudly
-if that regresses.
-
-Behavioural tests for the envelope, signatures, encryption, start-location
-derivation and manifest are added by the tasks that build those modules.
+Import smoke tests for every module in the package, plus the hashing helpers.
+Behavioural tests for each module live in their own test files.
 """
 
 from __future__ import annotations

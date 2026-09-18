@@ -45,7 +45,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -54,7 +54,6 @@ import pytest
 from app.analysis import quality_metrics
 from app.crypto import key_manager
 from app.crypto.encryption import MIN_SCRYPT_N
-from app.crypto.envelope import ErrorCorrectionParameters
 from app.stego import image_io
 from app.stego.errors import CapacityError
 from app.utils import constants, file_utils

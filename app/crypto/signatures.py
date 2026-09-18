@@ -22,16 +22,9 @@ verification workflow and the caller maps it to a ``SIGNATURE_INVALID`` verdict.
 :class:`~app.crypto.errors.KeyMaterialError` are reserved for operations that
 cannot be carried out at all, such as an unusable key object.
 
-Two notes on the previous implementation, because both were real defects rather
-than style choices:
-
-* The signature block used to be located by counting backwards from the end of
-  the buffer (``len(data) - 260``). Any trailing byte shifted the split, and the
-  declared length field was never cross-checked against it. Parsing now walks
-  forward from the declared lengths, in :mod:`app.crypto.envelope`.
-* The signature size was hard-coded to 256 bytes, which silently restricted the
-  whole application to 2048-bit keys even though key generation accepted a size
-  parameter. Nothing here assumes a modulus size.
+Signature blocks are located by walking forward from the declared section lengths
+in :mod:`app.crypto.envelope`, and no modulus size is assumed, so any RSA key of at
+least :data:`app.utils.constants.RSA_MIN_KEY_SIZE` bits works.
 """
 
 from __future__ import annotations

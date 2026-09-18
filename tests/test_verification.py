@@ -17,17 +17,16 @@ import json
 import os
 from pathlib import Path
 
-import numpy as np
 import pytest
 
 from app.crypto import key_manager, manifest as manifest_module
 from app.crypto.encryption import MIN_SCRYPT_N
 from app.crypto.envelope import ErrorCorrectionParameters
 from app.crypto.errors import KeyMaterialError
-from app.stego import audio_stego, image_io, image_stego
+from app.stego import image_io, image_stego
 from app.stego.errors import CapacityError
 from app.utils import constants, file_utils
-from app.verification import protect, verdicts
+from app.verification import verdicts
 from app.verification.protect import protect_media
 from app.verification.verifier import verify_media
 from conftest import make_audio, make_cover, write_audio_file, write_cover

@@ -19,7 +19,7 @@ choosing. Every view here is explicitly set to plain text.
 
 from __future__ import annotations
 
-from typing import Iterable, Mapping
+from typing import Iterable
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
@@ -34,7 +34,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.utils import constants, file_utils
+from app.utils import constants
 from app.verification.verdicts import VERDICT_DESCRIPTIONS, VerificationResult
 
 __all__ = ["ResultPanel", "hex_dump"]
@@ -290,17 +290,6 @@ class ResultPanel(QGroupBox):
         self._verdict_label.setProperty("verdict", "unknown")
         self._restyle(self._verdict_label)
         self._reason_label.setText(message)
-
-    def show_rows(self, rows: Mapping[str, object]) -> None:
-        """Show arbitrary key/value rows, for tabs that report something else."""
-        while self._flags_form.rowCount():
-            self._flags_form.removeRow(0)
-        self._flag_widgets.clear()
-        for label, value in rows.items():
-            widget = QLabel(str(value), self._flags_box)
-            widget.setTextFormat(Qt.TextFormat.PlainText)
-            widget.setWordWrap(True)
-            self._flags_form.addRow(f"{label}:", widget)
 
     @staticmethod
     def _restyle(widget: QWidget) -> None:

@@ -218,7 +218,6 @@ class MediaPreview(QWidget):
                 f"still shown."
             )
 
-        from PySide6.QtMultimedia import QMediaPlayer
 
         self._player.setSource(QUrl.fromLocalFile(os.path.abspath(path)))
         self._controls.setVisible(True)

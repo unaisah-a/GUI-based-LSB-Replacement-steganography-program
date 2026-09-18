@@ -1,11 +1,7 @@
 """Filesystem validation shared by every steganography medium.
 
-These checks were originally written twice: once inside
-:mod:`app.stego.image_stego` and once, less completely, inside the audio layer.
-The audio version was missing two of them, with real consequences —
-``embed_audio_lsb(path, path, ...)`` destroyed the cover object, and an occupied
-output path was silently overwritten. They live here so that image, audio and
-video all validate identically and a fix reaches all three.
+Image, audio and video all call these, so every medium refuses an in-place write,
+an occupied output path and an unreadable input in exactly the same way.
 
 Every function raises from the :mod:`app.stego.errors` hierarchy, and messages
 name only the file, never its directory (Requirement 14.9), because they are

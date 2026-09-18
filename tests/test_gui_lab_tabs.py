@@ -13,7 +13,6 @@ on the wiring and on the honesty properties that only exist in the interface:
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 import pytest

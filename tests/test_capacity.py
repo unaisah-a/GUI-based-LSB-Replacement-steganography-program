@@ -121,11 +121,8 @@ class TestPayloadLengthAccounting:
 class TestPayloadFits:
     """``payload_fits`` must actually consider the supplied payload length.
 
-    An earlier version computed ``payload_fits = max_payload > 0``, ignoring
-    ``payload_length`` entirely, so a payload far larger than the cover was still
-    reported as fitting. Embedding was never unsafe, because
-    :func:`app.stego.image_stego.embed_image` enforces capacity itself, but a GUI
-    pre-flight check reading this field would have been wrong.
+    A GUI pre-flight check reads this field, so a payload larger than the cover must
+    be reported as not fitting, even though ``embed_image`` also enforces capacity.
     """
 
     def test_payload_below_capacity_fits(self):
