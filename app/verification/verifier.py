@@ -20,8 +20,9 @@ from app.crypto.payload import (
 from app.crypto.start_location import derive_start_location
 from app.services.media import inspect_carrier
 from app.robustness.redundancy import decode_repetition3
-from app.stego.audio_stego import extract_audio_lsb
-from app.stego.image_stego import extract_image
+from app.stego.audio_stego import extract_audio_lsb, extract_audio_lsb_bounded
+from app.stego.image_stego import extract_image, extract_image_bounded
+from app.stego.video_stego import extract_video, extract_video_bounded
 from app.verification.verdicts import ResultBuilder, Verdict, VerificationResult
 
 
@@ -30,7 +31,11 @@ def resolve_start_location(
     manifest: Manifest,
     start_secret: str | bytes | None,
 ) -> tuple[int, object]:
-    carrier = inspect_carrier(media_path, manifest.media_type)
+    carrier = inspect_carrier(
+        media_path,
+        manifest.media_type,
+        video_frame_index=manifest.video_frame_index or 0,
+    )
     required = carrier.required_samples(
         manifest.embedded_payload_length, manifest.lsb_count
     )
@@ -60,6 +65,30 @@ def resolve_start_location(
 
 
 def _extract(media_path: str | Path, manifest: Manifest, start: int) -> bytes:
+    if manifest.robustness == "repetition-3":
+        if manifest.media_type == "image":
+            return extract_image_bounded(
+                str(media_path),
+                manifest.lsb_count,
+                start,
+                manifest.embedded_payload_length,
+            )
+        if manifest.media_type == "audio":
+            return extract_audio_lsb_bounded(
+                str(media_path),
+                manifest.embedded_payload_length,
+                lsb_count=manifest.lsb_count,
+                start_location=start,
+            )
+        if manifest.media_type == "video":
+            assert manifest.video_frame_index is not None
+            return extract_video_bounded(
+                str(media_path),
+                manifest.embedded_payload_length,
+                lsb_count=manifest.lsb_count,
+                start_location=start,
+                frame_index=manifest.video_frame_index,
+            )
     if manifest.media_type == "image":
         return extract_image(
             str(media_path),
@@ -74,7 +103,16 @@ def _extract(media_path: str | Path, manifest: Manifest, start: int) -> bytes:
             start_location=start,
             manifest_payload_length=manifest.embedded_payload_length,
         )
-    raise ValueError("video verification is not implemented yet")
+    if manifest.media_type == "video":
+        assert manifest.video_frame_index is not None
+        return extract_video(
+            str(media_path),
+            lsb_count=manifest.lsb_count,
+            start_location=start,
+            frame_index=manifest.video_frame_index,
+            manifest_payload_length=manifest.embedded_payload_length,
+        )
+    raise ValueError("unsupported media type")
 
 
 def _manifest_mismatches(manifest: Manifest, record: dict) -> list[str]:
@@ -99,6 +137,11 @@ def _manifest_mismatches(manifest: Manifest, record: dict) -> list[str]:
         comparisons["start location"] = (
             extraction.get("start_location"),
             manifest.start_location,
+        )
+    if manifest.media_type == "video":
+        comparisons["video frame index"] = (
+            extraction.get("video_frame_index"),
+            manifest.video_frame_index,
         )
     for label, (signed_value, manifest_value) in comparisons.items():
         if signed_value != manifest_value:
@@ -165,7 +208,12 @@ def verify_media(
             "Extraction failed; the exact cause cannot be determined from the bit stream.",
             start_location=start,
         )
-    result.add("Extraction", True, f"Extracted {len(extracted)} payload bytes.")
+    extraction_detail = f"Extracted {len(extracted)} payload bytes."
+    if manifest.robustness == "repetition-3":
+        extraction_detail += (
+            " Used the bounded manifest length; carrier header values remain untrusted."
+        )
+    result.add("Extraction", True, extraction_detail)
 
     if manifest.robustness == "repetition-3":
         try:

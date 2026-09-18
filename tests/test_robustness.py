@@ -1,9 +1,14 @@
 import numpy as np
 import pytest
+import json
 
 from app.crypto.encryption import generate_encryption_key
 from app.robustness.recovery import create_recovery_sidecar, restore_original
 from app.robustness.redundancy import decode_repetition3, encode_repetition3
+from app.robustness.experiments import (
+    export_repetition_experiment,
+    run_repetition_experiment,
+)
 from app.services.size_preservation import pad_png_to_size
 from app.stego import image_io
 
@@ -14,6 +19,40 @@ def test_repetition3_majority_corrects_one_copy_per_byte():
     for offset in range(0, len(encoded), 3):
         encoded[offset] ^= 0b01010101
     assert decode_repetition3(bytes(encoded), len(original)) == original
+
+
+def test_repetition3_two_copy_fault_is_unrecoverable():
+    original = b"A"
+    encoded = bytearray(encode_repetition3(original))
+    encoded[0] ^= 0x80
+    encoded[1] ^= 0x80
+    assert decode_repetition3(bytes(encoded), len(original)) != original
+
+
+def test_seeded_repetition_experiment_exports_recovery_and_capacity(tmp_path):
+    payload = b"deterministic robustness evidence"
+    first = run_repetition_experiment(
+        payload, seed=2005, corruption_count=8, lsb_count=3
+    )
+    second = run_repetition_experiment(
+        payload, seed=2005, corruption_count=8, lsb_count=3
+    )
+    assert first == second
+    assert first.without_redundancy.recovered_exactly is False
+    assert first.repetition_3.recovered_exactly is True
+    assert first.repetition_3.stored_payload_bytes == len(payload) * 3
+    assert (
+        first.repetition_3.required_carrier_samples
+        > first.without_redundancy.required_carrier_samples
+    )
+
+    report = tmp_path / "robustness-experiment.json"
+    export_repetition_experiment(first, report)
+    saved = json.loads(report.read_text(encoding="utf-8"))
+    assert saved == first.to_dict()
+    assert "compression" in saved["scope"]
+    with pytest.raises(FileExistsError):
+        export_repetition_experiment(first, report)
 
 
 def test_encrypted_sidecar_restores_exact_original(tmp_path):

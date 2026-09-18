@@ -3,7 +3,9 @@ import pytest
 import soundfile as sf
 
 from app.stego.audio_stego import (
+    embed_audio,
     embed_audio_lsb,
+    extract_audio,
     extract_audio_lsb,
 )
 
@@ -126,3 +128,44 @@ def test_audio_extraction_cross_checks_manifest_payload_length(tmp_path):
             start_location=100,
             manifest_payload_length=len(payload) + 1,
         )
+
+
+def test_shared_audio_adapters_retain_the_low_level_packet_format(tmp_path):
+    original = tmp_path / "original.wav"
+    protected = tmp_path / "protected.wav"
+    create_test_wav(original)
+    payload = b"legacy low-level transport"
+
+    result = embed_audio(original, protected, payload, 3, 17)
+
+    assert result["packet_size"] == len(payload) + len(b"INF2005") + 4
+    assert extract_audio(protected, 3, 17) == payload
+
+
+def test_audio_embedding_rejects_aliases_and_requires_explicit_overwrite(tmp_path):
+    original = tmp_path / "original.wav"
+    protected = tmp_path / "protected.wav"
+    alias = tmp_path / "alias.wav"
+    create_test_wav(original)
+
+    with pytest.raises(ValueError, match="differ"):
+        embed_audio_lsb(original, original, b"message", start_location=0)
+    alias.hardlink_to(original)
+    with pytest.raises(ValueError, match="differ"):
+        embed_audio_lsb(original, alias, b"message", start_location=0, overwrite=True)
+
+    protected.write_bytes(b"existing")
+    with pytest.raises(FileExistsError):
+        embed_audio_lsb(original, protected, b"message", start_location=0)
+    embed_audio_lsb(
+        original, protected, b"message", start_location=0, overwrite=True
+    )
+    assert extract_audio_lsb(protected, start_location=0) == b"message"
+
+
+def test_audio_rejects_non_pcm16_wav(tmp_path):
+    source = tmp_path / "pcm24.wav"
+    output = tmp_path / "protected.wav"
+    sf.write(source, np.zeros(100, dtype=np.int32), 8_000, subtype="PCM_24")
+    with pytest.raises(ValueError, match="PCM_16"):
+        embed_audio_lsb(source, output, b"message", start_location=0)

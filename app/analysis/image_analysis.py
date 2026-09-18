@@ -138,6 +138,8 @@ class QualityComparison:
     #: Requirement 8.5: lets a caller render the infinite case without parsing text.
     overall_psnr_unbounded: bool
     channels: tuple[ChannelMetric, ...]
+    #: Equality over the colour samples used by ``overall_mse`` and PSNR.
+    colour_samples_identical: bool
     pixel_identical: bool
     max_absolute_difference: int
     differing_samples: int
@@ -423,6 +425,9 @@ def compare_quality(
         overall_psnr_db=overall_psnr,
         overall_psnr_unbounded=overall_unbounded,
         channels=tuple(channel_metrics),
+        colour_samples_identical=bool(
+            np.array_equal(first[:, :, :colour_channels], second[:, :, :colour_channels])
+        ),
         pixel_identical=differing_samples == 0,
         max_absolute_difference=int(absolute.max()) if total_samples else 0,
         differing_samples=differing_samples,

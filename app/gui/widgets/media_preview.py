@@ -42,6 +42,15 @@ class MediaPreview(QGroupBox):
         layout.addWidget(self._image, 1)
         layout.addLayout(buttons)
 
+    def clear(self, message: str = "No media selected") -> None:
+        self._path = None
+        self._player.stop()
+        self._player.setSource(QUrl())
+        self._image.setPixmap(QPixmap())
+        self._image.setText(message)
+        self._play.setEnabled(False)
+        self._pause.setEnabled(False)
+
     def set_file(self, path: str) -> None:
         self._path = path
         suffix = Path(path).suffix.lower()
@@ -61,9 +70,10 @@ class MediaPreview(QGroupBox):
             self._player.stop()
             self._play.setEnabled(False)
             self._pause.setEnabled(False)
-        elif suffix == ".wav":
+        elif suffix in {".wav", ".mkv", ".mp4", ".mov", ".avi"}:
             self._image.setPixmap(QPixmap())
-            self._image.setText(f"PCM WAV\n{Path(path).name}")
+            media_label = "PCM WAV" if suffix == ".wav" else "Video"
+            self._image.setText(f"{media_label}\n{Path(path).name}")
             self._player.setSource(QUrl.fromLocalFile(str(Path(path).resolve())))
             self._play.setEnabled(True)
             self._pause.setEnabled(True)

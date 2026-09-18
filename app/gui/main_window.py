@@ -56,11 +56,16 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(STYLE)
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
-        self._add_tab(ProtectTab(), "Protect")
-        self._add_tab(VerifyTab(), "Verify")
-        self._add_tab(AttackTab(), "Attack Lab")
-        self._add_tab(SteganalysisTab(), "Analysis")
-        self._add_tab(VideoTab(), "Video")
+        self.protect_tab = ProtectTab()
+        self.verify_tab = VerifyTab()
+        self.attack_tab = AttackTab()
+        self.analysis_tab = SteganalysisTab()
+        self.video_tab = VideoTab()
+        self._add_tab(self.protect_tab, "Protect")
+        self._add_tab(self.verify_tab, "Verify")
+        self._add_tab(self.attack_tab, "Attack Lab")
+        self._add_tab(self.analysis_tab, "Analysis")
+        self._add_tab(self.video_tab, "Video")
         self.statusBar().showMessage(
             "Successful verification authenticates the hidden message and signed record."
         )
@@ -71,3 +76,16 @@ class MainWindow(QMainWindow):
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         scroll.setWidget(widget)
         self.tabs.addTab(scroll, label)
+
+    def closeEvent(self, event) -> None:
+        for tab in (
+            self.protect_tab,
+            self.verify_tab,
+            self.attack_tab,
+            self.analysis_tab,
+            self.video_tab,
+        ):
+            shutdown = getattr(tab, "shutdown", None)
+            if shutdown is not None:
+                shutdown()
+        super().closeEvent(event)

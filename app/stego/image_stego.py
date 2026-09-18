@@ -74,6 +74,7 @@ __all__ = [
     "EmbedResult",
     "embed_image",
     "extract_image",
+    "extract_image_bounded",
     "measure_capacity",
     "embeddable_stream",
 ]
@@ -361,6 +362,53 @@ def embed_image(
 def _decode_length_header(header_bits: npt.NDArray[np.uint8]) -> int:
     """Decode the 32-bit big-endian length from the head of the bit stream."""
     return int.from_bytes(bits_to_bytes(header_bits[:LENGTH_HEADER_BITS]), "big")
+
+
+def _bounded_length(value: object) -> int:
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise TypeError("bounded payload length must be a non-negative integer")
+    if not 0 <= value <= MAX_PAYLOAD_LENGTH:
+        raise ValueError(
+            f"bounded payload length must be between 0 and {MAX_PAYLOAD_LENGTH}"
+        )
+    return value
+
+
+def extract_image_bounded(
+    input_path: str,
+    lsb_count: int,
+    start_location: int,
+    payload_length: int,
+) -> bytes:
+    """Read exactly *payload_length* bytes while ignoring the carrier header value.
+
+    This is the repetition-mode bootstrap path. The caller must obtain the length
+    from a strictly parsed, capacity-checked manifest and must authenticate the
+    decoded payload before trusting it. The four header bytes are still skipped
+    in the continuous bit stream, including at depths that do not divide 32.
+    """
+    _assert_readable(input_path)
+    depth = validate_lsb_depth(lsb_count)
+    length = _bounded_length(payload_length)
+    array, _descriptor = image_io.load_image(input_path)
+    flat, _usable = embeddable_stream(array)
+    total_samples = int(flat.size)
+    start = _validate_start_location(start_location, total_samples)
+    available = total_samples - start
+    total_bits = LENGTH_HEADER_BITS + length * 8
+    needed_groups = groups_needed(total_bits, depth)
+    if needed_groups > available:
+        raise ExtractionError(
+            f"manifest-bounded payload needs {needed_groups} samples at depth "
+            f"{depth} from start location {start}, but only {available} are available"
+        )
+    stream_bits = unpack_groups_to_bits(
+        read_low_bits(
+            flat[start : start + needed_groups], depth, IMAGE_SAMPLE_WIDTH_BITS
+        ),
+        depth,
+    )
+    return bits_to_bytes(stream_bits[LENGTH_HEADER_BITS:total_bits])
 
 
 def extract_image(

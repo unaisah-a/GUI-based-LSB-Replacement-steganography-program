@@ -102,7 +102,7 @@ def test_generation_failure_leaves_no_partial_bundle(
     else:
         monkeypatch.setattr(
             protection,
-            "pad_png_to_size",
+            "preserve_protected_size",
             lambda *_args, **_kwargs: (_ for _ in ()).throw(
                 OSError("injected postprocess failure")
             ),
@@ -351,6 +351,54 @@ def test_invalid_size_setting_fails_before_embedding(
             _options(preserve_size="yes"),
         )
     assert not embedded
+
+
+def test_size_report_requires_preservation_before_embedding(
+    tmp_path, private_key, monkeypatch
+):
+    source, output, manifest = _paths(tmp_path)
+    embedded = False
+
+    def unexpected_embed(*_args, **_kwargs):
+        nonlocal embedded
+        embedded = True
+
+    monkeypatch.setattr(protection, "embed_image", unexpected_embed)
+    with pytest.raises(ValueError, match="requires preserve_size"):
+        protect_media(
+            source,
+            output,
+            manifest,
+            b"message",
+            private_key,
+            _options(size_report_path=tmp_path / "size.json"),
+        )
+    assert not embedded
+
+
+def test_size_report_failure_leaves_no_partial_bundle(
+    tmp_path, private_key, monkeypatch
+):
+    source, output, manifest = _paths(tmp_path)
+    report = tmp_path / "size.json"
+
+    def fail_report(*_args, **_kwargs):
+        raise OSError("injected size report failure")
+
+    monkeypatch.setattr(protection, "export_size_preservation_result", fail_report)
+    with pytest.raises(OSError, match="injected size report failure"):
+        protect_media(
+            source,
+            output,
+            manifest,
+            b"message",
+            private_key,
+            _options(preserve_size=True, size_report_path=report),
+        )
+    assert not output.exists()
+    assert not manifest.exists()
+    assert not report.exists()
+    assert not _transaction_files(tmp_path)
 
 
 def test_successful_bundle_replaces_destinations_and_binds_recovery_to_final_bytes(

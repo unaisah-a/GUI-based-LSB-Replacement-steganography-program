@@ -238,6 +238,8 @@ def _validate_record(record: object, *, encrypted: bool, total_length: int) -> d
     start_method = extraction.get("start_method")
     if start_method == "manual":
         extraction_required.add("start_location")
+    if extraction.get("media_type") == "video":
+        extraction_required.add("video_frame_index")
     missing = extraction_required - set(extraction)
     unknown = set(extraction) - extraction_required
     if missing:
@@ -254,6 +256,13 @@ def _validate_record(record: object, *, encrypted: bool, total_length: int) -> d
     if not isinstance(media_type, str) or media_type not in {"image", "audio", "video"}:
         raise PayloadFormatError("signed media_type is unsupported")
     _require_int(extraction["lsb_count"], "signed lsb_count", minimum=1, maximum=8)
+    if media_type == "video":
+        _require_int(
+            extraction["video_frame_index"],
+            "signed video_frame_index",
+            minimum=0,
+            maximum=(1 << 31) - 1,
+        )
     if not isinstance(start_method, str) or start_method not in {"manual", "hmac-sha256"}:
         raise PayloadFormatError("signed start_method is unsupported")
     if start_method == "manual":
@@ -316,6 +325,7 @@ def build_envelope(
     encryption_key: bytes | None = None,
     manual_start_location: int | None = None,
     robustness: str = "none",
+    video_frame_index: int | None = None,
     timestamp: str | None = None,
     record_nonce: str | None = None,
 ) -> BuiltEnvelope:
@@ -337,6 +347,15 @@ def build_envelope(
         raise ValueError(str(exc)) from exc
     if not isinstance(media_type, str) or media_type not in {"image", "audio", "video"}:
         raise ValueError("media_type must be image, audio, or video")
+    if media_type == "video":
+        if (
+            isinstance(video_frame_index, bool)
+            or not isinstance(video_frame_index, int)
+            or video_frame_index < 0
+        ):
+            raise ValueError("video media requires a non-negative video_frame_index")
+    elif video_frame_index is not None:
+        raise ValueError("video_frame_index is only valid for video media")
     if isinstance(lsb_count, bool) or not isinstance(lsb_count, int) or not 1 <= lsb_count <= 8:
         raise ValueError("lsb_count must be an integer from 1 to 8")
     if start_method not in {"manual", "hmac-sha256"}:
@@ -392,6 +411,8 @@ def build_envelope(
     }
     if start_method == "manual":
         extraction["start_location"] = manual_start_location
+    if media_type == "video":
+        extraction["video_frame_index"] = video_frame_index
 
     record: dict[str, Any] = {
         "content_type": content_type,

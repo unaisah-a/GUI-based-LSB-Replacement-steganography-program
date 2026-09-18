@@ -71,6 +71,7 @@ class Manifest:
     carrier_payload_length: int | None = None
     manifest_version: int = MANIFEST_VERSION
     payload_format: int = PAYLOAD_FORMAT_VERSION
+    video_frame_index: int | None = None
 
     def validate(self) -> "Manifest":
         _require_int(
@@ -151,6 +152,15 @@ class Manifest:
             "repetition-3",
         }:
             raise ManifestError("robustness mode is unsupported")
+        if self.media_type == "video":
+            _require_int(
+                self.video_frame_index,
+                "video_frame_index",
+                minimum=0,
+                maximum=(1 << 31) - 1,
+            )
+        elif self.video_frame_index is not None:
+            raise ManifestError("video_frame_index is only valid for video media")
         if self.robustness == "none" and self.carrier_payload_length not in {
             None,
             self.payload_length,
@@ -174,6 +184,8 @@ class Manifest:
         value = asdict(self)
         if value["start_location"] is None:
             del value["start_location"]
+        if value["video_frame_index"] is None:
+            del value["video_frame_index"]
         return value
 
     def to_json(self) -> str:
@@ -205,8 +217,15 @@ class Manifest:
             "carrier_payload_length",
             "public_key_fingerprint",
             "robustness",
+            "video_frame_index",
         }
-        required = allowed - {"start_location", "carrier_payload_length"}
+        required = allowed - {
+            "start_location",
+            "carrier_payload_length",
+            "video_frame_index",
+        }
+        if value.get("media_type") == "video":
+            required.add("video_frame_index")
         missing = required - set(value)
         if missing:
             raise ManifestError(

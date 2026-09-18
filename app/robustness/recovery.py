@@ -26,6 +26,53 @@ class RecoveryResult:
     original_sha256: str
     protected_sha256: str
     restored_bytes: int
+    sidecar_bytes: int
+    storage_overhead_bytes: int
+
+
+@dataclass(frozen=True)
+class RecoveryInspection:
+    sidecar_path: str
+    original_sha256: str
+    protected_sha256: str
+    original_bytes: int
+    sidecar_bytes: int
+    storage_overhead_bytes: int
+
+
+def _inspect_bytes(sidecar: bytes, sidecar_path: Path) -> RecoveryInspection:
+    if len(sidecar) < HEADER.size + 16:
+        raise ValueError("recovery sidecar is truncated")
+    magic, version, _nonce, protected_hash, original_hash, length = HEADER.unpack_from(
+        sidecar
+    )
+    if magic != MAGIC or version != VERSION:
+        raise ValueError("recovery sidecar format is unsupported")
+    if length > MAX_ORIGINAL_BYTES:
+        raise ValueError("recovery sidecar declares an unsafe original length")
+    expected = HEADER.size + length + 16
+    if len(sidecar) != expected:
+        raise ValueError(
+            f"recovery sidecar length is invalid: expected {expected} bytes, "
+            f"received {len(sidecar)}"
+        )
+    return RecoveryInspection(
+        str(sidecar_path),
+        original_hash.hex(),
+        protected_hash.hex(),
+        length,
+        len(sidecar),
+        len(sidecar) - length,
+    )
+
+
+def inspect_recovery_sidecar(
+    sidecar_path: str | os.PathLike[str],
+) -> RecoveryInspection:
+    """Validate bounded sidecar framing and report its encrypted-backup overhead."""
+    source = Path(sidecar_path).resolve()
+    sidecar = _read_limited(source, MAX_ORIGINAL_BYTES + HEADER.size + 16)
+    return _inspect_bytes(sidecar, source)
 
 
 def _read_limited(path: str | os.PathLike[str], limit: int) -> bytes:
@@ -123,6 +170,8 @@ def create_recovery_sidecar(
         original_hash.hex(),
         protected_hash.hex(),
         length,
+        len(sidecar),
+        len(sidecar) - length,
     )
 
 
@@ -144,15 +193,10 @@ def restore_original(
         raise ValueError("protected and recovery sidecar paths must be different")
     _validate_output(destination, (protected_source, sidecar_source), overwrite)
     sidecar = _read_limited(sidecar_path, MAX_ORIGINAL_BYTES + HEADER.size + 16)
-    if len(sidecar) < HEADER.size + 16:
-        raise ValueError("recovery sidecar is truncated")
-    magic, version, nonce, protected_hash, original_hash, length = HEADER.unpack_from(
+    inspection = _inspect_bytes(sidecar, sidecar_source)
+    _magic, _version, nonce, protected_hash, original_hash, length = HEADER.unpack_from(
         sidecar
     )
-    if magic != MAGIC or version != VERSION:
-        raise ValueError("recovery sidecar format is unsupported")
-    if length > MAX_ORIGINAL_BYTES:
-        raise ValueError("recovery sidecar declares an unsafe original length")
     protected = _read_limited(protected_path, MAX_ORIGINAL_BYTES)
     current_protected_hash = hashlib.sha256(protected).digest()
     if current_protected_hash != protected_hash:
@@ -174,4 +218,6 @@ def restore_original(
         original_hash.hex(),
         protected_hash.hex(),
         len(original),
+        inspection.sidecar_bytes,
+        inspection.storage_overhead_bytes,
     )

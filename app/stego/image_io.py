@@ -51,6 +51,7 @@ __all__ = [
     "ImageDescriptor",
     "load_image",
     "save_image",
+    "encode_png",
     "describe_only",
 ]
 
@@ -286,7 +287,7 @@ def _decode_png(raw: bytes, name: str, channels: int) -> npt.NDArray[np.uint8]:
     return np.ascontiguousarray(array, dtype=np.uint8)
 
 
-def _encode_png(array: npt.NDArray[np.uint8]) -> bytes:
+def _encode_png(array: npt.NDArray[np.uint8], compress_level: int = 6) -> bytes:
     """Encode an array as a non-interlaced PNG with no ancillary metadata.
 
     Requirement 1.3 (lossless compression) and 1.11 (required records only).
@@ -306,8 +307,25 @@ def _encode_png(array: npt.NDArray[np.uint8]) -> bytes:
     buffer = io.BytesIO()
     # optimize=False keeps output deterministic across Pillow builds; the pixel
     # data is lossless either way (Requirement 2.11 determinism).
-    image.save(buffer, format="PNG", optimize=False, compress_level=6)
+    image.save(buffer, format="PNG", optimize=False, compress_level=compress_level)
     return buffer.getvalue()
+
+
+def encode_png(
+    array: npt.NDArray[np.uint8], *, compress_level: int = 6
+) -> bytes:
+    """Encode validated pixels as a metadata-free PNG at a bounded lossless level."""
+    if isinstance(compress_level, bool) or not isinstance(compress_level, int):
+        raise ValidationError("PNG compression level must be an integer")
+    if not 0 <= compress_level <= 9:
+        raise ValidationError("PNG compression level must be between 0 and 9")
+    if array.dtype != np.uint8:
+        raise ValidationError(f"sample array must have dtype uint8, got {array.dtype}")
+    if array.ndim != 3 or array.shape[2] not in SUPPORTED_CHANNEL_COUNTS:
+        raise ValidationError(
+            "sample array must have supported height, width, and channel dimensions"
+        )
+    return _encode_png(array, compress_level)
 
 
 # --------------------------------------------------------------------------- #

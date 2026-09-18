@@ -63,6 +63,7 @@ keys/demo_private/
 !keys/**/.gitkeep
 !keys/public/
 !keys/public/*.pem
+!samples/r11/receiver/demo-public-key.pem
 
 # evidence/ is deliberately NOT ignored.
 #

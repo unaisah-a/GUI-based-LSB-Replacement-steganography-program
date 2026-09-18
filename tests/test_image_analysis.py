@@ -36,9 +36,14 @@ class TestMetricCorrectness:
         first, second = pair
         result = analysis.compare_quality(first, second)
         identical = np.array_equal(first, second)
+        colour_channels = 3 if first.shape[2] == 4 else first.shape[2]
+        colour_identical = np.array_equal(
+            first[:, :, :colour_channels], second[:, :, :colour_channels]
+        )
 
         assert result.pixel_identical is identical
-        if identical:
+        assert result.colour_samples_identical is colour_identical
+        if colour_identical:
             assert result.overall_mse == 0.0
             assert result.overall_psnr_db == math.inf
             assert result.overall_psnr_unbounded is True
@@ -118,6 +123,7 @@ class TestAlphaHandling:
         assert result.overall_mse == 0.0
         assert result.overall_psnr_unbounded is True
         assert result.alpha_excluded_from_overall is True
+        assert result.colour_samples_identical is True
 
         alpha = [channel for channel in result.channels if channel.is_alpha][0]
         assert alpha.mse > 0.0

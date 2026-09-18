@@ -310,12 +310,6 @@ def _resolve_start_location(
         )
 
     if passcode is not None:
-        if calculate_audio_start_location is None:
-            raise ImportError(
-                "calculate_audio_start_location is unavailable. "
-                "Add it to app/crypto/start_location.py."
-            )
-
         channels = get_channel_count(samples)
         derived = calculate_audio_start_location(
             passcode=passcode,
@@ -555,6 +549,60 @@ def extract_audio_lsb(
 
     packet = header + payload
     return parse_packet(packet)
+
+
+def extract_audio_lsb_bounded(
+    input_path,
+    payload_length,
+    lsb_count=1,
+    start_location=None,
+    passcode=None,
+):
+    """Read a manifest-bounded payload while ignoring audio magic/length values.
+
+    The outer transport header still occupies its normal place in the continuous
+    bit stream. Callers must authenticate the recovered payload before trusting
+    the manifest-supplied bound.
+    """
+    validate_lsb_count(lsb_count)
+    if (
+        isinstance(payload_length, bool)
+        or not isinstance(payload_length, int)
+        or payload_length < 0
+    ):
+        raise TypeError("bounded payload length must be a non-negative integer")
+    max_payload_length = (1 << (8 * LENGTH_BYTES)) - 1
+    if payload_length > max_payload_length:
+        raise ValueError("bounded payload length exceeds the audio transport limit")
+    samples, sample_rate = read_audio(input_path)
+    flat_samples = audio_to_samples(samples)
+    resolved_start, _ = _resolve_start_location(
+        samples=samples,
+        sample_rate=sample_rate,
+        lsb_count=lsb_count,
+        start_location=start_location,
+        passcode=passcode,
+    )
+    needed_samples = samples_required_for_packet(
+        HEADER_BYTES + payload_length, lsb_count
+    )
+    available = len(flat_samples) - resolved_start
+    if needed_samples > available:
+        raise ValueError(
+            "Manifest-bounded audio payload exceeds the available carrier samples."
+        )
+    bit_stream = _iter_lsb_bits(flat_samples, resolved_start, lsb_count)
+    _read_bits(
+        bit_stream,
+        HEADER_BYTES * 8,
+        "Audio ended before the carrier header could be skipped.",
+    )
+    payload_bits = _read_bits(
+        bit_stream,
+        payload_length * 8,
+        "Audio ended before the manifest-bounded payload was fully extracted.",
+    )
+    return bits_to_bytes(payload_bits)
 
 
 def embed_audio(

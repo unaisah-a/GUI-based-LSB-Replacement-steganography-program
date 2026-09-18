@@ -19,13 +19,15 @@ from app.robustness.recovery import (
 )
 from app.robustness.redundancy import encode_repetition3
 from app.services.media import CarrierCapacity, CarrierInfo, inspect_carrier
+from app.services.operations import OperationControl
 from app.services.size_preservation import (
     SizePreservationResult,
-    compare_file_sizes,
-    pad_png_to_size,
+    export_size_preservation_result,
+    preserve_protected_size,
 )
 from app.stego.audio_stego import embed_audio_lsb
 from app.stego.image_stego import embed_image
+from app.stego.video_stego import embed_video
 
 
 @dataclass(frozen=True)
@@ -40,9 +42,12 @@ class ProtectionOptions:
     encryption_key: bytes | None = None
     robustness: str = "none"
     preserve_size: bool = False
+    size_report_path: str | Path | None = None
     recovery_key: bytes | None = None
     recovery_path: str | Path | None = None
     overwrite: bool = False
+    video_frame_index: int = 0
+    operation: OperationControl | None = field(default=None, repr=False, compare=False)
 
 
 @dataclass(frozen=True)
@@ -60,6 +65,7 @@ class ProtectionResult:
     carrier_result: object
     record: dict[str, Any]
     size_preservation: SizePreservationResult | None = None
+    size_report_path: str | None = None
     recovery: RecoveryResult | None = None
 
 
@@ -99,16 +105,23 @@ class PublicationError(RuntimeError):
     """A complete protected-media bundle could not be published safely."""
 
 
+def _checkpoint(options: ProtectionOptions, message: str) -> None:
+    if options.operation is not None:
+        options.operation.checkpoint(message)
+
+
 def _validate_paths(
     input_path: str | Path,
     output_path: str | Path,
     manifest_path: str | Path,
     options: ProtectionOptions,
-) -> tuple[Path, Path, Path, Path | None]:
+) -> tuple[Path, Path, Path, Path | None, Path | None]:
     if not isinstance(options.overwrite, bool):
         raise TypeError("overwrite must be a boolean")
     if not isinstance(options.preserve_size, bool):
         raise TypeError("preserve_size must be a boolean")
+    if options.size_report_path is not None and not options.preserve_size:
+        raise ValueError("size_report_path requires preserve_size")
     source = Path(input_path).resolve()
     output = Path(output_path).resolve()
     manifest = Path(manifest_path).resolve()
@@ -130,6 +143,11 @@ def _validate_paths(
         ).resolve()
     else:
         recovery = None
+    size_report = (
+        Path(options.size_report_path).resolve()
+        if options.size_report_path is not None
+        else None
+    )
 
     named_paths: list[tuple[str, Path]] = [
         ("input", source),
@@ -138,12 +156,14 @@ def _validate_paths(
     ]
     if recovery is not None:
         named_paths.append(("recovery sidecar", recovery))
+    if size_report is not None:
+        named_paths.append(("size report", size_report))
     for index, (first_name, first) in enumerate(named_paths):
         for second_name, second in named_paths[index + 1 :]:
             if _paths_alias(first, second):
                 raise ValueError(f"{first_name} and {second_name} paths must be different")
 
-    for destination in (output, manifest, recovery):
+    for destination in (output, manifest, recovery, size_report):
         if destination is None:
             continue
         if not destination.parent.is_dir():
@@ -158,7 +178,7 @@ def _validate_paths(
             )
         if destination.exists() and not options.overwrite:
             raise FileExistsError(f"output already exists: {destination.name}")
-    return source, output, manifest, recovery
+    return source, output, manifest, recovery, size_report
 
 
 def _paths_alias(first: Path, second: Path) -> bool:
@@ -275,6 +295,7 @@ def _make_envelope(
         encryption_key=options.encryption_key,
         manual_start_location=options.start_location,
         robustness=options.robustness,
+        video_frame_index=(options.video_frame_index if media_type == "video" else None),
     )
 
 
@@ -324,7 +345,11 @@ def _prepare_protection(
     private_key,
     options: ProtectionOptions,
 ) -> _PreparedProtection:
-    carrier = inspect_carrier(input_path)
+    carrier = inspect_carrier(
+        input_path, video_frame_index=options.video_frame_index
+    )
+    if carrier.media_type == "video" and options.preserve_size:
+        raise ValueError("exact file-size preservation is not supported for video")
     envelope = _make_envelope(message, options, private_key, carrier.media_type)
     if options.robustness == "none":
         carrier_payload = envelope.data
@@ -365,9 +390,15 @@ def protect_media(
     options: ProtectionOptions,
 ) -> ProtectionResult:
     """Create and transactionally publish a protected-media bundle."""
-    source, output, manifest_path_value, recovery_path_value = _validate_paths(
-        input_path, output_path, manifest_path, options
-    )
+    _checkpoint(options, "Validating paths and settings…")
+    (
+        source,
+        output,
+        manifest_path_value,
+        recovery_path_value,
+        size_report_path_value,
+    ) = _validate_paths(input_path, output_path, manifest_path, options)
+    _checkpoint(options, "Signing payload and checking capacity…")
     prepared = _prepare_protection(source, message, private_key, options)
     carrier = prepared.carrier
     envelope = prepared.envelope
@@ -391,11 +422,16 @@ def protect_media(
         ),
         public_key_fingerprint=fingerprint,
         robustness=options.robustness,
+        video_frame_index=(
+            options.video_frame_index if carrier.media_type == "video" else None
+        ),
     ).validate()
 
     destinations = [output, manifest_path_value]
     if recovery_path_value is not None:
         destinations.append(recovery_path_value)
+    if size_report_path_value is not None:
+        destinations.append(size_report_path_value)
     staged: dict[Path, Path] = {}
     size_result: SizePreservationResult | None = None
     recovery_result: RecoveryResult | None = None
@@ -403,6 +439,7 @@ def protect_media(
         for destination in destinations:
             staged[destination] = _staging_path(destination)
         staged_output = staged[output]
+        _checkpoint(options, f"Embedding payload in {carrier.media_type} carrier…")
         if carrier.media_type == "image":
             carrier_result = embed_image(
                 str(source),
@@ -412,7 +449,7 @@ def protect_media(
                 start,
                 overwrite=False,
             )
-        else:
+        elif carrier.media_type == "audio":
             carrier_result = embed_audio_lsb(
                 str(source),
                 str(staged_output),
@@ -420,30 +457,36 @@ def protect_media(
                 lsb_count=options.lsb_count,
                 start_location=start,
             )
+        else:
+            carrier_result = embed_video(
+                str(source),
+                str(staged_output),
+                carrier_payload,
+                lsb_count=options.lsb_count,
+                start_location=start,
+                frame_index=options.video_frame_index,
+            )
 
+        _checkpoint(options, "Preparing optional output artifacts…")
         if options.preserve_size:
-            if output.suffix.lower() == ".png":
-                try:
-                    size_result = pad_png_to_size(
-                        staged_output, source.stat().st_size
-                    )
-                except ValueError as exc:
-                    comparison = compare_file_sizes(source, staged_output)
-                    size_result = replace(
-                        comparison,
-                        method=f"unavailable: {exc}",
-                    )
-            else:
-                size_result = compare_file_sizes(source, staged_output)
+            size_result = preserve_protected_size(source, staged_output)
+            if size_report_path_value is not None:
+                export_size_preservation_result(
+                    replace(size_result, output_path=str(output)),
+                    staged[size_report_path_value],
+                )
 
+        _checkpoint(options, "Writing companion manifest…")
         save_manifest(manifest_value, staged[manifest_path_value])
         if recovery_path_value is not None:
+            _checkpoint(options, "Creating encrypted recovery sidecar…")
             recovery_result = create_recovery_sidecar(
                 source,
                 staged_output,
                 staged[recovery_path_value],
                 options.recovery_key,
             )
+        _checkpoint(options, "Publishing complete output bundle…")
         _publish_bundle(staged, options.overwrite)
     except Exception:
         for temporary in staged.values():
@@ -466,6 +509,11 @@ def protect_media(
         size_preservation=(
             replace(size_result, output_path=str(output))
             if size_result is not None
+            else None
+        ),
+        size_report_path=(
+            str(size_report_path_value)
+            if size_report_path_value is not None
             else None
         ),
         recovery=(

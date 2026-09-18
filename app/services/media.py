@@ -10,6 +10,8 @@ from app.stego.audio_stego import HEADER_BYTES as AUDIO_HEADER_BYTES
 from app.stego.audio_stego import audio_to_samples, read_audio
 from app.stego.bit_utils import validate_lsb_depth
 from app.stego.capacity import LENGTH_HEADER_BYTES, required_position_count
+from app.stego.image_stego import embeddable_stream
+from app.stego.video_stego import probe_video
 
 
 @dataclass(frozen=True)
@@ -27,7 +29,6 @@ class CarrierCapacity:
     highest_valid_start_location: int
     max_payload_length: int
     fits: bool
-from app.stego.image_stego import embeddable_stream
 
 
 @dataclass(frozen=True)
@@ -74,10 +75,15 @@ class CarrierInfo:
         )
 
 
-def inspect_carrier(path: str | Path, media_type: str | None = None) -> CarrierInfo:
+def inspect_carrier(
+    path: str | Path,
+    media_type: str | None = None,
+    *,
+    video_frame_index: int = 0,
+) -> CarrierInfo:
     """Inspect a supported cover object and count eligible scalar samples."""
     source = Path(path)
-    candidates = (media_type,) if media_type else ("image", "audio")
+    candidates = (media_type,) if media_type else ("image", "audio", "video")
     failures: list[str] = []
     for candidate in candidates:
         if candidate == "image":
@@ -115,10 +121,38 @@ def inspect_carrier(path: str | Path, media_type: str | None = None) -> CarrierI
                 )
             except Exception as exc:
                 failures.append(f"audio: {exc}")
+        elif candidate == "video":
+            try:
+                info = probe_video(source)
+                if (
+                    isinstance(video_frame_index, bool)
+                    or not isinstance(video_frame_index, int)
+                    or not 0 <= video_frame_index < info.frame_count
+                ):
+                    raise ValueError(
+                        f"video frame index must be between 0 and {info.frame_count - 1}"
+                    )
+                return CarrierInfo(
+                    "video",
+                    info.samples_per_frame,
+                    LENGTH_HEADER_BYTES,
+                    {
+                        "container": "Matroska/FFV1 output",
+                        "source_codec": info.codec_name,
+                        "width": info.width,
+                        "height": info.height,
+                        "frames": info.frame_count,
+                        "frame_rate": info.frame_rate,
+                        "selected_frame": video_frame_index,
+                        "audio_streams": len(info.audio_streams),
+                    },
+                )
+            except Exception as exc:
+                failures.append(f"video: {exc}")
         else:
-            raise ValueError("media_type must be image or audio")
+            raise ValueError("media_type must be image, audio, or video")
     raise ValueError(
-        f"{source.name} is not a supported image or PCM-16 WAV file ("
+        f"{source.name} is not a supported image, PCM-16 WAV, or bounded video file ("
         + "; ".join(failures)
         + ")"
     )
