@@ -29,6 +29,7 @@ no plotting library.
 
 from __future__ import annotations
 
+import itertools
 import math
 import os
 from dataclasses import dataclass, field
@@ -264,11 +265,19 @@ def _video_report(
     worst_index = -1
     worst_mse = 0.0
 
-    pairs = zip(
+    # Containers can misreport their frame count, so the check above is not enough on
+    # its own: a clip that decodes short must be refused, not silently truncated.
+    pairs = itertools.zip_longest(
         video_stego.iterate_frames(original_path, cover),
         video_stego.iterate_frames(stego_path, stego),
     )
     for index, (left, right) in enumerate(pairs):
+        if left is None or right is None:
+            shorter = "original" if left is None else "stego"
+            raise ComparisonError(
+                f"the two clips cannot be compared: the {shorter} clip decoded only "
+                f"{index} frames, although both declare {cover.frame_count}"
+            )
         a = left.reshape(-1).astype(np.int32)
         b = right.reshape(-1).astype(np.int32)
         difference = np.abs(a - b)

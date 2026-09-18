@@ -207,7 +207,7 @@ Declared in full, with the reason each is present. Versions are pinned in
 | `numpy` | 2.1.3 | vectorised bit manipulation and all sample arithmetic |
 | `Pillow` | 11.0.0 | PNG and BMP encode and decode |
 | `soundfile` | 0.12.1 | WAV read and write |
-| `scipy` | 1.14.1 | audio resampling, used only by the resample attack |
+| `scipy` | 1.14.1 | chi-square p-values for the steganalysis indicators |
 | `cryptography` | 43.0.1 | RSA-PSS, AES-256-GCM, scrypt, SHA-256 |
 | `opencv-python` | 4.10.0.84 | video decode and encode, including the bundled FFV1 encoder |
 | `PySide6` | 6.8.0 | the interface, and QtMultimedia for playback |

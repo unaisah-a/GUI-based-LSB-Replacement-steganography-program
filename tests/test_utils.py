@@ -6,6 +6,8 @@ content-based media identification with atomic file writes, and logging setup.
 
 from __future__ import annotations
 
+import logging
+import logging.handlers
 import os
 import subprocess
 import sys
@@ -493,29 +495,35 @@ class TestLogging:
         finally:
             logging_utils.reset_logging()
 
-    def test_writes_into_the_evidence_log_directory(self, tmp_path):
+    def test_writes_a_rotating_log_file_into_the_log_directory(
+        self, tmp_path, monkeypatch
+    ):
+        monkeypatch.setattr(logging_utils, "log_directory", lambda: tmp_path)
         logging_utils.reset_logging()
         try:
-            logger = logging_utils.configure_logging(
-                to_stderr=False, file_name="test_probe.log"
-            )
+            logger = logging_utils.configure_logging(to_stderr=False)
             logger.info("probe record")
-            for handler in logger.handlers:
-                handler.flush()
+            (handler,) = logger.handlers
+            handler.flush()
 
-            target = logging_utils.log_directory() / "test_probe.log"
-            assert target.is_file()
+            assert isinstance(handler, logging.handlers.RotatingFileHandler)
+            assert handler.maxBytes == logging_utils.MAX_LOG_BYTES
+            target = tmp_path / logging_utils.DEFAULT_LOG_FILE_NAME
             assert "probe record" in target.read_text(encoding="utf-8")
         finally:
             logging_utils.reset_logging()
-            probe = logging_utils.log_directory() / "test_probe.log"
-            if probe.exists():
-                probe.unlink()
+
+    def test_get_logger_does_not_configure_logging(self):
+        logging_utils.reset_logging()
+        logging_utils.get_logger("app.anything")
+        assert logging.getLogger(logging_utils.LOGGER_NAME).handlers == []
 
     def test_log_directory_is_derived_from_the_package_not_the_cwd(self):
         expected = Path(__file__).resolve().parent.parent
         assert logging_utils.repository_root() == expected
-        assert logging_utils.log_directory() == expected / "evidence" / "logs"
+        # log_directory() itself is redirected by conftest so tests never write into
+        # the repository; the path it is built from is what matters here.
+        assert Path(logging_utils.LOG_DIRECTORY_NAME) == Path("evidence", "logs")
 
     def test_importing_the_module_has_no_filesystem_side_effect(self):
         """Importing must not create directories or open log files."""
@@ -523,6 +531,7 @@ class TestLogging:
             """
             import logging
             from app.utils import logging_utils
+            import app.verification.verifier  # calls get_logger at import time
 
             logger = logging.getLogger(logging_utils.LOGGER_NAME)
             print(len(logger.handlers))

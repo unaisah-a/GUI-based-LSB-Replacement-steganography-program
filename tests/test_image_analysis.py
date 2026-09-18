@@ -390,20 +390,22 @@ class TestLsbDistribution:
 
 
 class TestBit0Uniformity:
-    def test_balanced_channel_gives_zero(self):
+    def test_balanced_channel_gives_a_p_value_of_one(self):
         array = np.zeros((16, 16, 3), dtype=np.uint8)
         flat = array[:, :, 0].reshape(-1)
         flat[::2] = 1
         array[:, :, 0] = flat.reshape(16, 16)
         result = analysis.bit0_uniformity(array)[0]
-        assert result.value == pytest.approx(0.0)
+        assert result.details["statistic"] == pytest.approx(0.0)
+        assert result.value == pytest.approx(1.0)
         assert result.degrees_of_freedom == 1
 
     def test_all_zero_channel_gives_the_sample_count(self):
         array = np.zeros((16, 16, 3), dtype=np.uint8)
         result = analysis.bit0_uniformity(array)[0]
-        # Every sample in one category: chi-square equals n.
-        assert result.value == pytest.approx(256.0)
+        # Every sample in one category: chi-square equals n, far out in the tail.
+        assert result.details["statistic"] == pytest.approx(256.0)
+        assert result.value == pytest.approx(0.0, abs=1e-12)
 
     def test_insufficient_samples_suppresses_the_value(self):
         """Requirement 11.10."""
@@ -463,9 +465,32 @@ class TestPairOfValuesChiSquare:
         image_stego.embed_image(
             cover, output, bytes(range(256)) * (report.max_payload_length // 256), 1, 0
         )
-        before = analysis.pair_of_values_chi_square(cover)[0].value
-        after = analysis.pair_of_values_chi_square(output)[0].value
+        before = analysis.pair_of_values_chi_square(cover)[0].details["statistic"]
+        after = analysis.pair_of_values_chi_square(output)[0].details["statistic"]
         assert before != after
+
+    def test_embedding_raises_the_p_value_and_trips_the_threshold(self, workspace):
+        """Replacement equalises the (2k, 2k+1) pairs, so the p-value rises toward 1.
+
+        The cover holds only even values, so every pair starts maximally unequal and
+        the clean p-value is essentially 0. Filling the cover at depth 1 must push it
+        up and trip a threshold that the cover does not.
+        """
+        rng = np.random.default_rng(7)
+        array = (rng.integers(0, 128, (96, 96, 3)) * 2).astype(np.uint8)
+        cover = write_cover(workspace, array, image_io.PNG, "even")
+        output = os.path.join(workspace, "stego.png")
+        report, _ = image_stego.measure_capacity(cover, 1, 0)
+        payload = rng.integers(0, 256, report.max_payload_length, dtype=np.uint8)
+        image_stego.embed_image(cover, output, payload.tobytes(), 1, 0)
+
+        clean = analysis.pair_of_values_chi_square(cover, threshold=0.5)[0]
+        stego = analysis.pair_of_values_chi_square(output, threshold=0.5)[0]
+
+        assert clean.value < 0.01
+        assert stego.value > clean.value
+        assert clean.threshold_exceeded is False
+        assert stego.threshold_exceeded is True
 
 
 class TestPairOfValuesNeighbour:

@@ -4,15 +4,20 @@ Log records go to ``evidence/logs/`` because the assignment expects logs as
 submission evidence, and to stderr so a developer running from a terminal sees
 them immediately.
 
-Configuration is lazy and idempotent. Nothing is created at import time: a module
-that merely imports this one must not have the side effect of creating
-directories or opening files, otherwise importing the analysis layer inside a
-test would start writing into the repository.
+Only the application entry point configures logging, by calling
+:func:`configure_logging` from ``main()``. Modules call :func:`get_logger`, which
+never configures anything, so importing any part of ``app`` creates no directory
+and opens no file. Until ``main()`` runs, records follow Python's defaults, which
+is what lets pytest capture them in tests.
+
+The log file rotates at :data:`MAX_LOG_BYTES`, keeping :data:`LOG_BACKUP_COUNT`
+old files, so a long-lived checkout cannot grow it without bound.
 """
 
 from __future__ import annotations
 
 import logging
+import logging.handlers
 import os
 import sys
 import threading
@@ -33,6 +38,8 @@ __all__ = [
 LOGGER_NAME: Final[str] = "inf2005"
 LOG_DIRECTORY_NAME: Final[str] = os.path.join("evidence", "logs")
 DEFAULT_LOG_FILE_NAME: Final[str] = "application.log"
+MAX_LOG_BYTES: Final[int] = 1_000_000
+LOG_BACKUP_COUNT: Final[int] = 3
 
 _FORMAT: Final[str] = "%(asctime)s %(levelname)-8s %(name)s: %(message)s"
 _DATE_FORMAT: Final[str] = "%Y-%m-%dT%H:%M:%S%z"
@@ -69,8 +76,8 @@ def configure_logging(
 ) -> logging.Logger:
     """Install handlers on the application logger once and return it.
 
-    Repeat calls are no-ops, so any module may call this defensively. Use
-    :func:`reset_logging` in a test that needs to reconfigure.
+    Called by ``main()``. Repeat calls are no-ops. Use :func:`reset_logging` in a
+    test that needs to reconfigure.
     """
     global _configured
 
@@ -94,8 +101,11 @@ def configure_logging(
             try:
                 directory = log_directory()
                 directory.mkdir(parents=True, exist_ok=True)
-                file_handler = logging.FileHandler(
-                    directory / file_name, encoding="utf-8"
+                file_handler = logging.handlers.RotatingFileHandler(
+                    directory / file_name,
+                    maxBytes=MAX_LOG_BYTES,
+                    backupCount=LOG_BACKUP_COUNT,
+                    encoding="utf-8",
                 )
                 file_handler.setFormatter(formatter)
                 logger.addHandler(file_handler)
@@ -119,12 +129,11 @@ def configure_logging(
 
 
 def get_logger(name: str | None = None) -> logging.Logger:
-    """Return a child of the application logger, configuring it on first use.
+    """Return a child of the application logger. Never configures logging.
 
     ``get_logger(__name__)`` in ``app.stego.image_stego`` yields
     ``inf2005.app.stego.image_stego``, so log output identifies its source module.
     """
-    configure_logging()
     if not name or name == LOGGER_NAME:
         return logging.getLogger(LOGGER_NAME)
     return logging.getLogger(LOGGER_NAME).getChild(name)

@@ -105,14 +105,14 @@ _EXPLANATIONS: dict[str, str] = {
         "this toward 0.5, but plenty of unmodified media sits near 0.5 already."
     ),
     "bit0_uniformity_chi_square": (
-        "How far the balance of zero and one low bits departs from an even split, on "
-        "one degree of freedom. A low value means balanced, which many natural files "
-        "already are."
+        "A chi-square p-value for how well the zero and one low bits fit an even "
+        "split. Near 1 means balanced, which replacement produces but which many "
+        "natural files already are."
     ),
     "pair_of_values_chi_square": (
-        "Compares the counts within each pair of adjacent sample values. Replacement "
-        "moves samples between the two members of a pair without moving them out of "
-        "it, driving the two counts together."
+        "A chi-square p-value comparing the counts within each pair of adjacent "
+        "sample values. Replacement moves samples between the two members of a pair, "
+        "driving the counts together and the p-value toward 1."
     ),
     "pair_of_values_neighbour": (
         "The proportion of adjacent same-channel sample pairs that differ only in "
@@ -226,18 +226,19 @@ def audio_indicators(
     else:
         expected = analysed / 2.0
         statistic = ((zeros - expected) ** 2 + (ones - expected) ** 2) / expected
+        p_value = image_analysis.chi_square_p_value(statistic, 1)
         indicators.append(
             Indicator(
                 name="bit0_uniformity_chi_square",
                 scope="overall",
-                value=float(statistic),
+                value=p_value,
                 insufficient_sample=False,
                 analysed_sample_count=analysed,
                 explanation=_explain("bit0_uniformity_chi_square"),
-                details={"degrees_of_freedom": 1.0},
+                details={"statistic": float(statistic), "degrees_of_freedom": 1.0},
                 threshold=threshold,
                 threshold_exceeded=(
-                    None if threshold is None else bool(statistic > threshold)
+                    None if threshold is None else bool(p_value >= threshold)
                 ),
             )
         )
@@ -286,7 +287,7 @@ def audio_indicators(
                 },
                 threshold=threshold,
                 threshold_exceeded=(
-                    None if threshold is None else bool(proportion > threshold)
+                    None if threshold is None else bool(proportion >= threshold)
                 ),
             )
         )

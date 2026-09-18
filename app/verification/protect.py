@@ -19,15 +19,21 @@ The order of operations, and why it is forced
     3. measure the cover's capacity             -> total_samples becomes known
     4. check the envelope fits                  (input validation, before any write)
     5. resolve the start location               (needs 2 and 3)
-    6. embed
+    6. embed, into a temporary file beside the output
     6b. optionally match the cover's file size  (PNG only, and only if asked)
     7. write the companion manifest
+    8. move the stego file into place
 
 Step 6b sits where it does for one reason: the manifest records a digest of the
 stego file, so anything that rewrites that file has to happen *before* the manifest
 is written. Doing it afterwards would leave a manifest describing a file that no
 longer exists, which is exactly the kind of quiet inconsistency a receiver would hit
 much later and be unable to explain.
+
+Steps 6 to 8 are arranged so that a stego file never appears without its manifest.
+Both output paths are checked before anything is written, the stego file is built
+under a temporary name, and it is renamed into place only once the manifest has been
+written. If any of those steps fails, whatever was written is removed again.
 
 Step 2 has to precede step 5 because a derived start location depends on the
 envelope length, and step 5 has to precede step 6 for obvious reasons. That is
@@ -43,7 +49,9 @@ location fits", which is true but unhelpful.
 
 from __future__ import annotations
 
+import dataclasses
 import os
+import tempfile
 from dataclasses import dataclass
 from typing import Any, Mapping
 
@@ -51,8 +59,9 @@ from app.crypto import manifest as manifest_module
 from app.crypto import payload as payload_module
 from app.crypto import start_location
 from app.crypto.envelope import ErrorCorrectionParameters, VerificationRecord
+from app.crypto.errors import ManifestError
 from app.robustness import error_correction
-from app.stego import media
+from app.stego import media, paths
 from app.stego.errors import CapacityError
 from app.utils import constants, file_utils
 from app.utils.logging_utils import get_logger
@@ -143,6 +152,22 @@ def protect_media(
     # 1. What kind of cover is this? Detected from content.
     media_type = media.detect_media_type(input_path)
 
+    # Both outputs are checked now, so a refusal cannot come after the stego file
+    # has been written and leave it without a manifest.
+    paths.assert_distinct_paths(input_path, output_path)
+    paths.check_output_writable(output_path, overwrite)
+    manifest_target = (
+        os.fspath(manifest_path)
+        if manifest_path is not None
+        else file_utils.manifest_path_for(output_path)
+    )
+    if os.path.exists(manifest_target) and not overwrite:
+        raise ManifestError(
+            f"manifest path is already occupied: "
+            f"{file_utils.display_name(manifest_target)}; pass overwrite=True to "
+            f"replace it"
+        )
+
     # 2. Build and sign the payload. Media-free, so this can happen first.
     prepared = payload_module.prepare_payload(
         message,
@@ -217,40 +242,65 @@ def protect_media(
         nonce_hex=prepared.record.nonce_hex,
     )
 
-    # 6. Embed.
-    embed_result = media.embed(
-        input_path,
-        output_path,
-        embedded_payload,
-        lsb_depth,
-        start,
-        overwrite=overwrite,
+    # 6. Embed, under a temporary name in the destination directory.
+    final_path = os.fspath(output_path)
+    handle, partial_path = tempfile.mkstemp(
+        prefix=".partial-",
+        suffix=os.path.basename(final_path),
+        dir=os.path.dirname(os.path.abspath(final_path)),
     )
+    os.close(handle)
+    written_manifest_path: str | None = None
+    try:
+        embed_result = media.embed(
+            input_path,
+            partial_path,
+            embedded_payload,
+            lsb_depth,
+            start,
+            overwrite=True,
+        )
 
-    # 6b. Optionally rewrite the stego file at the cover's exact size.
-    #
-    # Before the manifest, because the manifest records the file's digest. The pixels
-    # are unchanged by this, so the payload still extracts and the signature still
-    # covers the same bytes; only the container's compression and padding differ.
-    size_result = None
-    if match_cover_size:
-        size_result = _match_cover_size(input_path, embed_result.output_path)
+        # 6b. Optionally rewrite the stego file at the cover's exact size.
+        #
+        # Before the manifest, because the manifest records the file's digest. The
+        # pixels are unchanged by this, so the payload still extracts and the
+        # signature still covers the same bytes; only the container's compression
+        # and padding differ.
+        size_result = None
+        if match_cover_size:
+            size_result = _match_cover_size(input_path, partial_path)
 
-    # 7. Publish the non-secret parameters.
-    manifest = manifest_module.Manifest.from_record(
-        prepared.record,
-        envelope_length=prepared.envelope_length,
-        container_format=embed_result.container_format,
-        resolved_start_location=start,
-        stego_file_name=file_utils.display_name(embed_result.output_path),
-        stego_sha256=file_utils.file_sha256(embed_result.output_path),
-    )
-    written_manifest_path = manifest_module.write_manifest(
-        manifest,
-        manifest_path,
-        stego_path=None if manifest_path is not None else embed_result.output_path,
-        overwrite=overwrite,
-    )
+        # 7. Publish the non-secret parameters.
+        manifest = manifest_module.Manifest.from_record(
+            prepared.record,
+            envelope_length=prepared.envelope_length,
+            container_format=embed_result.container_format,
+            resolved_start_location=start,
+            stego_file_name=file_utils.display_name(final_path),
+            stego_sha256=file_utils.file_sha256(partial_path),
+        )
+        written_manifest_path = manifest_module.write_manifest(
+            manifest, manifest_target, overwrite=overwrite
+        )
+
+        # 8. Only now does the stego file appear under its real name.
+        os.replace(partial_path, final_path)
+    except BaseException:
+        _discard(partial_path)
+        if written_manifest_path is not None:
+            _discard(written_manifest_path)
+        raise
+
+    # The results were produced against the temporary name; report the real one.
+    embed_result = dataclasses.replace(embed_result, output_path=final_path)
+    if size_result is not None:
+        details = dict(size_result.details)
+        if "output" in details:
+            details["output"] = file_utils.display_name(final_path)
+        size_result = dataclasses.replace(
+            size_result, stego_path=final_path, details=details
+        )
 
     secrets: list[str] = []
     if start_method == constants.START_METHOD_HMAC:
@@ -284,6 +334,13 @@ def protect_media(
         required_secrets=tuple(secrets),
         size_preservation=size_result,
     )
+
+
+def _discard(path: str) -> None:
+    try:
+        os.unlink(path)
+    except OSError:
+        pass
 
 
 def _match_cover_size(

@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 from app.utils import constants
-from app.utils.logging_utils import get_logger
+from app.utils.logging_utils import configure_logging, get_logger
 
 STYLESHEET_PATH = Path(__file__).resolve().parent / "assets" / "styles" / "app.qss"
 
@@ -36,6 +36,7 @@ def main(argv: list[str] | None = None) -> int:
 
     from app.gui.main_window import MainWindow
 
+    configure_logging()
     log = get_logger(__name__)
     log.info("starting %s %s", constants.APP_NAME, constants.APP_VERSION)
 

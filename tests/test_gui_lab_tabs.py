@@ -278,7 +278,9 @@ class TestAttackTabRunning:
         load(attack_tab, protected_png)
         self._select(attack_tab, "payload.signature")
 
-        run = attack_tab._run_one(attack_tab.selected_attack())
+        run = attack_tab._run_one(
+            attack_tab.selected_attack(), attack_tab._collect_inputs()
+        )
         attack_tab._on_attack_finished(run)
 
         assert run.before.verdict == verdicts.VERDICT_AUTHENTIC
@@ -296,7 +298,9 @@ class TestAttackTabRunning:
         load(attack_tab, protected_png)
         self._select(attack_tab, "image.outside")
 
-        run = attack_tab._run_one(attack_tab.selected_attack())
+        run = attack_tab._run_one(
+            attack_tab.selected_attack(), attack_tab._collect_inputs()
+        )
         attack_tab._on_attack_finished(run)
 
         assert run.after.verdict == verdicts.VERDICT_AUTHENTIC
@@ -308,7 +312,9 @@ class TestAttackTabRunning:
         load(attack_tab, protected_png)
         self._select(attack_tab, "payload.magic")
         attack_tab._on_attack_finished(
-            attack_tab._run_one(attack_tab.selected_attack())
+            attack_tab._run_one(
+                attack_tab.selected_attack(), attack_tab._collect_inputs()
+            )
         )
 
         text = attack_tab.log_view.toPlainText()
@@ -323,7 +329,9 @@ class TestAttackTabRunning:
         self._select(attack_tab, "payload.random_bits")
         attack_tab.bit_error_spin.setValue(0.05)
 
-        run = attack_tab._run_one(attack_tab.selected_attack())
+        run = attack_tab._run_one(
+            attack_tab.selected_attack(), attack_tab._collect_inputs()
+        )
         assert run.outcome.details["bit_error_rate"] == 0.05
 
     def test_the_manifest_field_option_is_passed_through(
@@ -334,7 +342,9 @@ class TestAttackTabRunning:
         index = attack_tab.manifest_field_combo.findData("message_length")
         attack_tab.manifest_field_combo.setCurrentIndex(index)
 
-        run = attack_tab._run_one(attack_tab.selected_attack())
+        run = attack_tab._run_one(
+            attack_tab.selected_attack(), attack_tab._collect_inputs()
+        )
 
         assert run.outcome.details["field"] == "message_length"
         assert run.after.verdict == verdicts.VERDICT_TAMPERED
@@ -347,7 +357,9 @@ class TestAttackTabRunning:
         load(attack_tab, protected_png)
         self._select(attack_tab, "manifest.tamper")
 
-        run = attack_tab._run_one(attack_tab.selected_attack())
+        run = attack_tab._run_one(
+            attack_tab.selected_attack(), attack_tab._collect_inputs()
+        )
 
         assert run.attack.target == "manifest"
         assert run.outcome.output_path != result.stego_path
@@ -360,7 +372,9 @@ class TestAttackTabRunning:
         load(attack_tab, protected_png)
         self._select(attack_tab, "payload.resign")
 
-        run = attack_tab._run_one(attack_tab.selected_attack())
+        run = attack_tab._run_one(
+            attack_tab.selected_attack(), attack_tab._collect_inputs()
+        )
 
         # Against the genuine sender's public key it fails, which is the point.
         assert run.after.verdict == verdicts.VERDICT_SIGNATURE_INVALID
@@ -370,14 +384,16 @@ class TestAttackTabRunning:
         load(attack_tab, protected_wav)
         self._select(attack_tab, "audio.amplitude")
 
-        run = attack_tab._run_one(attack_tab.selected_attack())
+        run = attack_tab._run_one(
+            attack_tab.selected_attack(), attack_tab._collect_inputs()
+        )
         assert run.after.verdict != verdicts.VERDICT_AUTHENTIC
 
     def test_running_every_attack_reports_matches_and_skips(
         self, attack_tab, protected_png
     ):
         load(attack_tab, protected_png)
-        completed, skipped = attack_tab._run_every()
+        completed, skipped = attack_tab._run_every(attack_tab._collect_inputs())
         attack_tab._on_all_finished((completed, skipped))
 
         assert completed
@@ -416,7 +432,7 @@ class TestAttackTabRunning:
         attack_tab.key_edit.setText(public_path)
         attack_tab.start_secret_edit.setText(START_SECRET)
 
-        completed, skipped = attack_tab._run_every()
+        completed, skipped = attack_tab._run_every(attack_tab._collect_inputs())
         attack_tab._on_all_finished((completed, skipped))
 
         if skipped:
@@ -427,7 +443,9 @@ class TestAttackTabRunning:
         load(attack_tab, protected_png)
         self._select(attack_tab, "payload.magic")
         attack_tab._on_attack_finished(
-            attack_tab._run_one(attack_tab.selected_attack())
+            attack_tab._run_one(
+                attack_tab.selected_attack(), attack_tab._collect_inputs()
+            )
         )
         attack_tab.clear_log()
 
@@ -512,7 +530,7 @@ class TestSteganalysisTab:
         analysis_tab.drop_zone.accept_path(result.stego_path)
         analysis_tab.reference_edit.setText("")
 
-        report = analysis_tab._run_analysis()
+        report = analysis_tab._run_analysis(analysis_tab._collect_inputs())
         analysis_tab._on_analysed(report)
 
         assert analysis_tab.report is report
@@ -524,7 +542,7 @@ class TestSteganalysisTab:
         analysis_tab.drop_zone.accept_path(result.stego_path)
         analysis_tab.reference_edit.setText(cover)
 
-        report = analysis_tab._run_analysis()
+        report = analysis_tab._run_analysis(analysis_tab._collect_inputs())
         analysis_tab._on_analysed(report)
 
         assert analysis_tab.quality_panel.value_for("MSE") is not None
@@ -536,7 +554,7 @@ class TestSteganalysisTab:
     ):
         result, _, _ = protected_png
         analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis())
+        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
 
         assert analysis_tab.plane_channel_combo.count() == 3
         # Eight bit positions for the selected channel.
@@ -545,7 +563,7 @@ class TestSteganalysisTab:
     def test_changing_the_channel_re_renders(self, analysis_tab, protected_png):
         result, _, _ = protected_png
         analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis())
+        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
 
         analysis_tab.plane_channel_combo.setCurrentIndex(1)
         assert analysis_tab._plane_grid.count() == 8
@@ -554,7 +572,7 @@ class TestSteganalysisTab:
         """Not a precise-looking number computed from nothing."""
         tiny = write_cover(str(tmp_path), make_cover(4, 4, 3), image_io.PNG, "tiny")
         analysis_tab.drop_zone.accept_path(tiny)
-        analysis_tab._on_analysed(analysis_tab._run_analysis())
+        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
 
         texts = [
             analysis_tab.indicator_table.item(row, 2).text()
@@ -565,7 +583,7 @@ class TestSteganalysisTab:
     def test_every_row_explains_what_it_measures(self, analysis_tab, protected_png):
         result, _, _ = protected_png
         analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis())
+        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
 
         for row in range(analysis_tab.indicator_table.rowCount()):
             assert analysis_tab.indicator_table.item(row, 4).text()
@@ -577,7 +595,7 @@ class TestSteganalysisTab:
 
         result, _, _ = protected_png
         analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis())
+        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
 
         for row in range(analysis_tab.indicator_table.rowCount()):
             assert (
@@ -590,7 +608,7 @@ class TestSteganalysisTab:
         analysis_tab.drop_zone.accept_path(result.stego_path)
         analysis_tab.reference_edit.setText(cover)
 
-        report = analysis_tab._run_analysis()
+        report = analysis_tab._run_analysis(analysis_tab._collect_inputs())
         analysis_tab._on_analysed(report)
 
         assert report.media_type == constants.MEDIA_AUDIO
@@ -600,7 +618,7 @@ class TestSteganalysisTab:
     def test_audio_shows_no_bit_plane_grid(self, analysis_tab, protected_wav):
         result, _, _ = protected_wav
         analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis())
+        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
 
         assert analysis_tab._plane_grid.count() == 0
         assert "image media only" in analysis_tab.views_box.title()

@@ -723,6 +723,39 @@ class TestProtect:
         )
         assert result.required_secrets == ()
 
+    def test_no_temporary_file_is_left_behind(self, png_cover, tmp_path, keys):
+        do_protect(png_cover, tmp_path, keys)
+        assert not [p for p in tmp_path.iterdir() if p.name.startswith(".partial-")]
+
+    def test_an_occupied_manifest_path_is_refused_before_anything_is_written(
+        self, png_cover, tmp_path, keys
+    ):
+        from app.crypto.errors import ManifestError
+
+        output = tmp_path / "stego.png"
+        Path(file_utils.manifest_path_for(output)).write_text("{}")
+        before = sorted(p.name for p in tmp_path.iterdir())
+
+        with pytest.raises(ManifestError, match="already occupied"):
+            do_protect(png_cover, tmp_path, keys, output_path=str(output))
+        assert sorted(p.name for p in tmp_path.iterdir()) == before
+
+    def test_a_failed_manifest_write_leaves_no_stego_file(
+        self, png_cover, tmp_path, keys, monkeypatch
+    ):
+        from app.crypto import manifest as manifest_module
+        from app.crypto.errors import ManifestError
+
+        def refuse(*args, **kwargs):
+            raise ManifestError("disk full")
+
+        monkeypatch.setattr(manifest_module, "write_manifest", refuse)
+        before = sorted(p.name for p in tmp_path.iterdir())
+
+        with pytest.raises(ManifestError, match="disk full"):
+            do_protect(png_cover, tmp_path, keys)
+        assert sorted(p.name for p in tmp_path.iterdir()) == before
+
     def test_stego_digest_is_recorded(self, png_cover, tmp_path, keys):
         result = do_protect(png_cover, tmp_path, keys)
         assert result.manifest.stego_sha256 == file_utils.file_sha256(

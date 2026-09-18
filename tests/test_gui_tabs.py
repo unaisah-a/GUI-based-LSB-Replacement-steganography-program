@@ -189,18 +189,44 @@ class TestProtectTabReadout:
         assert protect_tab.message_length_label.text() == "5 bytes"
 
     def test_the_signature_size_follows_the_selected_key(
-        self, protect_tab, key_files
+        self, protect_tab, key_files, qtbot
     ):
         """A 2048-bit key signs in 256 bytes, not the 384 of the default size."""
         private_path, _ = key_files
         protect_tab.key_edit.setText(private_path)
-        assert protect_tab._signature_size == constants.RSA_MIN_KEY_SIZE // 8
+        qtbot.waitUntil(
+            lambda: protect_tab._signature_size == constants.RSA_MIN_KEY_SIZE // 8
+        )
+
+    def test_the_key_is_not_read_on_every_keystroke(
+        self, protect_tab, key_files, monkeypatch, qtbot
+    ):
+        private_path, _ = key_files
+        reads = []
+        original = key_manager.load_private_key
+        monkeypatch.setattr(
+            key_manager,
+            "load_private_key",
+            lambda path, **kwargs: reads.append(path) or original(path, **kwargs),
+        )
+        for end in range(1, len(private_path) + 1):
+            protect_tab.key_edit.setText(private_path[:end])
+
+        qtbot.waitUntil(lambda: len(reads) == 1)
+        assert reads == [private_path]
 
     def test_an_unreadable_key_path_falls_back_to_the_default_size(
-        self, protect_tab, tmp_path
+        self, protect_tab, key_files, tmp_path, qtbot
     ):
+        private_path, _ = key_files
+        protect_tab.key_edit.setText(private_path)
+        qtbot.waitUntil(
+            lambda: protect_tab._signature_size == constants.RSA_MIN_KEY_SIZE // 8
+        )
         protect_tab.key_edit.setText(str(tmp_path / "absent.pem"))
-        assert protect_tab._signature_size == constants.RSA_KEY_SIZE_DEFAULT // 8
+        qtbot.waitUntil(
+            lambda: protect_tab._signature_size == constants.RSA_KEY_SIZE_DEFAULT // 8
+        )
 
     def test_the_predicted_payload_length_matches_a_real_one(
         self, protect_tab, png_cover, key_files, tmp_path
@@ -347,7 +373,7 @@ class TestProtectTabOperation:
         output = str(tmp_path / "stego.png")
         configure(protect_tab, png_cover, private_path, output)
 
-        result = protect_tab._run_protect()
+        result = protect_tab._run_protect(protect_tab._collect_inputs())
         protect_tab._on_protected(result)
 
         assert Path(result.stego_path).is_file()
@@ -355,6 +381,22 @@ class TestProtectTabOperation:
         assert protect_tab.result is result
         assert protect_tab.quality_panel.value_for("MSE") is not None
         assert protect_tab.quality_panel.value_for("PSNR") is not None
+
+    def test_edits_after_submission_do_not_reach_the_worker(
+        self, protect_tab, png_cover, key_files, tmp_path
+    ):
+        """The worker reads a snapshot taken on the interface thread, not the widgets."""
+        private_path, _ = key_files
+        output = str(tmp_path / "stego.png")
+        configure(protect_tab, png_cover, private_path, output, media_id="IMG-001")
+
+        inputs = protect_tab._collect_inputs()
+        protect_tab.media_id_edit.setText("IMG-EDITED")
+        protect_tab.output_edit.setText(str(tmp_path / "elsewhere.png"))
+        result = protect_tab._run_protect(inputs)
+
+        assert result.record.media_id == "IMG-001"
+        assert result.stego_path == output
 
     def test_the_settings_reach_the_backend(
         self, protect_tab, png_cover, key_files, tmp_path
@@ -365,7 +407,7 @@ class TestProtectTabOperation:
             protect_tab, png_cover, private_path, output, depth=5, media_id="IMG-777"
         )
 
-        result = protect_tab._run_protect()
+        result = protect_tab._run_protect(protect_tab._collect_inputs())
 
         assert result.record.lsb_depth == 5
         assert result.record.media_id == "IMG-777"
@@ -382,7 +424,7 @@ class TestProtectTabOperation:
         )
         protect_tab.start_location_spin.setValue(1_234)
 
-        result = protect_tab._run_protect()
+        result = protect_tab._run_protect(protect_tab._collect_inputs())
         assert result.record.start_location == 1_234
         assert result.start_location == 1_234
 
@@ -394,7 +436,7 @@ class TestProtectTabOperation:
         protect_tab.encrypt_check.setChecked(True)
         protect_tab.passphrase_edit.setText(PASSPHRASE)
 
-        result = protect_tab._run_protect()
+        result = protect_tab._run_protect(protect_tab._collect_inputs())
 
         assert result.encrypted is True
         assert MESSAGE.encode("utf-8") not in Path(result.stego_path).read_bytes()
@@ -405,7 +447,7 @@ class TestProtectTabOperation:
         private_path, _ = key_files
         configure(protect_tab, png_cover, private_path, str(tmp_path / "stego.png"))
 
-        protect_tab._on_protected(protect_tab._run_protect())
+        protect_tab._on_protected(protect_tab._run_protect(protect_tab._collect_inputs()))
 
         assert protect_tab.secrets_label.isVisibleTo(protect_tab)
         text = protect_tab.secrets_label.text()
@@ -421,7 +463,7 @@ class TestProtectTabOperation:
             media_id="AUD-001",
         )
 
-        result = protect_tab._run_protect()
+        result = protect_tab._run_protect(protect_tab._collect_inputs())
         protect_tab._on_protected(result)
 
         assert result.media_type == constants.MEDIA_AUDIO
@@ -575,7 +617,7 @@ class TestVerifyTabOperation:
     def test_a_good_file_verifies(self, verify_tab, protected):
         self._prepare(verify_tab, protected)
 
-        outcome = verify_tab._run_verify()
+        outcome = verify_tab._run_verify(verify_tab._collect_inputs())
         verify_tab._on_verified(outcome)
 
         assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
@@ -584,7 +626,7 @@ class TestVerifyTabOperation:
 
     def test_the_checks_are_displayed(self, verify_tab, protected):
         self._prepare(verify_tab, protected)
-        verify_tab._on_verified(verify_tab._run_verify())
+        verify_tab._on_verified(verify_tab._run_verify(verify_tab._collect_inputs()))
 
         assert verify_tab.result_panel.flag_text("signature_valid") == "yes"
         assert verify_tab.result_panel.flag_text("hash_valid") == "yes"
@@ -597,7 +639,7 @@ class TestVerifyTabOperation:
         self._prepare(verify_tab, protected)
         verify_tab.start_secret_edit.setText("the wrong secret")
 
-        outcome = verify_tab._run_verify()
+        outcome = verify_tab._run_verify(verify_tab._collect_inputs())
         verify_tab._on_verified(outcome)
 
         assert outcome.verdict != verdicts.VERDICT_AUTHENTIC
@@ -612,7 +654,7 @@ class TestVerifyTabOperation:
         data["message_length"] = data["message_length"] + 1
         Path(result.manifest_path).write_text(json.dumps(data), encoding="utf-8")
 
-        outcome = verify_tab._run_verify()
+        outcome = verify_tab._run_verify(verify_tab._collect_inputs())
         verify_tab._on_verified(outcome)
 
         assert outcome.verdict == verdicts.VERDICT_TAMPERED
@@ -629,7 +671,7 @@ class TestVerifyTabOperation:
         verify_tab.drop_zone.accept_path(plain)
         verify_tab.manifest_edit.setText(result.manifest_path)
 
-        outcome = verify_tab._run_verify()
+        outcome = verify_tab._run_verify(verify_tab._collect_inputs())
         verify_tab._on_verified(outcome)
 
         assert outcome.verdict == verdicts.VERDICT_PAYLOAD_MISSING
@@ -640,7 +682,7 @@ class TestVerifyTabOperation:
         self, verify_tab, protected
     ):
         self._prepare(verify_tab, protected, original=True)
-        verify_tab._on_verified(verify_tab._run_verify())
+        verify_tab._on_verified(verify_tab._run_verify(verify_tab._collect_inputs()))
 
         text = verify_tab.comparison_view.toPlainText()
         assert "Original" in text
@@ -649,7 +691,7 @@ class TestVerifyTabOperation:
 
     def test_no_comparison_without_the_original(self, verify_tab, protected):
         self._prepare(verify_tab, protected)
-        verify_tab._on_verified(verify_tab._run_verify())
+        verify_tab._on_verified(verify_tab._run_verify(verify_tab._collect_inputs()))
         assert verify_tab.comparison_view.toPlainText() == ""
 
     def test_an_unusable_key_is_reported_as_an_error(
@@ -663,7 +705,7 @@ class TestVerifyTabOperation:
         verify_tab.key_edit.setText(str(tmp_path / "absent.pem"))
 
         with pytest.raises(Exception):
-            verify_tab._run_verify()
+            verify_tab._run_verify(verify_tab._collect_inputs())
 
         verify_tab._on_verify_failed("key file not found: absent.pem", "traceback")
         assert "Could not complete" in verify_tab.result_panel.verdict_text
@@ -682,7 +724,7 @@ class TestProtectThenVerifyThroughTheTabs:
         qtbot.addWidget(verify)
 
         configure(protect, png_cover, private_path, str(tmp_path / "sent.png"))
-        result = protect._run_protect()
+        result = protect._run_protect(protect._collect_inputs())
         protect._on_protected(result)
 
         verify.drop_zone.accept_path(result.stego_path)
@@ -690,7 +732,7 @@ class TestProtectThenVerifyThroughTheTabs:
         verify.start_secret_edit.setText(START_SECRET)
         verify.original_edit.setText(png_cover)
 
-        outcome = verify._run_verify()
+        outcome = verify._run_verify(verify._collect_inputs())
         verify._on_verified(outcome)
 
         assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
@@ -709,14 +751,14 @@ class TestProtectThenVerifyThroughTheTabs:
         configure(protect, png_cover, private_path, str(tmp_path / "sent.png"))
         protect.encrypt_check.setChecked(True)
         protect.passphrase_edit.setText(PASSPHRASE)
-        result = protect._run_protect()
+        result = protect._run_protect(protect._collect_inputs())
 
         verify.drop_zone.accept_path(result.stego_path)
         verify.key_edit.setText(public_path)
         verify.start_secret_edit.setText(START_SECRET)
         verify.passphrase_edit.setText(PASSPHRASE)
 
-        outcome = verify._run_verify()
+        outcome = verify._run_verify(verify._collect_inputs())
         verify._on_verified(outcome)
 
         assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
@@ -734,7 +776,7 @@ class TestProtectThenVerifyThroughTheTabs:
         configure(protect, png_cover, private_path, str(tmp_path / "sent.png"))
         protect.encrypt_check.setChecked(True)
         protect.passphrase_edit.setText(PASSPHRASE)
-        result = protect._run_protect()
+        result = protect._run_protect(protect._collect_inputs())
         protect._on_protected(result)
 
         assert "message passphrase" in protect.secrets_label.text()

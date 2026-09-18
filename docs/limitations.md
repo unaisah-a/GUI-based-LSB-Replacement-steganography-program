@@ -192,9 +192,17 @@ cover.
 ## 8. Steganalysis indicators are not detectors
 
 None of the indicators establishes that a file does or does not contain embedded data.
-The module returns no verdict, no confidence and no probability, and the tab shows
-none.
+The module returns no verdict and no confidence, and the tab shows none.
 
+- The two chi-square indicators report a goodness-of-fit **p-value** (Westfeld and
+  Pfitzmann's pair-of-values attack). Replacement pushes it toward 1, so a threshold
+  flags values at or above it. The p-value is the probability of counts this uneven
+  *if* the pairs were even; it is **not** the probability that the file holds data.
+  The synthetic cover in `samples/` already scores about 0.997 in its green channel
+  with nothing embedded.
+- Each figure is computed over the whole image. A small payload at a secret offset
+  changes too few samples to move it: the committed sample stego image carries an
+  814-byte payload and its p-values barely differ from the cover's.
 - Natural media routinely produces values that look suspicious. A photograph's low
   bits are close to random already.
 - A short or low-entropy payload routinely produces values that look ordinary.
@@ -226,6 +234,16 @@ The manifest is unsigned and must be, because it publishes the parameters needed
   paired with a different file that happens to share a stem. It can still be paired
   with the wrong file deliberately, which produces `PAYLOAD_MISSING` or
   `CANNOT_VERIFY`.
+- **The manifest gives the hidden payload away.** The `.manifest.json` travels next to
+  the stego file, in plain JSON, and says outright that the file carries a payload.
+  Anyone who intercepts the pair can read the LSB depth (`lsb_depth`), the payload's
+  exact size (`envelope_length`) and how its position was chosen (`start_method`),
+  along with the media ID and nonce. The only thing it keeps hidden is *where* the
+  payload starts, and only for the derived method: that position comes from the
+  start secret, which is never in the manifest. For a manually chosen position the
+  manifest publishes the position itself. So the manifest makes this a tool for
+  *verifying* media, not for hiding that a message exists: the steganography conceals
+  where the payload sits, but not that there is one.
 
 ---
 

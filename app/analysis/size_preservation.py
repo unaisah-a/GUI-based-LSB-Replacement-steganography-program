@@ -36,9 +36,9 @@ The PNG strategy, and its honest limits
    lengths, so one of them may already hit the target exactly. This costs nothing
    but time and changes no pixel.
 2. **Pad with an ancillary chunk.** If the smallest candidate is still under the
-   target, the shortfall is filled with a ``teXt`` chunk sized to close the gap
-   exactly. Ancillary chunks are skippable by specification, so the result is a
-   valid PNG that decodes to identical pixels.
+   target, the shortfall is filled with a private ancillary ``stPd`` chunk sized to
+   close the gap exactly. Ancillary chunks are skippable by specification, so the
+   result is a valid PNG that decodes to identical pixels.
 
 The limit is stated rather than hidden: **if every candidate encoding is already
 larger than the cover, the size cannot be matched.** Bytes cannot be removed from a

@@ -24,7 +24,7 @@ Pillow==11.0.0
 
 # --- Audio steganography and robust embedding (Member 3) --------------------
 # soundfile: read and write WAV/PCM audio.
-# scipy: scientific computing helpers for audio analysis.
+# scipy: chi-square p-values for the steganalysis indicators (scipy.stats.chi2).
 soundfile==0.12.1
 scipy==1.14.1
 

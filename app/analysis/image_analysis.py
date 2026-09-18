@@ -14,11 +14,19 @@ On what the steganalysis indicators mean
 ----------------------------------------
 Every indicator here is a descriptive statistic. None of them establishes that
 an image does or does not contain embedded data, and this module deliberately
-returns no verdict, no confidence percentage and no probability of embedding
-(Requirement 11.6, 11.7). Natural images routinely produce "suspicious" values,
-and a small or low-entropy payload routinely produces unremarkable ones. A
-threshold flag, where a caller supplies a threshold, records a comparison the
-caller asked for; it is not a detection.
+returns no verdict and no confidence percentage (Requirement 11.6, 11.7). Natural
+images routinely produce "suspicious" values, and a small or low-entropy payload
+routinely produces unremarkable ones. A threshold flag, where a caller supplies a
+threshold, records a comparison the caller asked for; it is not a detection.
+
+The two chi-square indicators report a **goodness-of-fit p-value**, as in the
+Westfeld-Pfitzmann attack, with the raw statistic kept in ``details``. LSB
+replacement drives the counts toward the even split the test models, which makes
+the statistic *smaller* and the p-value *larger*. A p-value near 1 is therefore
+what embedding looks like, and a threshold on these indicators flags
+``value >= threshold``. The p-value is the probability of counts at least this far
+from an even split if they were even; it is not the probability that the image
+contains data.
 
 Alpha channel handling is deliberately asymmetric, matching the specification:
 
@@ -40,6 +48,7 @@ from typing import Final, Sequence
 
 import numpy as np
 import numpy.typing as npt
+from scipy.stats import chi2
 
 from app.stego.capacity import embeddable_channel_count
 from app.stego.errors import ComparisonError, ValidationError
@@ -598,13 +607,25 @@ def difference_image(
 # --------------------------------------------------------------------------- #
 
 
+#: Every indicator here moves *up* under LSB replacement: the chi-square p-values
+#: rise as pair counts are equalised, and the neighbour proportion rises as more
+#: adjacent samples differ only in bit 0. So every threshold flags values at or
+#: above it. Stated once, and recorded on each result, so it is never implicit.
+THRESHOLD_DIRECTION: Final[str] = "value >= threshold"
+
+
 def _threshold_fields(
     value: float | None, threshold: float | None
 ) -> tuple[float | None, bool | None, str | None]:
     """Requirement 11.8: flag a threshold crossing and record the direction."""
     if threshold is None or value is None:
         return (None if threshold is None else float(threshold)), None, None
-    return float(threshold), bool(value >= threshold), "value >= threshold"
+    return float(threshold), bool(value >= threshold), THRESHOLD_DIRECTION
+
+
+def chi_square_p_value(statistic: float, degrees_of_freedom: int) -> float:
+    """Return the upper-tail probability of *statistic* on *degrees_of_freedom*."""
+    return float(chi2.sf(statistic, degrees_of_freedom))
 
 
 def lsb_distribution(
@@ -677,12 +698,13 @@ def lsb_distribution(
 def bit0_uniformity(
     image: object, *, region: object = None, threshold: float | None = None
 ) -> tuple[IndicatorResult, ...]:
-    """Chi-square test of bit-0 values against an even split.
+    """Chi-square test of bit-0 values against an even split, as a p-value.
 
-    Requirement 11.2. One degree of freedom. This is a different indicator from
+    Requirement 11.2. One degree of freedom; the statistic is in
+    ``details["statistic"]``. This is a different indicator from
     :func:`pair_of_values_chi_square`: it asks only whether zeros and ones are
-    balanced, which many unmodified natural images already satisfy, so a low
-    value here is weak evidence of anything.
+    balanced, which many unmodified natural images already satisfy, so a high
+    p-value here is weak evidence of anything.
     """
     array = _as_array(image)
     bounds = _coerce_region(region)
@@ -718,13 +740,14 @@ def bit0_uniformity(
 
         expected = analysed / 2.0
         statistic = ((zeros - expected) ** 2 + (ones - expected) ** 2) / expected
-        limit, exceeded, direction = _threshold_fields(statistic, threshold)
+        p_value = chi_square_p_value(statistic, 1)
+        limit, exceeded, direction = _threshold_fields(p_value, threshold)
         results.append(
             IndicatorResult(
                 indicator="bit0_uniformity_chi_square",
                 scope=f"channel:{index}:{labels[index]}",
                 channel_index=index,
-                value=float(statistic),
+                value=p_value,
                 insufficient_sample=False,
                 analysed_sample_count=analysed,
                 region=region_dict,
@@ -732,7 +755,11 @@ def bit0_uniformity(
                 threshold=limit,
                 threshold_exceeded=exceeded,
                 threshold_direction=direction,
-                details={"ones_count": float(ones), "zeros_count": float(zeros)},
+                details={
+                    "statistic": float(statistic),
+                    "ones_count": float(ones),
+                    "zeros_count": float(zeros),
+                },
             )
         )
     return tuple(results)
@@ -741,14 +768,18 @@ def bit0_uniformity(
 def pair_of_values_chi_square(
     image: object, *, region: object = None, threshold: float | None = None
 ) -> tuple[IndicatorResult, ...]:
-    """Pair-of-values chi-square over histogram bin pairs (2k, 2k+1).
+    """Pair-of-values chi-square over histogram bin pairs (2k, 2k+1), as a p-value.
 
-    Requirement 11.9. LSB replacement moves samples between the two members of a
-    ``(2k, 2k+1)`` pair without moving them out of the pair, so it drives the two
-    bin counts of each pair toward each other while leaving the pair total
-    unchanged. The expected count for both bins of a pair is therefore the mean of
-    the pair, and the statistic measures how far the observed counts sit from that
-    mean.
+    Requirement 11.9. The statistic is in ``details["statistic"]``. LSB replacement
+    moves samples between the two members of a ``(2k, 2k+1)`` pair without moving
+    them out of the pair, so it drives the two bin counts of each pair toward each
+    other while leaving the pair total unchanged. The expected count is therefore the
+    mean of the pair.
+
+    This is the Westfeld-Pfitzmann statistic, ``sum((n_2k - mean_k)**2 / mean_k)``,
+    which takes one bin per pair. Summing both bins would double every term, and a
+    fully embedded image would then give a p-value spread uniformly over 0 to 1
+    rather than near 1, which is the behaviour the attack relies on.
 
     Bin pairs whose expected count falls below 5 are excluded, the conventional
     guard for the chi-square approximation, and the degrees of freedom are the
@@ -797,30 +828,27 @@ def pair_of_values_chi_square(
             continue
 
         used_even = even[included]
-        used_odd = odd[included]
         used_expected = expected[included]
-        # Sum the per-bin contributions, each divided by its own expected count.
-        statistic = float(
-            (
-                ((used_even - used_expected) ** 2) / used_expected
-                + ((used_odd - used_expected) ** 2) / used_expected
-            ).sum()
-        )
-        limit, exceeded, direction = _threshold_fields(statistic, threshold)
+        # One bin per pair: the odd bin's deviation mirrors the even bin's exactly.
+        statistic = float((((used_even - used_expected) ** 2) / used_expected).sum())
+        degrees_of_freedom = included_pairs - 1
+        p_value = chi_square_p_value(statistic, degrees_of_freedom)
+        limit, exceeded, direction = _threshold_fields(p_value, threshold)
         results.append(
             IndicatorResult(
                 indicator="pair_of_values_chi_square",
                 scope=f"channel:{index}:{labels[index]}",
                 channel_index=index,
-                value=statistic,
+                value=p_value,
                 insufficient_sample=False,
                 analysed_sample_count=analysed,
                 region=region_dict,
-                degrees_of_freedom=included_pairs - 1,
+                degrees_of_freedom=degrees_of_freedom,
                 threshold=limit,
                 threshold_exceeded=exceeded,
                 threshold_direction=direction,
                 details={
+                    "statistic": statistic,
                     "included_bin_pairs": float(included_pairs),
                     "excluded_bin_pairs": float(excluded_pairs),
                 },

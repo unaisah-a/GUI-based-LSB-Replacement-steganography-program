@@ -38,6 +38,7 @@ tmp/
 
 # Logs
 *.log
+*.log.[0-9]*
 
 # Captured test-run output (pytest stdout redirected to a file so long runs can
 # be inspected without flooding a terminal).

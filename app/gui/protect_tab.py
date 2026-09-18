@@ -28,8 +28,9 @@ to write over its own input, it is difficult to destroy a cover object by accide
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -66,6 +67,9 @@ from app.verification.protect import ProtectResult, protect_media
 
 __all__ = ["ProtectTab"]
 
+#: How long the key path must stop changing before the key file is read.
+KEY_READ_DELAY_MS = 300
+
 _log = get_logger(__name__)
 
 #: Derived from the registry rather than hardcoded, so the tab never offers a medium
@@ -75,6 +79,28 @@ _ACCEPTED_MEDIA = tuple(
     for media_type in (constants.MEDIA_IMAGE, constants.MEDIA_AUDIO, constants.MEDIA_VIDEO)
     if media.supports(media_type)
 )
+
+
+@dataclass(frozen=True)
+class ProtectInputs:
+    """A snapshot of the form, taken on the interface thread before work starts.
+
+    The worker thread reads only this, never the widgets, so a value edited while
+    protection is running cannot leak into the operation halfway through.
+    """
+
+    cover_path: str
+    output_path: str
+    key_path: str
+    message: bytes
+    media_id: str
+    lsb_depth: int
+    start_method: str
+    start_secret: str | None
+    manual_start_location: int | None
+    passphrase: str | None
+    ecc: ErrorCorrectionParameters | None
+    match_cover_size: bool
 
 
 def _cover_prompt() -> str:
@@ -109,8 +135,14 @@ class ProtectTab(QWidget):
         self._result: ProtectResult | None = None
         # The signature length depends on the modulus of the key actually selected,
         # so the capacity read-out cannot assume the default size. Kept up to date by
-        # _on_key_path_changed and used by _estimated_envelope_length.
+        # _read_key_size and used by _estimated_envelope_length.
         self._signature_size = constants.RSA_KEY_SIZE_DEFAULT // 8
+        # Reading the key parses a PEM file, so it waits until typing pauses rather
+        # than running on every keystroke.
+        self._key_read_timer = QTimer(self)
+        self._key_read_timer.setSingleShot(True)
+        self._key_read_timer.setInterval(KEY_READ_DELAY_MS)
+        self._key_read_timer.timeout.connect(self._read_key_size)
 
         outer = QVBoxLayout(self)
 
@@ -258,7 +290,7 @@ class ProtectTab(QWidget):
         key_layout.setContentsMargins(0, 0, 0, 0)
         self.key_edit = QLineEdit(key_row)
         self.key_edit.setPlaceholderText("private key used to sign")
-        self.key_edit.textChanged.connect(self._on_key_path_changed)
+        self.key_edit.textChanged.connect(self._key_read_timer.start)
         key_layout.addWidget(self.key_edit, 1)
         self.key_browse_button = QPushButton("Browse...", key_row)
         self.key_browse_button.clicked.connect(self._choose_key_path)
@@ -344,15 +376,19 @@ class ProtectTab(QWidget):
         self.passphrase_edit.setEnabled(self.encrypt_check.isChecked())
         self._update_readout()
 
-    def _on_key_path_changed(self, path: str) -> None:
+    def _read_key_size(self) -> None:
         """Read the selected key's size so the capacity read-out stays exact.
 
         A 2048-bit key produces a 256-byte signature and a 3072-bit key a 384-byte
         one. Assuming the default would make the predicted payload length wrong by
         128 bytes for anyone using a smaller key, and the read-out is meant to match
         what actually gets embedded.
+
+        Runs once the path has stopped changing for :data:`KEY_READ_DELAY_MS`, or at
+        once when the read-out needs the size and a read is still pending.
         """
-        candidate = path.strip()
+        self._key_read_timer.stop()
+        candidate = self.key_edit.text().strip()
         size = constants.RSA_KEY_SIZE_DEFAULT // 8
 
         if candidate and os.path.isfile(candidate):
@@ -443,6 +479,8 @@ class ProtectTab(QWidget):
 
     def _estimated_envelope_length(self) -> int:
         """The envelope's own length, before any error-correcting code."""
+        if self._key_read_timer.isActive():
+            self._read_key_size()
         from app.crypto.encryption import OVERHEAD_BYTES
 
         message_length = len(self.message_bytes())
@@ -611,33 +649,48 @@ class ProtectTab(QWidget):
 
         self._runner.submit(
             self._run_protect,
+            self._collect_inputs(),
             on_success=self._on_protected,
             on_error=self._on_protect_failed,
             on_finished=lambda: self.protect_button.setEnabled(True),
         )
 
-    def _run_protect(self) -> ProtectResult:
-        """The backend call. Runs on a worker thread; touches no widgets."""
-        private_key = key_manager.load_private_key(self.key_edit.text().strip())
+    def _collect_inputs(self) -> ProtectInputs:
+        """Read the form. Interface thread only."""
         manual = self.start_method == constants.START_METHOD_MANUAL
-
-        return protect_media(
-            self._cover_path,
-            self.output_edit.text().strip(),
-            self.message_bytes(),
-            private_key,
+        return ProtectInputs(
+            cover_path=self._cover_path,
+            output_path=self.output_edit.text().strip(),
+            key_path=self.key_edit.text().strip(),
+            message=self.message_bytes(),
             media_id=self.media_id_edit.text().strip(),
             lsb_depth=self.lsb_depth,
             start_method=self.start_method,
             start_secret=None if manual else self.start_secret_edit.text(),
-            manual_start_location=(
-                self.start_location_spin.value() if manual else None
-            ),
+            manual_start_location=self.start_location_spin.value() if manual else None,
             passphrase=(
                 self.passphrase_edit.text() if self.encrypt_check.isChecked() else None
             ),
             ecc=self._ecc_parameters(),
             match_cover_size=self.match_size_check.isChecked(),
+        )
+
+    @staticmethod
+    def _run_protect(inputs: ProtectInputs) -> ProtectResult:
+        """The backend call. Runs on a worker thread and reads only *inputs*."""
+        return protect_media(
+            inputs.cover_path,
+            inputs.output_path,
+            inputs.message,
+            key_manager.load_private_key(inputs.key_path),
+            media_id=inputs.media_id,
+            lsb_depth=inputs.lsb_depth,
+            start_method=inputs.start_method,
+            start_secret=inputs.start_secret,
+            manual_start_location=inputs.manual_start_location,
+            passphrase=inputs.passphrase,
+            ecc=inputs.ecc,
+            match_cover_size=inputs.match_cover_size,
         )
 
     def _on_protected(self, result: ProtectResult) -> None:

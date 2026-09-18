@@ -24,6 +24,7 @@ things that genuinely cannot be computed from one file.
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 
 import numpy as np
 from PySide6.QtCore import Qt, Signal
@@ -103,6 +104,15 @@ def array_to_pixmap(array: np.ndarray) -> QPixmap:
         raise ValueError(f"cannot render an array of shape {data.shape}")
 
     return QPixmap.fromImage(image.copy())
+
+
+@dataclass(frozen=True)
+class AnalysisInputs:
+    """A snapshot of the form, taken on the interface thread before work starts."""
+
+    path: str
+    reference: str | None
+    scaled_planes: bool
 
 
 class SteganalysisTab(QWidget):
@@ -304,18 +314,26 @@ class SteganalysisTab(QWidget):
 
         self._runner.submit(
             self._run_analysis,
+            self._collect_inputs(),
             on_success=self._on_analysed,
             on_error=self._on_analysis_failed,
             on_finished=lambda: self.analyse_button.setEnabled(True),
         )
 
-    def _run_analysis(self) -> AnalysisReport:
-        """The backend call. Runs on a worker thread; touches no widgets."""
-        reference = self.reference_edit.text().strip() or None
-        return steganalysis.analyse(
-            self._path,
-            reference=reference,
+    def _collect_inputs(self) -> AnalysisInputs:
+        """Read the form. Interface thread only."""
+        assert self._path is not None
+        return AnalysisInputs(
+            path=self._path,
+            reference=self.reference_edit.text().strip() or None,
             scaled_planes=self.scaled_check.isChecked(),
+        )
+
+    @staticmethod
+    def _run_analysis(inputs: AnalysisInputs) -> AnalysisReport:
+        """The backend call. Runs on a worker thread and reads only *inputs*."""
+        return steganalysis.analyse(
+            inputs.path, reference=inputs.reference, scaled_planes=inputs.scaled_planes
         )
 
     def _on_analysed(self, report: AnalysisReport) -> None:

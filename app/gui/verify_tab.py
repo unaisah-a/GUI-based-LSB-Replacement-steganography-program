@@ -25,6 +25,7 @@ explicitly, for the case where the two arrived separately or were renamed.
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
@@ -56,6 +57,17 @@ from app.verification.verifier import verify_media
 __all__ = ["VerifyTab"]
 
 _log = get_logger(__name__)
+
+
+@dataclass(frozen=True)
+class VerifyInputs:
+    """A snapshot of the form, taken on the interface thread before work starts."""
+
+    stego_path: str
+    manifest_path: str
+    key_path: str
+    start_secret: str | None
+    passphrase: str | None
 
 
 class VerifyTab(QWidget):
@@ -328,19 +340,32 @@ class VerifyTab(QWidget):
 
         self._runner.submit(
             self._run_verify,
+            self._collect_inputs(),
             on_success=self._on_verified,
             on_error=self._on_verify_failed,
             on_finished=lambda: self.verify_button.setEnabled(True),
         )
 
-    def _run_verify(self) -> VerificationResult:
-        """The backend call. Runs on a worker thread; touches no widgets."""
-        return verify_media(
-            self._stego_path,
-            self.manifest_edit.text().strip(),
-            self.key_edit.text().strip(),
+    def _collect_inputs(self) -> VerifyInputs:
+        """Read the form. Interface thread only."""
+        assert self._stego_path is not None
+        return VerifyInputs(
+            stego_path=self._stego_path,
+            manifest_path=self.manifest_edit.text().strip(),
+            key_path=self.key_edit.text().strip(),
             start_secret=self.start_secret_edit.text() or None,
             passphrase=self.passphrase_edit.text() or None,
+        )
+
+    @staticmethod
+    def _run_verify(inputs: VerifyInputs) -> VerificationResult:
+        """The backend call. Runs on a worker thread and reads only *inputs*."""
+        return verify_media(
+            inputs.stego_path,
+            inputs.manifest_path,
+            inputs.key_path,
+            start_secret=inputs.start_secret,
+            passphrase=inputs.passphrase,
         )
 
     def _on_verified(self, result: VerificationResult) -> None:

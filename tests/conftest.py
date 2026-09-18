@@ -35,6 +35,22 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from app.stego import image_io
 from app.stego.capacity import LENGTH_HEADER_BYTES, embeddable_channel_count
+from app.utils import logging_utils
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _keep_test_logs_out_of_the_repository(tmp_path_factory):
+    """Point any file logging a test sets up at a temporary directory.
+
+    Only ``main()`` configures logging, so an ordinary test writes no log file at all.
+    This covers the tests that configure it deliberately: none of them may append to
+    ``evidence/logs/``, which is submission evidence, not a test artefact.
+    """
+    patch = pytest.MonkeyPatch()
+    log_directory = tmp_path_factory.mktemp("logs")
+    patch.setattr(logging_utils, "log_directory", lambda: log_directory)
+    yield
+    patch.undo()
 
 # Requirement 15.10: at most 100 examples per property, no per-example deadline,
 # and the whole property suite finishes within 120 seconds. The deadline is

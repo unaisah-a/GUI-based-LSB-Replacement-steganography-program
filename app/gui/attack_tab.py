@@ -27,6 +27,7 @@ instance — are reported as skipped with the reason, not silently dropped.
 from __future__ import annotations
 
 import os
+from dataclasses import dataclass
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
@@ -70,6 +71,23 @@ _MANIFEST_FIELDS: tuple[tuple[str, str], ...] = (
     ("media_id", "media_id (breaks extraction)"),
     ("encrypted", "encrypted (caught by the cross-check)"),
 )
+
+
+@dataclass(frozen=True)
+class AttackInputs:
+    """A snapshot of the form, taken on the interface thread before work starts.
+
+    The worker thread reads only this, never the widgets.
+    """
+
+    stego_path: str
+    media_type: str | None
+    manifest_path: str
+    key_path: str
+    start_secret: str | None
+    passphrase: str | None
+    bit_error_rate: float
+    manifest_field: object
 
 
 class AttackTab(QWidget):
@@ -346,42 +364,57 @@ class AttackTab(QWidget):
             return "Choose an attack from the list."
         return None
 
-    def _options_for(self, attack: Attack) -> dict[str, object]:
+    def _collect_inputs(self) -> AttackInputs:
+        """Read the form. Interface thread only."""
+        assert self._stego_path is not None
+        return AttackInputs(
+            stego_path=self._stego_path,
+            media_type=self._media_type,
+            manifest_path=self.manifest_edit.text().strip(),
+            key_path=self.key_edit.text().strip(),
+            start_secret=self.start_secret_edit.text() or None,
+            passphrase=self.passphrase_edit.text() or None,
+            bit_error_rate=self.bit_error_spin.value(),
+            manifest_field=self.manifest_field_combo.currentData(),
+        )
+
+    @staticmethod
+    def _options_for(attack: Attack, inputs: AttackInputs) -> dict[str, object]:
         if attack.key == "payload.random_bits":
-            return {"bit_error_rate": self.bit_error_spin.value()}
+            return {"bit_error_rate": inputs.bit_error_rate}
         if attack.key == "manifest.tamper":
-            return {"field": self.manifest_field_combo.currentData()}
+            return {"field": inputs.manifest_field}
         return {}
 
-    def _output_path_for(self, attack: Attack) -> str:
-        assert self._stego_path is not None
+    @staticmethod
+    def _output_path_for(attack: Attack, inputs: AttackInputs) -> str:
         stem = attack.key.replace(".", "_")
 
         if attack.target == "manifest":
-            base = self.manifest_edit.text().strip()
+            base = inputs.manifest_path
             directory = os.path.dirname(os.path.abspath(base))
             return file_utils.unique_path(
                 os.path.join(directory, f"attacked_{stem}.manifest.json")
             )
 
-        directory = os.path.dirname(os.path.abspath(self._stego_path))
-        extension = os.path.splitext(self._stego_path)[1]
+        directory = os.path.dirname(os.path.abspath(inputs.stego_path))
+        extension = os.path.splitext(inputs.stego_path)[1]
         return file_utils.unique_path(
             os.path.join(directory, f"attacked_{stem}{extension}")
         )
 
-    def _build_context(self, attack: Attack) -> AttackContext:
-        assert self._stego_path is not None
+    def _build_context(self, attack: Attack, inputs: AttackInputs) -> AttackContext:
         return registry.context_from_manifest(
-            self._stego_path,
-            self.manifest_edit.text().strip(),
-            self._output_path_for(attack),
-            start_secret=self.start_secret_edit.text() or None,
+            inputs.stego_path,
+            inputs.manifest_path,
+            self._output_path_for(attack, inputs),
+            start_secret=inputs.start_secret,
             attacker_private_key=self._attacker_key_if_needed(attack),
-            **self._options_for(attack),
+            **self._options_for(attack, inputs),
         )
 
-    def _attacker_key_if_needed(self, attack: Attack):
+    @staticmethod
+    def _attacker_key_if_needed(attack: Attack):
         """Generate a key the attacker controls, for the re-signing attack.
 
         An attacker with a signing key of their own is exactly the scenario that
@@ -410,19 +443,20 @@ class AttackTab(QWidget):
         self._runner.submit(
             self._run_one,
             attack,
+            self._collect_inputs(),
             on_success=self._on_attack_finished,
             on_error=self._on_attack_failed,
             on_finished=lambda: self._set_running(False),
         )
 
-    def _run_one(self, attack: Attack) -> AttackRun:
-        """The backend call. Runs on a worker thread; touches no widgets."""
+    def _run_one(self, attack: Attack, inputs: AttackInputs) -> AttackRun:
+        """The backend call. Runs on a worker thread and reads only *inputs*."""
         return registry.run_attack(
             attack.key,
-            self._build_context(attack),
-            self.key_edit.text().strip(),
-            start_secret=self.start_secret_edit.text() or None,
-            passphrase=self.passphrase_edit.text() or None,
+            self._build_context(attack, inputs),
+            inputs.key_path,
+            start_secret=inputs.start_secret,
+            passphrase=inputs.passphrase,
         )
 
     def run_all_attacks(self) -> None:
@@ -438,27 +472,23 @@ class AttackTab(QWidget):
 
         self._runner.submit(
             self._run_every,
+            self._collect_inputs(),
             on_success=self._on_all_finished,
             on_error=self._on_attack_failed,
             on_finished=lambda: self._set_running(False),
         )
 
-    def _run_every(self) -> tuple[list[AttackRun], list[tuple[str, str]]]:
-        assert self._media_type is not None
+    def _run_every(
+        self, inputs: AttackInputs
+    ) -> tuple[list[AttackRun], list[tuple[str, str]]]:
+        """Runs on a worker thread and reads only *inputs*."""
+        assert inputs.media_type is not None
         completed: list[AttackRun] = []
         skipped: list[tuple[str, str]] = []
 
-        for attack in registry.available_attacks(self._media_type):
+        for attack in registry.available_attacks(inputs.media_type):
             try:
-                completed.append(
-                    registry.run_attack(
-                        attack.key,
-                        self._build_context(attack),
-                        self.key_edit.text().strip(),
-                        start_secret=self.start_secret_edit.text() or None,
-                        passphrase=self.passphrase_edit.text() or None,
-                    )
-                )
+                completed.append(self._run_one(attack, inputs))
             except AttackError as exc:
                 # Not every attack applies to every file: modifying outside the
                 # payload needs a payload that does not fill the medium, for one.

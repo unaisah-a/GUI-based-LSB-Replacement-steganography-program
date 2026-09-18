@@ -182,6 +182,27 @@ class TestAudioQuality:
         assert report.within_distortion_bound is True
 
 
+class TestVideoQuality:
+    def test_a_clip_that_decodes_short_is_refused_not_truncated(
+        self, video_factory, monkeypatch
+    ):
+        """Containers can misreport frame counts; a short clip must not be averaged."""
+        from app.stego import video_stego
+
+        cover = video_factory(frame_count=4, name="cover")
+        stego = video_factory(frame_count=4, name="stego")
+        real = video_stego.iterate_frames
+
+        def short_for_stego(path, descriptor):
+            frames = list(real(path, descriptor))
+            return iter(frames[:-1] if path == stego else frames)
+
+        monkeypatch.setattr(video_stego, "iterate_frames", short_for_stego)
+
+        with pytest.raises(ComparisonError, match="stego clip decoded only 3 frames"):
+            quality_metrics.compare_quality(cover, stego)
+
+
 class TestQualityDispatch:
     def test_mixed_media_is_refused(self, tmp_path):
         image = write_cover(str(tmp_path), make_cover(32, 32, 3), image_io.PNG, "i")
