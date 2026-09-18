@@ -1,6 +1,6 @@
 {
   "container_format": "MKV",
-  "created": "2026-09-18T08:11:43+00:00",
+  "created": "2026-09-18T10:13:03+00:00",
   "ecc": null,
   "encrypted": false,
   "encryption": null,
@@ -10,10 +10,10 @@
   "media_id": "SAMPLE-VID-001",
   "media_type": "video",
   "message_length": 62,
-  "nonce": "4aa68f368022ba9051448918c89d0e74",
+  "nonce": "288ba153026ca7185a6d58d087ae0a0d",
   "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
   "start_location": null,
   "start_method": "hmac_prf",
   "stego_file": "cover_stego.mkv",
-  "stego_sha256": "ea8f636e6eed4684565ab83e4403723d2820977ea780dc6912ea61b32cabca33"
+  "stego_sha256": "0321a86d1990e71221b193182049e39b18800c79f3cbb0d2cbfbd712569d9b05"
 }
