@@ -24,6 +24,7 @@ __all__ = [
     "ValidationError",
     "CapacityError",
     "ExtractionError",
+    "LengthHeaderError",
     "ComparisonError",
 ]
 
@@ -81,6 +82,26 @@ class ExtractionError(StegoError):
     produce indistinguishable bit streams, so the message never asserts which
     of those occurred.
     """
+
+
+class LengthHeaderError(ExtractionError):
+    """The 4-byte length header decoded to a value that cannot be used.
+
+    Either it exceeds what the medium can hold from the start location, or it
+    disagrees with the payload length the manifest declares. Raised separately so
+    the verifier can say that a payload was expected here and the one field that
+    frames it is unusable, rather than only that nothing could be read. The header
+    is not covered by the signature, so this still does not establish a cause.
+    """
+
+    def __init__(
+        self, message: str, *, decoded_length: int, expected_length: int | None
+    ) -> None:
+        super().__init__(message)
+        #: The value the header decoded to.
+        self.decoded_length = decoded_length
+        #: The length the manifest declared, when one was supplied.
+        self.expected_length = expected_length
 
 
 class ComparisonError(ValidationError):

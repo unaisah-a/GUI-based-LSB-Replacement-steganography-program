@@ -30,6 +30,7 @@ readable in the same image.
 | 14 | `14_steganalysis_difference.png` | 21–23 | Steganalysis | Load `samples/images/stego/cover_stego.png` with `samples/images/original/cover.png` as the reference. | The amplified difference image, beside the bit planes and the distortion figures |
 | 15 | `15_video_per_frame.png` | 21–23 | Video | Load `samples/video/stego/cover_stego.mkv` with its manifest, secret `demo-start-secret`, the sample key, and `samples/video/original/cover.mkv` as the reference. Press *Locate the payload frames* and step to a carrier frame. | The list of carrier frames and the per-frame difference view for a frame that carries payload |
 | 16 | `16_video_clean_frame.png` | 21–23 | Video | Same as shot 15, stepped to a frame that carries no payload. | The difference view showing no change |
+| 17 | `17_length_header.png` | 7–10 | Attack Lab | Load the stego PNG and run *Corrupt the length header*. | Observed `PAYLOAD_MISSING`, and the reason saying a payload was expected and its length field is unusable |
 
 Shots 11 and 13 are deliberately separate. A wrong secret can never be proved to be
 wrong, so it gives `PAYLOAD_MISSING`; only a declared location that cannot fit the

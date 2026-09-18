@@ -5,7 +5,7 @@ The interesting pair here is :func:`modify_pixels_inside_payload` and
 different places and produce opposite verdicts, which is the clearest way to show
 what baseline verification does and does not cover:
 
-* inside the payload region -> the envelope no longer reads, so verification fails
+* inside the payload region -> the signature no longer verifies
 * outside the payload region -> the payload is untouched, so verification succeeds
 
 The second is a genuine limitation of the scheme, not a bug, and the test suite
@@ -19,13 +19,19 @@ import os
 
 import numpy as np
 
-from app.attacks.base import AttackError, AttackOutcome
+from app.attacks.base import (
+    AttackError,
+    AttackOutcome,
+    inside_payload_expected,
+    payload_tail,
+)
 from app.stego import image_io, image_stego
 from app.utils import constants, file_utils
 from app.verification import verdicts
 
 __all__ = [
     "blank_region",
+    "invert_samples",
     "modify_pixels_inside_payload",
     "modify_pixels_outside_payload",
     "recompress_as_lossy",
@@ -47,6 +53,33 @@ def _save(array: np.ndarray, descriptor, output_path: str, overwrite: bool) -> s
     return target
 
 
+def invert_samples(
+    stego_path: str | os.PathLike[str],
+    output_path: str | os.PathLike[str],
+    first: int,
+    end: int,
+    *,
+    overwrite: bool = False,
+) -> str:
+    """Invert the embeddable samples ``[first, end)`` and write the result."""
+    array, descriptor = _load(os.fspath(stego_path))
+    flat, channels = image_stego.embeddable_stream(array)
+
+    if first >= flat.size:
+        raise AttackError(
+            f"sample {first} lies beyond the image's {flat.size} embeddable samples"
+        )
+
+    modified = flat.copy()
+    modified[first : min(end, flat.size)] ^= 0xFF
+
+    stego = array.copy()
+    stego[:, :, :channels] = modified.reshape(
+        array.shape[0], array.shape[1], channels
+    )
+    return _save(stego, descriptor, output_path, overwrite)
+
+
 def modify_pixels_inside_payload(
     stego_path: str | os.PathLike[str],
     output_path: str | os.PathLike[str],
@@ -55,47 +88,33 @@ def modify_pixels_inside_payload(
     *,
     sample_count: int = 64,
     overwrite: bool = False,
+    ecc: object = None,
 ) -> AttackOutcome:
-    """Invert samples inside the region that carries the payload."""
-    array, descriptor = _load(os.fspath(stego_path))
-    flat, channels = image_stego.embeddable_stream(array)
+    """Invert the last samples of the payload region, where the signature lies.
 
-    if start_location >= flat.size:
-        raise AttackError(
-            f"start location {start_location} lies beyond the image's "
-            f"{flat.size} embeddable samples"
-        )
-
-    end = min(flat.size, start_location + max(1, min(sample_count, samples_written)))
-    modified = flat.copy()
-    modified[start_location:end] ^= 0xFF
-
-    stego = array.copy()
-    stego[:, :, :channels] = modified.reshape(
-        array.shape[0], array.shape[1], channels
-    )
-    written = _save(stego, descriptor, output_path, overwrite)
+    See :func:`app.attacks.base.payload_tail` for why the end of the region is the
+    target rather than its start.
+    """
+    first, end = payload_tail(start_location, samples_written, sample_count)
+    written = invert_samples(stego_path, output_path, first, end, overwrite=overwrite)
 
     return AttackOutcome(
         name="modify pixels inside the payload",
         output_path=written,
         description=(
-            f"Inverted {end - start_location} samples starting at sample "
-            f"{start_location}, inside the region carrying the payload."
+            f"Inverted {end - first} samples, {first} to {end - 1}, at the end of the "
+            f"payload region. They carry the signature, so the length header and the "
+            f"framing still read and the damage reaches the signature check."
         ),
-        expected_verdicts=frozenset(
-            {
-                verdicts.VERDICT_PAYLOAD_MISSING,
-                verdicts.VERDICT_SIGNATURE_INVALID,
-                verdicts.VERDICT_CANNOT_VERIFY,
-            }
-        ),
+        expected_verdicts=inside_payload_expected(ecc),
         target="media",
         details={
-            "samples_modified": end - start_location,
+            "samples_modified": end - first,
+            "first_sample": first,
             "start_location": start_location,
         },
     )
+
 
 
 def modify_pixels_outside_payload(

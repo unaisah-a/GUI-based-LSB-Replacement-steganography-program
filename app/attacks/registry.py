@@ -74,6 +74,23 @@ def _region_call(function):
     return invoke
 
 
+def _inside_call(function):
+    """Adapt an inside-the-payload attack, which also needs to know about the code."""
+
+    def invoke(context: AttackContext) -> AttackOutcome:
+        return function(
+            context.stego_path,
+            context.output_path,
+            context.start_location,
+            context.samples_written,
+            overwrite=context.overwrite,
+            ecc=context.ecc,
+            **context.options,
+        )
+
+    return invoke
+
+
 def _simple_call(function):
     """Adapt an attack that needs only the file and its options."""
 
@@ -149,6 +166,17 @@ ATTACKS: Final[tuple[Attack, ...]] = (
         summary="Make the payload unrecognisable as a payload.",
     ),
     Attack(
+        key="payload.length_header",
+        label="Corrupt the length header",
+        media_types=ANY_MEDIA,
+        invoke=_payload_call(payload_attacks.corrupt_length_header),
+        summary=(
+            "Invert the one sample carrying the low bits of the unsigned 4-byte "
+            "length header. The only single-sample change that gives "
+            "PAYLOAD_MISSING rather than SIGNATURE_INVALID."
+        ),
+    ),
+    Attack(
         key="payload.truncate",
         label="Truncate the payload",
         media_types=ANY_MEDIA,
@@ -192,8 +220,11 @@ ATTACKS: Final[tuple[Attack, ...]] = (
         key="image.inside",
         label="Modify pixels inside the payload",
         media_types=IMAGE_ONLY,
-        invoke=_region_call(image_attacks.modify_pixels_inside_payload),
-        summary="Invert samples in the region carrying the payload.",
+        invoke=_inside_call(image_attacks.modify_pixels_inside_payload),
+        summary=(
+            "Invert the last samples of the payload region, which carry the "
+            "signature. The header still reads, so the signature check fails."
+        ),
     ),
     Attack(
         key="image.outside",
@@ -224,8 +255,11 @@ ATTACKS: Final[tuple[Attack, ...]] = (
         key="audio.inside",
         label="Corrupt samples inside the payload",
         media_types=AUDIO_ONLY,
-        invoke=_region_call(audio_attacks.corrupt_samples_inside_payload),
-        summary="Invert the low byte of samples in the payload region.",
+        invoke=_inside_call(audio_attacks.corrupt_samples_inside_payload),
+        summary=(
+            "Invert the low byte of the last samples of the payload region, which "
+            "carry the signature. The signature check fails."
+        ),
     ),
     Attack(
         key="audio.outside",
@@ -263,8 +297,11 @@ ATTACKS: Final[tuple[Attack, ...]] = (
         key="video.inside",
         label="Corrupt samples inside the payload",
         media_types=VIDEO_ONLY,
-        invoke=_region_call(video_attacks.corrupt_samples_inside_payload),
-        summary="Invert samples in the frames carrying the payload.",
+        invoke=_inside_call(video_attacks.corrupt_samples_inside_payload),
+        summary=(
+            "Invert the last samples of the payload region, which carry the "
+            "signature. The signature check fails."
+        ),
     ),
     Attack(
         key="video.outside",

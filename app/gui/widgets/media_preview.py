@@ -15,12 +15,23 @@ and everything else in the tab keeps working. That matters because the image pat
 which is the bulk of the demonstration, does not need QtMultimedia at all.
 
 The status is exposed as :attr:`MediaPreview.playback_available` so a caller can say
-so in the interface instead of leaving a dead button.
+so in the interface instead of leaving a dead button. A missing backend does not
+raise: Qt creates the player anyway and reports it through ``isAvailable()``, so that
+is checked explicitly.
+
+Finding the FFmpeg backend on Windows
+-------------------------------------
+Qt 6.8 plays media through an FFmpeg plugin whose FFmpeg DLLs sit in the PySide6
+package directory. Some Windows interpreters, notably the Microsoft Store build of
+Python, do not search that directory, so the plugin fails to load and Qt reports no
+backend at all. :func:`_allow_bundled_ffmpeg` adds the directory to the DLL search
+path before the first player is created.
 """
 
 from __future__ import annotations
 
 import os
+import sys
 
 from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QPixmap
@@ -41,6 +52,25 @@ from app.utils.logging_utils import get_logger
 __all__ = ["MediaPreview"]
 
 _log = get_logger(__name__)
+
+_ffmpeg_directory_added = False
+
+
+def _allow_bundled_ffmpeg() -> None:
+    """Let Qt's FFmpeg media plugin find the FFmpeg DLLs shipped with PySide6.
+
+    A no-op except on Windows, and done at most once.
+    """
+    global _ffmpeg_directory_added
+    if _ffmpeg_directory_added or sys.platform != "win32":
+        return
+    import PySide6
+
+    try:
+        os.add_dll_directory(os.path.dirname(os.path.abspath(PySide6.__file__)))
+    except OSError as exc:  # pragma: no cover - an unusual installation
+        _log.warning("could not add the PySide6 DLL directory: %s", exc)
+    _ffmpeg_directory_added = True
 
 
 class MediaPreview(QWidget):
@@ -257,10 +287,15 @@ class MediaPreview(QWidget):
             return False
 
         try:
+            _allow_bundled_ffmpeg()
             from PySide6.QtMultimedia import QAudioOutput, QMediaPlayer
             from PySide6.QtMultimediaWidgets import QVideoWidget
 
             self._player = QMediaPlayer(self)
+            if not self._player.isAvailable():
+                # No backend could be loaded. Qt does not raise for this; the
+                # player exists but can never play anything.
+                raise RuntimeError("no QtMultimedia backend is available")
             self._audio_output = QAudioOutput(self)
             self._player.setAudioOutput(self._audio_output)
 
@@ -274,6 +309,8 @@ class MediaPreview(QWidget):
             self._player.playbackStateChanged.connect(self._on_state_changed)
         except Exception as exc:
             _log.warning("media playback unavailable: %s", exc)
+            if self._player is not None:
+                self._player.deleteLater()
             self._player = None
             self._audio_output = None
             self._video_widget = None

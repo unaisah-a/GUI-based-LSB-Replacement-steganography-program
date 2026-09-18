@@ -59,7 +59,7 @@ from app.crypto.key_manager import load_public_key
 from app.robustness import error_correction
 from app.robustness.redundancy import RedundancyError
 from app.stego import media
-from app.stego.errors import StegoError
+from app.stego.errors import LengthHeaderError, StegoError
 from app.utils import constants, file_utils
 from app.utils.logging_utils import get_logger
 from app.verification import verdicts
@@ -75,6 +75,37 @@ def _resolve_public_key(public_key: Any) -> Any:
     if isinstance(public_key, (str, os.PathLike)):
         return load_public_key(public_key)
     return public_key
+
+
+def _length_header_reason(exc: LengthHeaderError, start: int) -> str:
+    """Explain an unusable length header without claiming why it is unusable.
+
+    The manifest says a payload of a known length begins here, so "nothing was
+    found" would understate what happened: something was expected and the one field
+    that frames it cannot be used. The header is not signed, so the cause cannot be
+    established. Modification is consistent with it, and so are a wrong secret, a
+    wrong depth and no payload at all. The number of differing bits is reported
+    because it is a fact about the evidence, not a conclusion.
+    """
+    expected = exc.expected_length
+    if expected is None:
+        return (
+            f"a payload was expected at start location {start:,}, but its 4-byte "
+            f"length field decodes to {exc.decoded_length:,}, which cannot be used: "
+            f"{exc}. The length field is not covered by the signature, so this "
+            f"cannot say why. It is consistent with the file having been modified at "
+            f"that location."
+        )
+    differing = bin((exc.decoded_length ^ expected) & 0xFFFFFFFF).count("1")
+    return (
+        f"the manifest declares a {expected:,}-byte payload at start location "
+        f"{start:,}, but the 4-byte length field read there decodes to "
+        f"{exc.decoded_length:,}, which cannot be used. It differs from the declared "
+        f"length in {differing} of 32 bits. The length field is not covered by the "
+        f"signature, so this cannot say why: it is consistent with the file having "
+        f"been modified at that location, and also with a wrong start secret or "
+        f"depth, or with no payload having been embedded."
+    )
 
 
 def verify_media(
@@ -227,6 +258,21 @@ def _verify_with_manifest(
             manifest.lsb_depth,
             start,
             manifest_payload_length=embedded_length,
+        )
+    except LengthHeaderError as exc:
+        return VerificationResult(
+            verdict=verdicts.VERDICT_PAYLOAD_MISSING,
+            reason=_length_header_reason(exc, start),
+            payload_found=False,
+            start_location_valid=True,
+            start_location=start,
+            notes=(constants.AMBIGUOUS_FAILURE_NOTICE,),
+            details={
+                "stage": "length_header",
+                "stego_file": name,
+                "decoded_length": exc.decoded_length,
+                "expected_length": exc.expected_length,
+            },
         )
     except StegoError as exc:
         return VerificationResult(

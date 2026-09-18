@@ -966,3 +966,97 @@ class TestKeyErrorsStillRaise:
                 private_key,
                 start_secret=START_SECRET,
             )
+
+
+class TestSingleBitFlips:
+    """Where one flipped bit lands decides how the failure reads.
+
+    The length header is not signed, so a flip there is reported as an unusable
+    length field that is consistent with modification. A flip in the message or the
+    signature reaches the signature check. A flip in the record can also stop the
+    record decoding before the signature is checked, which is ``CANNOT_VERIFY``.
+    None of them is ``AUTHENTIC``.
+    """
+
+    def _protect(self, tmp_path, keys):
+        return do_protect(
+            png_cover_path(tmp_path),
+            tmp_path,
+            keys,
+            lsb_depth=1,
+            start_method=constants.START_METHOD_MANUAL,
+            start_secret=None,
+            manual_start_location=0,
+        )
+
+    def _flip(self, tmp_path, keys, result, offset):
+        from app.attacks import image_attacks
+
+        _, public_key = keys
+        flipped = image_attacks.invert_samples(
+            result.stego_path, str(tmp_path / f"flipped{offset}.png"), offset, offset + 1
+        )
+        return verify_media(flipped, result.manifest_path, public_key)
+
+    @staticmethod
+    def _sections(result):
+        """Stream bit offsets of the message and signature sections, at depth 1."""
+        from app.crypto import envelope as envelope_module
+        from app.stego import media
+
+        parsed = envelope_module.parse_envelope(media.extract(result.stego_path, 1, 0))
+        header = constants.LENGTH_HEADER_BYTES
+        message = (header + 18 + len(parsed.record_bytes)) * 8
+        signature = message + (len(parsed.message) + 4) * 8
+        return message, signature
+
+    def test_a_flip_in_the_length_header(self, tmp_path, keys):
+        result = self._protect(tmp_path, keys)
+        outcome = self._flip(tmp_path, keys, result, 5)
+
+        assert outcome.verdict == verdicts.VERDICT_PAYLOAD_MISSING
+        assert outcome.details["stage"] == "length_header"
+        assert "manifest declares" in outcome.reason
+        assert "differs from the declared length in 1 of 32 bits" in outcome.reason
+        assert "consistent with the file having been modified" in outcome.reason
+        assert constants.AMBIGUOUS_FAILURE_NOTICE in outcome.notes
+
+    def test_flips_in_the_message_and_signature(self, tmp_path, keys):
+        result = self._protect(tmp_path, keys)
+        message, signature = self._sections(result)
+
+        for offset in (message + 3, signature + 3, signature + 1000):
+            outcome = self._flip(tmp_path, keys, result, offset)
+            assert outcome.verdict == verdicts.VERDICT_SIGNATURE_INVALID, offset
+
+    @pytest.mark.parametrize("offset", [200, 2000])
+    def test_a_flip_in_the_record_is_never_authentic(self, tmp_path, keys, offset):
+        result = self._protect(tmp_path, keys)
+        outcome = self._flip(tmp_path, keys, result, offset)
+
+        assert outcome.verdict in {
+            verdicts.VERDICT_SIGNATURE_INVALID,
+            verdicts.VERDICT_CANNOT_VERIFY,
+        }
+
+    def test_a_wrong_secret_is_not_described_as_modification_alone(
+        self, png_cover, tmp_path, keys
+    ):
+        """The same failure path, reached without any modification at all."""
+        _, public_key = keys
+        result = do_protect(png_cover, tmp_path, keys)
+
+        outcome = verify_media(
+            result.stego_path,
+            result.manifest_path,
+            public_key,
+            start_secret="not the secret",
+        )
+
+        assert outcome.verdict == verdicts.VERDICT_PAYLOAD_MISSING
+        if outcome.details["stage"] == "length_header":
+            assert "wrong start secret" in outcome.reason
+
+
+def png_cover_path(tmp_path):
+    return write_cover(str(tmp_path), make_cover(64, 64, 3), image_io.PNG, "cover")

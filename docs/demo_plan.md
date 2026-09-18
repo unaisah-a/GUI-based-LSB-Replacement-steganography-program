@@ -91,7 +91,10 @@ secret is spoken, not sent.
    demonstration.
 
 Then repeat quickly with the **long message** (the Project Overview paragraph) and the
-**custom message** with encryption on, to cover all three required sizes. For the
+**custom message** with encryption on, to cover all three required sizes. Then switch
+the payload to **A file** and protect a small PNG or WAV. On the Verify tab the
+recovered image is shown, or the recovered audio played, inside the application, and
+**Save recovered payload...** writes it out under its original name. For the
 encrypted one, point out that the passphrase is a *second* out-of-band secret, separate
 from the start secret.
 
@@ -108,11 +111,20 @@ from the start secret.
    key, `SIGNATURE_INVALID` against the real sender's. This is the point — reaching
    `TAMPERED` requires a signing key, and the attack fails against a receiver who holds
    the right one.
-3. **Modify pixels outside the payload.** Observed: `AUTHENTIC`. Pause here. The image
+3. **Modify pixels inside the payload.** Observed: `SIGNATURE_INVALID`. The attack
+   inverts the last 64 samples of the payload region, which carry the signature, so the
+   payload is still found and the signature check is what fails.
+4. **Corrupt the length header.** Observed: `PAYLOAD_MISSING`. One sample changes, in
+   the 4-byte length field that frames the payload. That field is stego framing, not
+   part of the signed envelope, so the verifier never reaches the signature. Read the
+   reason aloud: a payload was expected at this location, its length field is
+   unusable, and this is *consistent with* modification. It does not claim
+   modification, because a wrong secret or depth produces the same evidence.
+5. **Modify pixels outside the payload.** Observed: `AUTHENTIC`. Pause here. The image
    has visibly changed and the verdict is still `AUTHENTIC`, because what was
    authenticated is the signed message, not the whole file. Say it as a limitation, not
    an excuse.
-4. **Re-encode as lossy JPEG.** Observed: `CANNOT_VERIFY` — the verifier refuses lossy
+6. **Re-encode as lossy JPEG.** Observed: `CANNOT_VERIFY` — the verifier refuses lossy
    input by design, which is why the supported formats are lossless.
 
 Each run shows *expected* beside *observed*. Point at the pairing: the attacks declare
@@ -172,6 +184,22 @@ not let them forge anything.
 
    Both are detections, by two different mechanisms. That is why the manifest does not
    need to be signed.
+
+**Say this before anyone asks: authenticity here is payload-scoped.** A pixel flipped
+*before* the payload region, or bytes changed in a WAV *outside* the payload, still
+verify as `AUTHENTIC`. That is by design. The signature covers the verification record
+and the message, not every sample of the file, and an LSB scheme has no way to sign
+the samples that carry the signature. The result says so itself. Its notes carry the
+scope notice ("It does not mean every part of the cover media is unchanged"). When the
+file's SHA-256 no longer matches the digest in the manifest, a second note says the file
+is not byte-for-byte the one that was protected, without changing the verdict, because
+the manifest is unsigned.
+
+**If asked why `TAMPERED` is never produced by modifying the media:** `TAMPERED` means
+the signature verified but the manifest disagrees with the signed record. Any change
+to the media that reaches the signed bytes fails the signature first. So without the
+signing key an attacker can only produce `SIGNATURE_INVALID`, or a payload that cannot
+be found or read.
 
 ---
 
@@ -241,7 +269,7 @@ user precisely what that does and does not cover.
 
 | If | Then |
 |---|---|
-| Playback fails on the demo machine | Expected on machines without the Windows media feature pack. The widget shows a message and everything else keeps working. Use the Steganalysis difference image and the Video tab's per-frame view instead. |
+| Playback fails on the demo machine | The preview says "Playback is not available on this machine" instead of offering a Play button that does nothing. Everything else keeps working. Use the quality figures (PSNR, largest sample change) for audio, and the Steganalysis difference image and the Video tab's per-frame view for image and video. **Test playback on the actual lab machine beforehand**: play `samples/audio/stego/stego.wav` in the Protect tab, and a recovered WAV payload in the Verify tab. |
 | A file picker is slow | Use drag and drop; both routes emit the same signal. |
 | An output path is occupied | The application refuses rather than overwriting. Change the name — this is the safety behaviour, so say so instead of hiding it. |
 | A video encode is slow | Use a shorter clip. Video embedding re-encodes and verifies its own output, which is deliberate and costs a pass. |
@@ -264,6 +292,7 @@ user precisely what that does and does not cover.
 | Receiver recovery for image **and** audio | 3–7, 10–15 |
 | Cover and stego displayed or played, before and after | 3–7, 10–15 |
 | Recovered payload displayed, never executed | 3–7 |
+| Payload types: typed text, text file, image, audio | 3–7 |
 | Two positive cases minimum | 3–7, 10–15 |
 | Three negative cases minimum | 7–10, 15–18, 18–21 |
 | Insufficient capacity as input validation | 3–7 |

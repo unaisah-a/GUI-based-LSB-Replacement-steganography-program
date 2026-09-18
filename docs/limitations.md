@@ -54,6 +54,14 @@ The consequence is deliberate and visible in the verdict vocabulary:
   secret is required, not as `WRONG_START_LOCATION`.
 - A wrong secret is reported as `PAYLOAD_MISSING` or `CANNOT_VERIFY`, with
   `constants.AMBIGUOUS_FAILURE_NOTICE` attached.
+- The 4-byte length header in front of the envelope is stego framing and is **not
+  signed**. A single flipped bit in it stops extraction before the signature is
+  reached, so the verdict is `PAYLOAD_MISSING`, not `SIGNATURE_INVALID`. The reason
+  says that the manifest declared a payload of a given length at that location, that
+  the length field read there is unusable, and by how many bits it differs. It says
+  this is consistent with modification, and equally with a wrong secret or depth. It
+  does not claim either. The Attack Lab's *Corrupt the length header* shows this case
+  on purpose.
 
 Labelling every extraction failure as a wrong start location would be a stronger
 claim than the evidence supports.

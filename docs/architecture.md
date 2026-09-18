@@ -61,6 +61,12 @@ The stego layer beneath it writes only a bare 4-byte big-endian length header
 followed by these bytes. Both media do exactly that, and neither knows what the
 bytes mean.
 
+The length header is outside the signature. It cannot be inside it: the receiver
+needs the length to know how many bytes to read before it has anything to verify.
+Damage to it is reported as `PAYLOAD_MISSING`, with a reason stating that a payload
+was expected there and its length field is unusable. See
+[`limitations.md`](limitations.md) §2.
+
 ### Why the magic is not in the stego framing
 
 The audio layer originally wrote its own `b"INF2005"` marker into the medium and
@@ -349,11 +355,17 @@ signature — and claiming a single verdict for those would be inventing precisi
 
 | Target | Attacks |
 |---|---|
-| payload (any medium) | corrupt record / message / signature / magic, truncate, flip random bits, substitute-and-re-sign |
+| payload (any medium) | corrupt record / message / signature / magic / length header, truncate, flip random bits, substitute-and-re-sign |
 | manifest | edit any published field |
 | image | modify pixels inside / outside the payload, blank a region, re-encode as JPEG |
 | audio | corrupt samples inside / outside the payload, scale amplitude, resample, truncate |
 | video | corrupt samples inside / outside the payload, drop frames, re-encode lossily |
+
+The *inside* attacks invert the **last** samples of the payload region. Those carry
+the signature, so the payload is still found and the signature check fails. Aiming
+at the first samples would hit the unsigned length header instead and demonstrate
+nothing about the signature. That case has its own attack, *corrupt the length
+header*.
 
 Three details are worth naming:
 

@@ -25,6 +25,7 @@ from app.attacks import registry
 from app.attacks.base import AttackError
 from app.crypto import key_manager
 from app.crypto.encryption import MIN_SCRYPT_N
+from app.crypto.envelope import ErrorCorrectionParameters
 from app.stego import image_io
 from app.stego.errors import FileError
 from app.utils import constants
@@ -592,3 +593,126 @@ class TestOutputSafety:
         )
         with pytest.raises(FileError, match="does not exist"):
             registry.attack_by_key("payload.signature").invoke(context)
+
+
+# --------------------------------------------------------------------------- #
+# Aiming inside the payload: the signature, not the length header
+# --------------------------------------------------------------------------- #
+
+
+class TestInsideAttacksReachTheSignature:
+    """The demonstration relies on these giving SIGNATURE_INVALID every time."""
+
+    @pytest.mark.parametrize("depth", range(1, 9))
+    def test_image_inside_gives_signature_invalid_at_every_depth(
+        self, tmp_path, keys, depth
+    ):
+        _, public_key = keys
+        result = protect_image(tmp_path, keys, lsb_depth=depth)
+        context = registry.context_from_protect_result(
+            result, str(tmp_path / "inside.png")
+        )
+
+        run = registry.run_attack("image.inside", context, public_key)
+
+        assert run.after.verdict == verdicts.VERDICT_SIGNATURE_INVALID
+        assert run.matched_expectation
+
+    @pytest.mark.parametrize("depth", [1, 4, 8])
+    def test_audio_inside_gives_signature_invalid(self, tmp_path, keys, depth):
+        _, public_key = keys
+        result = protect_audio(tmp_path, keys, lsb_depth=depth)
+        context = registry.context_from_protect_result(
+            result, str(tmp_path / "inside.wav")
+        )
+
+        run = registry.run_attack("audio.inside", context, public_key)
+
+        assert run.after.verdict == verdicts.VERDICT_SIGNATURE_INVALID
+        assert run.matched_expectation
+
+    def test_the_damage_is_at_the_end_of_the_region(self, tmp_path, keys):
+        _, public_key = keys
+        result = protect_image(tmp_path, keys, manual_start_location=100)
+        context = registry.context_from_protect_result(
+            result, str(tmp_path / "inside.png")
+        )
+
+        run = registry.run_attack("image.inside", context, public_key)
+
+        written = result.embed_result.samples_written
+        assert run.outcome.details["first_sample"] == 100 + written - 64
+        assert run.outcome.details["first_sample"] > 100
+
+    def test_with_repetition_coding_the_damage_can_be_repaired(self, tmp_path, keys):
+        _, public_key = keys
+        result = protect_image(
+            tmp_path,
+            keys,
+            lsb_depth=3,
+            ecc=ErrorCorrectionParameters(constants.ECC_REPETITION, 3),
+        )
+        context = registry.context_from_protect_result(
+            result, str(tmp_path / "inside.png")
+        )
+
+        run = registry.run_attack("image.inside", context, public_key)
+
+        assert run.after.verdict == verdicts.VERDICT_AUTHENTIC
+        assert run.matched_expectation
+
+
+class TestLengthHeaderAttack:
+    def test_it_is_offered_for_every_medium(self):
+        for media_type in (
+            constants.MEDIA_IMAGE,
+            constants.MEDIA_AUDIO,
+            constants.MEDIA_VIDEO,
+        ):
+            keys = {a.key for a in registry.available_attacks(media_type)}
+            assert "payload.length_header" in keys
+
+    @pytest.mark.parametrize("depth", [1, 3, 8])
+    def test_image_gives_payload_missing_with_a_specific_reason(
+        self, tmp_path, keys, depth
+    ):
+        _, public_key = keys
+        result = protect_image(tmp_path, keys, lsb_depth=depth)
+        context = registry.context_from_protect_result(
+            result, str(tmp_path / "header.png")
+        )
+
+        run = registry.run_attack("payload.length_header", context, public_key)
+
+        assert run.after.verdict == verdicts.VERDICT_PAYLOAD_MISSING
+        assert run.after.details["stage"] == "length_header"
+        assert "manifest declares" in run.after.reason
+        assert "consistent with the file having been modified" in run.after.reason
+        assert run.matched_expectation
+
+    def test_audio_gives_payload_missing(self, tmp_path, keys):
+        _, public_key = keys
+        result = protect_audio(tmp_path, keys, lsb_depth=2)
+        context = registry.context_from_protect_result(
+            result, str(tmp_path / "header.wav")
+        )
+
+        run = registry.run_attack("payload.length_header", context, public_key)
+
+        assert run.after.verdict == verdicts.VERDICT_PAYLOAD_MISSING
+        assert run.after.details["stage"] == "length_header"
+
+    def test_only_one_sample_changes(self, tmp_path, keys):
+        _, public_key = keys
+        result = protect_image(tmp_path, keys, lsb_depth=1)
+        context = registry.context_from_protect_result(
+            result, str(tmp_path / "header.png")
+        )
+
+        run = registry.run_attack("payload.length_header", context, public_key)
+
+        before, _ = image_io.load_image(result.stego_path)
+        after, _ = image_io.load_image(run.outcome.output_path)
+        assert int((before != after).sum()) == 1
+        # Depth 1: the header's 32 bits sit in samples 0 to 31.
+        assert run.outcome.details["sample"] == 31

@@ -38,6 +38,9 @@ __all__ = [
     "AttackError",
     "AttackOutcome",
     "copy_for_attack",
+    "inside_payload_expected",
+    "length_header_sample",
+    "payload_tail",
 ]
 
 
@@ -160,3 +163,48 @@ def copy_for_attack(
         )
     shutil.copyfile(os.fspath(source), target)
     return target
+
+
+def payload_tail(start_location: int, samples_written: int, count: int) -> tuple[int, int]:
+    """The last *count* samples of the payload region, as ``[first, end)``.
+
+    The "inside the payload" attacks aim here rather than at the start of the region.
+    The first samples carry the 4-byte length header, which is not signed, so
+    damaging them makes the payload unreadable and the verdict ``PAYLOAD_MISSING``,
+    which says nothing about the signature. The envelope *ends* with its signature,
+    at least 256 bytes long, so the final samples always carry signature bytes as
+    long as ``count * depth`` stays within 2,048 bits. The framing is left intact,
+    the envelope still parses, and the damage lands on the signature check.
+    """
+    end = start_location + max(1, samples_written)
+    return max(start_location, end - max(1, count)), end
+
+
+def length_header_sample(start_location: int, lsb_depth: int) -> int:
+    """The sample that carries the lowest-order bits of the 4-byte length header.
+
+    Inverting it changes the decoded length by a small amount, so the stream still
+    fits the medium and the failure is specifically a length that disagrees with
+    the manifest.
+    """
+    from app.stego.bit_utils import groups_needed
+    from app.utils import constants
+
+    header_bits = constants.LENGTH_HEADER_BYTES * 8
+    return start_location + groups_needed(header_bits, lsb_depth) - 1
+
+
+def inside_payload_expected(ecc: object) -> frozenset[str]:
+    """What damage at the end of the payload region should produce.
+
+    ``SIGNATURE_INVALID``. With an error-correcting code active only one of the
+    repeated copies is damaged, so majority voting can repair it, and surviving as
+    ``AUTHENTIC`` is the code working rather than the attack failing.
+    """
+    from app.robustness import error_correction
+    from app.verification import verdicts
+
+    expected = {verdicts.VERDICT_SIGNATURE_INVALID}
+    if error_correction.is_active(ecc):
+        expected.add(verdicts.VERDICT_AUTHENTIC)
+    return frozenset(expected)

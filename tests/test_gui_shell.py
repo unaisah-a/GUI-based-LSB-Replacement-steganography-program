@@ -22,6 +22,7 @@ tests.
 from __future__ import annotations
 
 import os
+import sys
 
 import pytest
 
@@ -506,6 +507,28 @@ class TestMediaPreview:
             assert shown is True
         else:
             assert shown is False
+
+    def test_a_missing_backend_is_reported_rather_than_a_dead_button(
+        self, qtbot, wav_file, monkeypatch
+    ):
+        """Qt does not raise when no backend loads; the player is just unavailable."""
+        from PySide6.QtMultimedia import QMediaPlayer
+
+        monkeypatch.setattr(QMediaPlayer, "isAvailable", lambda self: False)
+        preview = MediaPreview()
+        qtbot.addWidget(preview)
+
+        assert preview.show_file(wav_file) is False
+        assert preview.playback_available is False
+        assert "Playback is not available" in preview._message_label.text()
+
+    @pytest.mark.skipif(sys.platform != "win32", reason="the DLL search path is Windows-only")
+    def test_the_bundled_ffmpeg_backend_loads_on_windows(self, qtbot, wav_file):
+        """Without the PySide6 directory on the DLL path, no backend loads at all."""
+        preview = MediaPreview()
+        qtbot.addWidget(preview)
+        assert preview.playback_available is True
+        assert preview.show_file(wav_file) is True
 
     def test_clearing_forgets_the_file(self, qtbot, png_file):
         preview = MediaPreview()

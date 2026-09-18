@@ -15,6 +15,8 @@ the expected verdict predictable and the demonstration explainable:
 * corrupt the **message** -> ``SIGNATURE_INVALID`` (the message is signed too)
 * **truncate** the envelope -> ``PAYLOAD_MISSING``
 * corrupt the **magic** -> ``PAYLOAD_MISSING``
+* corrupt the **length header** -> ``PAYLOAD_MISSING``, with a reason saying a payload
+  was expected but the one unsigned field framing it is unusable
 
 Note that corrupting the message gives ``SIGNATURE_INVALID`` rather than
 ``TAMPERED``, because the signature covers the message. Reaching ``TAMPERED``
@@ -34,7 +36,12 @@ from typing import Any, Final
 
 import numpy as np
 
-from app.attacks.base import AttackError, AttackOutcome, copy_for_attack
+from app.attacks.base import (
+    AttackError,
+    AttackOutcome,
+    copy_for_attack,
+    length_header_sample,
+)
 from app.crypto import envelope as envelope_module
 from app.crypto import signatures
 from app.stego import media
@@ -43,6 +50,7 @@ from app.verification import verdicts
 
 __all__ = [
     "corrupt_envelope_magic",
+    "corrupt_length_header",
     "corrupt_message_section",
     "corrupt_random_payload_bits",
     "corrupt_record_section",
@@ -359,6 +367,57 @@ def corrupt_envelope_magic(
         expected_verdicts=frozenset({verdicts.VERDICT_PAYLOAD_MISSING}),
         target="payload",
         details={"bytes_changed": 1},
+    )
+
+
+def corrupt_length_header(
+    stego_path,
+    output_path,
+    lsb_depth,
+    start_location,
+    *,
+    overwrite: bool = False,
+    ecc: Any = None,
+) -> AttackOutcome:
+    """Invert the one sample carrying the lowest bits of the 4-byte length header.
+
+    The header is the stego layer's framing and sits outside the signed envelope, so
+    this is the one place where a single-sample change cannot reach the signature
+    check. The decoded length no longer matches the manifest, extraction stops, and
+    the verdict is ``PAYLOAD_MISSING``. The reason says that a payload was expected
+    and its length field is unusable, which is as far as the evidence goes.
+    """
+    from app.attacks import audio_attacks, image_attacks, video_attacks
+    from app.utils import constants
+
+    source = os.fspath(stego_path)
+    try:
+        media_type = media.detect_media_type(source)
+    except Exception as exc:
+        raise AttackError(
+            f"{file_utils.display_name(source)} is not a supported medium: {exc}"
+        ) from exc
+
+    invert = {
+        constants.MEDIA_IMAGE: image_attacks.invert_samples,
+        constants.MEDIA_AUDIO: audio_attacks.invert_samples,
+        constants.MEDIA_VIDEO: video_attacks.invert_samples,
+    }[media_type]
+    sample = length_header_sample(start_location, lsb_depth)
+    written = invert(source, os.fspath(output_path), sample, sample + 1, overwrite=overwrite)
+
+    return AttackOutcome(
+        name="corrupt the length header",
+        output_path=written,
+        description=(
+            f"Inverted sample {sample}, the last of the samples carrying the 4-byte "
+            f"length header at depth {lsb_depth}. The header is not signed, so the "
+            f"envelope is never reached; the receiver can only report that the "
+            f"expected payload's length field is unusable."
+        ),
+        expected_verdicts=frozenset({verdicts.VERDICT_PAYLOAD_MISSING}),
+        target="payload",
+        details={"sample": sample, "start_location": start_location},
     )
 
 

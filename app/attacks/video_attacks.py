@@ -36,7 +36,12 @@ from typing import Final
 
 import numpy as np
 
-from app.attacks.base import AttackError, AttackOutcome
+from app.attacks.base import (
+    AttackError,
+    AttackOutcome,
+    inside_payload_expected,
+    payload_tail,
+)
 from app.stego import video_stego
 from app.stego.errors import StegoError
 from app.utils import constants, file_utils
@@ -47,6 +52,7 @@ __all__ = [
     "corrupt_samples_inside_payload",
     "corrupt_samples_outside_payload",
     "drop_frames",
+    "invert_samples",
     "recompress_lossy",
 ]
 
@@ -112,6 +118,32 @@ def _corrupt_range(
     return _write(modified(), output_path, descriptor, overwrite)
 
 
+def invert_samples(
+    stego_path: str | os.PathLike[str],
+    output_path: str | os.PathLike[str],
+    first: int,
+    end: int,
+    *,
+    overwrite: bool = False,
+) -> str:
+    """Invert the flat samples ``[first, end)`` and re-encode losslessly."""
+    source = os.fspath(stego_path)
+    descriptor = _describe(source)
+    if first >= descriptor.total_samples:
+        raise AttackError(
+            f"sample {first} lies beyond the clip's {descriptor.total_samples} "
+            f"samples"
+        )
+    return _corrupt_range(
+        source,
+        os.fspath(output_path),
+        descriptor,
+        first,
+        min(end, descriptor.total_samples),
+        overwrite,
+    )
+
+
 def corrupt_samples_inside_payload(
     stego_path: str | os.PathLike[str],
     output_path: str | os.PathLike[str],
@@ -120,46 +152,34 @@ def corrupt_samples_inside_payload(
     *,
     sample_count: int = 256,
     overwrite: bool = False,
+    ecc: object = None,
 ) -> AttackOutcome:
-    """Invert samples inside the region carrying the payload."""
+    """Invert the last samples of the payload region, where the signature lies.
+
+    See :func:`app.attacks.base.payload_tail` for why the end of the region is the
+    target rather than its start.
+    """
     source = os.fspath(stego_path)
     descriptor = _describe(source)
+    first, end = payload_tail(start_location, samples_written, sample_count)
+    written = invert_samples(source, output_path, first, end, overwrite=overwrite)
 
-    if start_location >= descriptor.total_samples:
-        raise AttackError(
-            f"start location {start_location} lies beyond the clip's "
-            f"{descriptor.total_samples} samples"
-        )
-
-    end = min(
-        descriptor.total_samples,
-        start_location + max(1, min(sample_count, samples_written)),
-    )
-    written = _corrupt_range(
-        source, os.fspath(output_path), descriptor, start_location, end, overwrite
-    )
-
-    first_frame = start_location // descriptor.samples_per_frame
+    first_frame = first // descriptor.samples_per_frame
     last_frame = (end - 1) // descriptor.samples_per_frame
 
     return AttackOutcome(
         name="corrupt samples inside the payload",
         output_path=written,
         description=(
-            f"Inverted {end - start_location} samples from sample "
-            f"{start_location}, inside the payload region, spanning frames "
-            f"{first_frame} to {last_frame}."
+            f"Inverted {end - first} samples, {first} to {end - 1}, at the end of the "
+            f"payload region, spanning frames {first_frame} to {last_frame}. They "
+            f"carry the signature, so the damage reaches the signature check."
         ),
-        expected_verdicts=frozenset(
-            {
-                verdicts.VERDICT_PAYLOAD_MISSING,
-                verdicts.VERDICT_SIGNATURE_INVALID,
-                verdicts.VERDICT_CANNOT_VERIFY,
-            }
-        ),
+        expected_verdicts=inside_payload_expected(ecc),
         target="media",
         details={
-            "samples_modified": end - start_location,
+            "samples_modified": end - first,
+            "first_sample": first,
             "start_location": start_location,
             "first_frame": first_frame,
             "last_frame": last_frame,

@@ -21,7 +21,12 @@ import os
 
 import numpy as np
 
-from app.attacks.base import AttackError, AttackOutcome
+from app.attacks.base import (
+    AttackError,
+    AttackOutcome,
+    inside_payload_expected,
+    payload_tail,
+)
 from app.stego import audio_stego
 from app.utils import constants, file_utils
 from app.verification import verdicts
@@ -29,6 +34,7 @@ from app.verification import verdicts
 __all__ = [
     "corrupt_samples_inside_payload",
     "corrupt_samples_outside_payload",
+    "invert_samples",
     "resample",
     "scale_amplitude",
     "truncate_audio",
@@ -62,6 +68,34 @@ def _save(
     return target
 
 
+def invert_samples(
+    stego_path: str | os.PathLike[str],
+    output_path: str | os.PathLike[str],
+    first: int,
+    end: int,
+    *,
+    overwrite: bool = False,
+) -> str:
+    """Invert the low byte of samples ``[first, end)`` and write the result."""
+    samples, descriptor = _load(os.fspath(stego_path))
+    flat, _ = audio_stego.embeddable_stream(samples)
+
+    if first >= flat.size:
+        raise AttackError(f"sample {first} lies beyond the file's {flat.size} samples")
+
+    modified = flat.copy()
+    # Invert only the low byte, so the change is audible-scale rather than a
+    # full-scale sample inversion that would sound like a click.
+    modified[first : min(end, flat.size)] ^= np.uint16(0x00FF)
+
+    return _save(
+        modified.view(np.int16).reshape(samples.shape),
+        descriptor,
+        output_path,
+        overwrite,
+    )
+
+
 def corrupt_samples_inside_payload(
     stego_path: str | os.PathLike[str],
     output_path: str | os.PathLike[str],
@@ -70,47 +104,30 @@ def corrupt_samples_inside_payload(
     *,
     sample_count: int = 64,
     overwrite: bool = False,
+    ecc: object = None,
 ) -> AttackOutcome:
-    """Invert the low bits of samples inside the payload region."""
-    samples, descriptor = _load(os.fspath(stego_path))
-    flat, _ = audio_stego.embeddable_stream(samples)
+    """Invert the low byte of the last samples of the payload region.
 
-    if start_location >= flat.size:
-        raise AttackError(
-            f"start location {start_location} lies beyond the file's {flat.size} "
-            f"samples"
-        )
-
-    end = min(flat.size, start_location + max(1, min(sample_count, samples_written)))
-    modified = flat.copy()
-    # Invert only the low byte, so the change is audible-scale rather than a
-    # full-scale sample inversion that would sound like a click.
-    modified[start_location:end] ^= np.uint16(0x00FF)
-
-    written = _save(
-        modified.view(np.int16).reshape(samples.shape),
-        descriptor,
-        output_path,
-        overwrite,
-    )
+    See :func:`app.attacks.base.payload_tail` for why the end of the region is the
+    target rather than its start.
+    """
+    first, end = payload_tail(start_location, samples_written, sample_count)
+    written = invert_samples(stego_path, output_path, first, end, overwrite=overwrite)
 
     return AttackOutcome(
         name="corrupt samples inside the payload",
         output_path=written,
         description=(
-            f"Inverted the low byte of {end - start_location} samples starting at "
-            f"sample {start_location}, inside the payload region."
+            f"Inverted the low byte of {end - first} samples, {first} to {end - 1}, "
+            f"at the end of the payload region. They carry the signature, so the "
+            f"length header and the framing still read and the damage reaches the "
+            f"signature check."
         ),
-        expected_verdicts=frozenset(
-            {
-                verdicts.VERDICT_PAYLOAD_MISSING,
-                verdicts.VERDICT_SIGNATURE_INVALID,
-                verdicts.VERDICT_CANNOT_VERIFY,
-            }
-        ),
+        expected_verdicts=inside_payload_expected(ecc),
         target="media",
         details={
-            "samples_modified": end - start_location,
+            "samples_modified": end - first,
+            "first_sample": first,
             "start_location": start_location,
         },
     )

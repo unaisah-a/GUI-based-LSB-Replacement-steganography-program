@@ -530,7 +530,19 @@ class TestVideoAttacks:
         run = self._run(result, public_path, tmp_path, "video.inside", "inside")
 
         assert run.before.verdict == verdicts.VERDICT_AUTHENTIC
-        assert run.after.verdict != verdicts.VERDICT_AUTHENTIC
+        assert run.after.verdict == verdicts.VERDICT_SIGNATURE_INVALID
+        assert run.matched_expectation
+
+    def test_corrupting_the_length_header_is_reported_as_such(
+        self, big_cover, tmp_path, keys
+    ):
+        result, public_path = protect_clip(big_cover, tmp_path, keys)
+        run = self._run(
+            result, public_path, tmp_path, "payload.length_header", "header"
+        )
+
+        assert run.after.verdict == verdicts.VERDICT_PAYLOAD_MISSING
+        assert run.after.details["stage"] == "length_header"
         assert run.matched_expectation
 
     def test_corruption_outside_the_payload_still_verifies(

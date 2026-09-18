@@ -38,7 +38,12 @@ from app.stego.bit_utils import (
     write_low_bits,
 )
 from app.stego.capacity import MAX_PAYLOAD_LENGTH
-from app.stego.errors import CapacityError, ExtractionError, ValidationError
+from app.stego.errors import (
+    CapacityError,
+    ExtractionError,
+    LengthHeaderError,
+    ValidationError,
+)
 from app.utils import constants
 
 __all__ = [
@@ -183,8 +188,9 @@ def extract_stream(
 
     :param manifest_payload_length: when supplied, the decoded header must agree with
         it. The header still decides how many bytes are read; this is a cross-check.
-    :raises ExtractionError: the decoded length is inconsistent with the capacity,
-        the stream is truncated, or the manifest length disagrees.
+    :raises LengthHeaderError: the decoded length is inconsistent with the capacity,
+        or the manifest length disagrees.
+    :raises ExtractionError: the stream is truncated.
     """
     available = total_samples - start
     header_groups = groups_needed(LENGTH_HEADER_BITS, depth)
@@ -206,16 +212,20 @@ def extract_stream(
     # request a multi-gigabyte buffer.
     max_payload = max(0, (available * depth) // 8 - constants.LENGTH_HEADER_BYTES)
     if payload_length > max_payload:
-        raise ExtractionError(
+        raise LengthHeaderError(
             f"decoded payload length {payload_length} is inconsistent with the "
             f"{medium} capacity: at depth {depth} from start location {start} the "
-            f"{medium} can hold at most {max_payload} payload bytes"
+            f"{medium} can hold at most {max_payload} payload bytes",
+            decoded_length=payload_length,
+            expected_length=manifest_payload_length,
         )
 
     if manifest_payload_length is not None and payload_length != manifest_payload_length:
-        raise ExtractionError(
+        raise LengthHeaderError(
             f"decoded payload length {payload_length} disagrees with the manifest "
-            f"payload length {manifest_payload_length}"
+            f"payload length {manifest_payload_length}",
+            decoded_length=payload_length,
+            expected_length=manifest_payload_length,
         )
 
     if payload_length == 0:
