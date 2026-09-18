@@ -52,7 +52,8 @@ from PySide6.QtWidgets import (
 from app.attacks import registry
 from app.attacks.base import Attack, AttackContext, AttackError
 from app.attacks.registry import AttackRun
-from app.crypto import key_manager, manifest as manifest_module
+from app.crypto import key_manager
+from app.crypto import manifest as manifest_module
 from app.gui.widgets.drop_zone import DropZone
 from app.gui.widgets.file_info_panel import FileInfoPanel
 from app.gui.workers import BackgroundRunner
@@ -286,7 +287,7 @@ class AttackTab(QWidget):
             return
         try:
             manifest = manifest_module.read_manifest(path)
-        except Exception:  # noqa: BLE001 - reported when an attack is run
+        except Exception:
             return
 
         self.start_secret_edit.setEnabled(

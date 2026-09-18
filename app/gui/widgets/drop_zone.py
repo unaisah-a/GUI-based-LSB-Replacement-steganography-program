@@ -21,7 +21,7 @@ mean two places to keep in step.
 from __future__ import annotations
 
 import os
-from typing import Iterable
+from collections.abc import Iterable
 
 from PySide6.QtCore import QMimeData, Qt, Signal
 from PySide6.QtGui import QDragEnterEvent, QDragLeaveEvent, QDropEvent

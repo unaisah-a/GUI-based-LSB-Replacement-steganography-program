@@ -19,8 +19,8 @@ import pytest
 from app.stego import bit_utils, image_io
 from app.utils import constants, file_utils, logging_utils
 from app.utils.file_utils import UnsupportedMediaError
-from conftest import make_audio, make_cover, write_audio_file, write_cover
 
+from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 # --------------------------------------------------------------------------- #
 # Constants
@@ -33,7 +33,7 @@ class TestConstantsAgreeWithTheLibraryLayer:
             assert bit_utils.validate_lsb_depth(depth) == depth
 
     def test_depth_list_is_exactly_one_to_eight(self):
-        assert constants.LSB_DEPTHS == tuple(range(1, 9))
+        assert tuple(range(1, 9)) == constants.LSB_DEPTHS
 
     def test_image_containers_match_image_io(self):
         assert set(constants.SUPPORTED_CONTAINERS[constants.MEDIA_IMAGE]) == set(

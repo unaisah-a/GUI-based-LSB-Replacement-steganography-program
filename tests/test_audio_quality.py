@@ -5,6 +5,7 @@ Every test generates its own audio inside ``tmp_path``.
 
 from __future__ import annotations
 
+import itertools
 import math
 
 import numpy as np
@@ -12,6 +13,7 @@ import pytest
 
 from app.analysis import audio_analysis, quality_metrics
 from app.stego.errors import ComparisonError
+
 from conftest import AUDIO_SAMPLE_RATE, make_audio, write_audio_file
 
 
@@ -112,7 +114,9 @@ class TestValidation:
 
 
 class TestDistortionAgainstDepth:
-    def test_distortion_rises_monotonically_with_depth(self, tmp_path):
+    def test_distortion_rises_monotonically_with_depth(
+        self, tmp_path, evidence_directory
+    ):
         """The trade-off the depth control exists to expose, measured.
 
         Every payload bit is filled from the same deterministic stream, so the only
@@ -120,7 +124,6 @@ class TestDistortionAgainstDepth:
         depth, because a fixed small payload would touch fewer samples at a greater
         depth and confound the comparison.
         """
-        from pathlib import Path
 
         from app.stego import audio_stego
         from app.utils import file_utils
@@ -162,7 +165,7 @@ class TestDistortionAgainstDepth:
             )
 
         # The claim: more bits replaced means more distortion, at every step.
-        for earlier, later in zip(rows, rows[1:]):
+        for earlier, later in itertools.pairwise(rows):
             assert later["mse"] > earlier["mse"], later["lsb_depth"]
             assert later["psnr_db"] < earlier["psnr_db"], later["lsb_depth"]
             assert later["snr_db"] < earlier["snr_db"], later["lsb_depth"]
@@ -174,8 +177,9 @@ class TestDistortionAgainstDepth:
         for row in rows:
             assert row["within_expected_lsb_bound"] is True
 
-        directory = Path(__file__).resolve().parents[1] / "evidence" / "results"
-        directory.mkdir(parents=True, exist_ok=True)
+        if evidence_directory is None:
+            return
+        directory = evidence_directory
 
         file_utils.write_json_atomic(
             str(directory / "audio_quality_by_depth.json"),

@@ -22,8 +22,8 @@ from hypothesis import given
 from app.analysis import image_analysis as analysis
 from app.stego import image_io, image_stego
 from app.stego.errors import ComparisonError, ValidationError
-from conftest import image_pair, make_cover, write_cover
 
+from conftest import image_pair, make_cover, write_cover
 
 # --------------------------------------------------------------------------- #
 # Requirement 8 and 15.5: quality metrics
@@ -121,7 +121,7 @@ class TestAlphaHandling:
         assert result.overall_psnr_unbounded is True
         assert result.alpha_excluded_from_overall is True
 
-        alpha = [channel for channel in result.channels if channel.is_alpha][0]
+        alpha = next(channel for channel in result.channels if channel.is_alpha)
         assert alpha.mse > 0.0
         assert alpha.label == "alpha"
         # But it is still visible as a difference at the sample level.
@@ -363,8 +363,8 @@ class TestLsbDistribution:
         array = np.zeros((16, 16, 3), dtype=np.uint8)
         array[:, :, 0] = 1  # every red sample has bit 0 set
         results = analysis.lsb_distribution(array)
-        red = [r for r in results if r.channel_index == 0][0]
-        green = [r for r in results if r.channel_index == 1][0]
+        red = next(r for r in results if r.channel_index == 0)
+        green = next(r for r in results if r.channel_index == 1)
 
         assert red.value == 1.0
         assert red.details["ones_count"] == 256.0

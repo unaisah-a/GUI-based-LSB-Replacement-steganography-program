@@ -44,8 +44,9 @@ from __future__ import annotations
 import dataclasses
 import math
 import os
+from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import Final, Sequence
+from typing import Final
 
 import numpy as np
 import numpy.typing as npt

@@ -24,8 +24,9 @@ sequence as verified.
 from __future__ import annotations
 
 import os
+from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import Any, Final, Iterator
+from typing import Any, Final
 
 import numpy as np
 import numpy.typing as npt
@@ -557,7 +558,10 @@ def _assert_round_trip(
 
     if recovered != expected:
         _discard(output_path)
-        differing = sum(1 for a, b in zip(recovered, expected) if a != b)
+        # The lengths may differ; only the overlapping bytes are compared.
+        differing = sum(
+            1 for a, b in zip(recovered, expected, strict=False) if a != b
+        )
         raise DecodeError(
             f"the payload read back out of the clip that was just written differs "
             f"from what was embedded ({len(recovered)} of {len(expected)} bytes "

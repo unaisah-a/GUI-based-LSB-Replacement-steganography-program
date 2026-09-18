@@ -14,7 +14,8 @@ from pathlib import Path
 import pytest
 
 from app.crypto import envelope as env
-from app.crypto import key_manager, manifest as manifest_module, payload, signatures
+from app.crypto import key_manager, payload, signatures
+from app.crypto import manifest as manifest_module
 from app.crypto.encryption import MIN_SCRYPT_N
 from app.crypto.envelope import EncryptionParameters, ErrorCorrectionParameters
 from app.crypto.errors import EncryptionError, ManifestError, RecordError

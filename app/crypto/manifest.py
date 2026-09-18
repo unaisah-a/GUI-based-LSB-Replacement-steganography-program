@@ -50,13 +50,14 @@ signature over the verification record is the guarantee.
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Final, Mapping
+from typing import Any, Final
 
 from app.crypto import envelope as envelope_module
-from app.crypto.envelope import EncryptionParameters, ErrorCorrectionParameters
 from app.crypto import fields
+from app.crypto.envelope import EncryptionParameters, ErrorCorrectionParameters
 from app.crypto.errors import ManifestError
 from app.utils import constants, file_utils
 
@@ -125,7 +126,7 @@ class Manifest:
         stego_file_name: str | None = None,
         stego_sha256: str | None = None,
         created: str | None = None,
-    ) -> "Manifest":
+    ) -> Manifest:
         """Build a manifest from a signed record and the values it cannot carry.
 
         ``envelope_length`` is supplied rather than read from the record because
@@ -184,7 +185,7 @@ class Manifest:
         }
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "Manifest":
+    def from_dict(cls, data: Mapping[str, Any]) -> Manifest:
         """Validate untrusted manifest content and build a manifest.
 
         Every check here happens before any value is used to drive extraction, so
@@ -483,9 +484,11 @@ def cross_check(
 
     # Only the manual method publishes a location, and only then is the record's
     # copy non-null; see the VerificationRecord docstring for why.
-    if record.start_method == constants.START_METHOD_MANUAL:
-        if manifest.start_location != record.start_location:
-            mismatches.append("start_location")
+    if (
+        record.start_method == constants.START_METHOD_MANUAL
+        and manifest.start_location != record.start_location
+    ):
+        mismatches.append("start_location")
 
     if envelope_length is not None and manifest.envelope_length != envelope_length:
         mismatches.append("envelope_length")

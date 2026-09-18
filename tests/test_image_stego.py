@@ -22,8 +22,8 @@ from app.stego.errors import (
     FileError,
     ValidationError,
 )
-from conftest import ScratchDirectory, embedding_case, make_cover, write_cover
 
+from conftest import ScratchDirectory, embedding_case, make_cover, write_cover
 
 # --------------------------------------------------------------------------- #
 # Requirement 15.1: round trip

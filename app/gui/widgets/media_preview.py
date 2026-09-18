@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import os
 
-from PySide6.QtCore import QUrl, Qt, Signal
+from PySide6.QtCore import Qt, QUrl, Signal
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QHBoxLayout,
@@ -205,7 +205,7 @@ class MediaPreview(QWidget):
             )
         )
 
-    def resizeEvent(self, event) -> None:  # noqa: N802 - Qt naming
+    def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
         if self._stack.currentIndex() == 1:
             self._rescale()
@@ -252,7 +252,7 @@ class MediaPreview(QWidget):
             self._player.positionChanged.connect(self._on_position_changed)
             self._player.durationChanged.connect(self._on_duration_changed)
             self._player.playbackStateChanged.connect(self._on_state_changed)
-        except Exception as exc:  # noqa: BLE001 - see the module docstring
+        except Exception as exc:
             _log.warning("media playback unavailable: %s", exc)
             self._player = None
             self._audio_output = None

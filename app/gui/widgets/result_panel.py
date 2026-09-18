@@ -19,7 +19,7 @@ choosing. Every view here is explicitly set to plain text.
 
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (

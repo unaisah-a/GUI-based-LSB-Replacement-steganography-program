@@ -27,6 +27,7 @@ from app.utils import constants
 from app.verification import verdicts
 from app.verification.protect import protect_media
 from app.verification.verifier import verify_media
+
 from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 START_SECRET = "the start secret"

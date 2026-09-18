@@ -94,7 +94,7 @@ class AudioEmbedResult:
 # --------------------------------------------------------------------------- #
 
 
-def _describe(path: str | os.PathLike[str], info: "sf._SoundFileInfo") -> AudioDescriptor:
+def _describe(path: str | os.PathLike[str], info: sf._SoundFileInfo) -> AudioDescriptor:
     channels = int(info.channels)
     frames = int(info.frames)
     return AudioDescriptor(

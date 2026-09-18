@@ -52,8 +52,15 @@ The window has five tabs: **Protect**, **Verify**, **Attack Lab**, **Steganalysi
 ```
 
 Configuration is in [`pytest.ini`](pytest.ini): tests are collected from `tests/`, and
-warnings are treated as errors. The GUI tests use `pytest-qt` and need no visible window;
-on a headless machine set `QT_QPA_PLATFORM=offscreen` first.
+warnings are treated as errors. The GUI tests use `pytest-qt` and need no visible window.
+
+```bash
+.venv\Scripts\python -m pytest --cov              # with a coverage report
+.venv\Scripts\python -m pytest --write-evidence   # also regenerate evidence/results/
+.venv\Scripts\ruff check .                        # lint, configured in pyproject.toml
+```
+
+GitHub Actions runs the linter and the full suite on every push and pull request.
 
 ---
 

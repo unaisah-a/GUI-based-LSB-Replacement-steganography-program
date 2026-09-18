@@ -19,8 +19,15 @@ from pathlib import Path
 import pytest
 
 from app.stego import audio_stego, capacity, image_io, image_stego, media
-from app.stego.errors import CapacityError, DecodeError, FileError, StegoError, ValidationError
+from app.stego.errors import (
+    CapacityError,
+    DecodeError,
+    FileError,
+    StegoError,
+    ValidationError,
+)
 from app.utils import constants
+
 from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 PAYLOAD = b"INF2005 shared facade test"

@@ -60,6 +60,7 @@ from app.utils import constants, file_utils
 from app.verification import media_compare, verdicts
 from app.verification.protect import protect_media
 from app.verification.verifier import verify_media
+
 from conftest import (
     make_audio,
     make_cover,
@@ -144,16 +145,15 @@ def record_case(
 
 
 @pytest.fixture(scope="module", autouse=True)
-def write_evidence():
+def write_evidence(evidence_directory):
     """Write the evidence artefacts once, after every case in this file has run."""
     _RESULTS.clear()
     yield
 
-    if not _RESULTS:  # pragma: no cover - only when the module is deselected
+    if evidence_directory is None or not _RESULTS:
         return
 
-    directory = Path(__file__).resolve().parents[1] / "evidence" / "results"
-    directory.mkdir(parents=True, exist_ok=True)
+    directory = evidence_directory
 
     file_utils.write_json_atomic(
         str(directory / "e2e_results.json"),

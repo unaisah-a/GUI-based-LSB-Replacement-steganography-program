@@ -27,16 +27,17 @@ from typing import Any
 import pytest
 
 from app.analysis import size_preservation
-from app.crypto import hashing
 from app.analysis.size_preservation import (
     DEFLATE_LEVELS,
     MIN_PNG_CHUNK_OVERHEAD,
     PADDING_CHUNK_TYPE,
     SizeResult,
 )
+from app.crypto import hashing
 from app.stego import audio_stego, image_io, image_stego, video_stego
-from app.stego.errors import ValidationError
+from app.stego.errors import DecodeError, ValidationError
 from app.utils import constants, file_utils
+
 from conftest import (
     make_audio,
     make_cover,
@@ -58,16 +59,15 @@ def record(result: SizeResult, scenario: str) -> None:
 
 
 @pytest.fixture(scope="module", autouse=True)
-def write_evidence():
+def write_evidence(evidence_directory):
     """Write the experiment's artefacts once every case in this file has run."""
     _RESULTS.clear()
     yield
 
-    if not _RESULTS:  # pragma: no cover - only when the module is deselected
+    if evidence_directory is None or not _RESULTS:
         return
 
-    directory = Path(__file__).resolve().parents[1] / "evidence" / "results"
-    directory.mkdir(parents=True, exist_ok=True)
+    directory = evidence_directory
 
     applicable = [row for row in _RESULTS if row["applicable"]]
     matched = [row for row in applicable if row["exact"]]
@@ -167,10 +167,10 @@ def write_evidence():
         "",
         "### Where it stops working",
         "",
-        f"- If every candidate is already **larger** than the cover, the size cannot "
-        f"be matched. Bytes cannot be removed from a PNG without changing its "
-        f"pixels. This is the usual case at higher LSB depths, and it is the reason "
-        f"exact PNG preservation is reported per file rather than promised.",
+        "- If every candidate is already **larger** than the cover, the size cannot "
+        "be matched. Bytes cannot be removed from a PNG without changing its "
+        "pixels. This is the usual case at higher LSB depths, and it is the reason "
+        "exact PNG preservation is reported per file rather than promised.",
         f"- If the shortfall is smaller than {MIN_PNG_CHUNK_OVERHEAD} bytes, it cannot "
         f"be padded either: that is what a PNG chunk costs with an empty payload.",
         "",
@@ -429,7 +429,7 @@ class TestPadding:
             size_preservation.pad_png_to_size(raw, len(raw) + 5)
 
     def test_a_non_png_is_refused(self):
-        with pytest.raises(Exception):
+        with pytest.raises(DecodeError, match="not a PNG"):
             size_preservation.pad_png_to_size(b"not a png at all", 500)
 
 

@@ -8,8 +8,8 @@ specific container variants rather than a broad input space.
 from __future__ import annotations
 
 import os
-from pathlib import Path
 import struct
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -17,6 +17,7 @@ from PIL import Image
 
 from app.stego import image_io
 from app.stego.errors import DecodeError, FileError, ValidationError
+
 from conftest import make_cover, write_cover
 
 
@@ -251,7 +252,7 @@ class TestPngVariants:
     def test_one_bit_png_is_rejected(self, workspace):
         path = os.path.join(workspace, "bilevel.png")
         Image.fromarray(
-            (make_cover(8, 8, 1, "stripes", 1)[:, :, 0] > 0)
+            make_cover(8, 8, 1, "stripes", 1)[:, :, 0] > 0
         ).save(path)
         with pytest.raises(DecodeError, match="sample width"):
             image_io.load_image(path)

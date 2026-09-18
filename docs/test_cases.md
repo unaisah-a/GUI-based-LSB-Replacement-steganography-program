@@ -203,8 +203,13 @@ $env:HYPOTHESIS_PROFILE="fast"; .venv\Scripts\python -m pytest -q
 
 ## 8. Generated evidence
 
-Four artefacts are produced by running the suite, so they always describe the current
-code:
+Four artefacts are produced by the suite, so they always describe the code that
+produced them. The experiments run and assert on every test run, but the files are only
+rewritten when asked, so an ordinary run leaves the working tree untouched:
+
+```bash
+python -m pytest --write-evidence
+```
 
 | Artefact | Written by | Records |
 |---|---|---|
@@ -215,7 +220,4 @@ code:
 
 All four include the failures and the limits. That is the point of them.
 
-None of these files should be edited by hand. Two earlier hand-maintained artefacts had
-gone stale — one described a payload format the code no longer uses, the other was a
-pasted terminal capture from a different machine — and both were replaced by generated
-versions for that reason.
+None of these files should be edited by hand; regenerate them instead.

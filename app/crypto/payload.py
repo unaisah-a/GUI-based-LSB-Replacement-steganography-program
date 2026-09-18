@@ -39,8 +39,9 @@ whether its digest matched; mapping that onto ``AUTHENTIC`` or ``TAMPERED`` is
 from __future__ import annotations
 
 import os
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any, Mapping
+from typing import Any
 
 from app.crypto import encryption as encryption_module
 from app.crypto import envelope as envelope_module
@@ -51,7 +52,7 @@ from app.crypto.envelope import (
     VerificationRecord,
 )
 from app.crypto.errors import RecordError
-from app.crypto.hashing import sha256_hex, hashes_equal
+from app.crypto.hashing import hashes_equal, sha256_hex
 from app.utils import constants
 
 __all__ = [

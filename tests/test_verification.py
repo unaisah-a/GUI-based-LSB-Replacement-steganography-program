@@ -19,7 +19,8 @@ from pathlib import Path
 
 import pytest
 
-from app.crypto import hashing, key_manager, manifest as manifest_module
+from app.crypto import hashing, key_manager
+from app.crypto import manifest as manifest_module
 from app.crypto.encryption import MIN_SCRYPT_N
 from app.crypto.envelope import ErrorCorrectionParameters
 from app.crypto.errors import KeyMaterialError
@@ -29,6 +30,7 @@ from app.utils import constants, file_utils
 from app.verification import verdicts
 from app.verification.protect import protect_media
 from app.verification.verifier import verify_media
+
 from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 FAST_SCRYPT = {"scrypt_n": MIN_SCRYPT_N, "scrypt_r": 8, "scrypt_p": 1}
@@ -199,7 +201,7 @@ class TestAuthentic:
         assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
 
     def test_a_public_key_path_is_accepted(self, png_cover, tmp_path, keys):
-        private_key, public_key = keys
+        _, public_key = keys
         key_path = str(tmp_path / "public.pem")
         key_manager.save_public_key(public_key, key_path)
         result = do_protect(png_cover, tmp_path, keys)

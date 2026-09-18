@@ -26,12 +26,14 @@ pytest.importorskip("PySide6", reason="PySide6 is required for the interface tes
 
 from app.crypto import key_manager
 from app.crypto.encryption import MIN_SCRYPT_N
+from app.crypto.errors import KeyMaterialError
 from app.gui.protect_tab import ProtectTab
 from app.gui.verify_tab import VerifyTab
 from app.stego import image_io, media
 from app.utils import constants
 from app.verification import verdicts
 from app.verification.protect import protect_media
+
 from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 START_SECRET = "the start secret"
@@ -704,7 +706,7 @@ class TestVerifyTabOperation:
         self._prepare(verify_tab, protected)
         verify_tab.key_edit.setText(str(tmp_path / "absent.pem"))
 
-        with pytest.raises(Exception):
+        with pytest.raises(KeyMaterialError, match="not found"):
             verify_tab._run_verify(verify_tab._collect_inputs())
 
         verify_tab._on_verify_failed("key file not found: absent.pem", "traceback")
@@ -767,7 +769,7 @@ class TestProtectThenVerifyThroughTheTabs:
     def test_the_receiver_is_told_which_secrets_are_needed(
         self, qtbot, png_cover, key_files, tmp_path
     ):
-        private_path, public_path = key_files
+        private_path, _ = key_files
         protect = ProtectTab()
         verify = VerifyTab()
         qtbot.addWidget(protect)

@@ -28,10 +28,11 @@ after that. The design rationale is in ``docs/architecture.md`` section 2.
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from functools import partial
-from typing import Any, Final, Mapping
+from typing import Any, Final
 
 from app.crypto import fields
 from app.crypto.errors import EnvelopeError, RecordError
@@ -154,7 +155,7 @@ def utc_timestamp() -> str:
     Second resolution: sub-second digits add nothing here and make the recorded
     value harder to read in the demo.
     """
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    return datetime.now(UTC).replace(microsecond=0).isoformat()
 
 
 # --------------------------------------------------------------------------- #
@@ -188,7 +189,7 @@ class EncryptionParameters:
         }
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "EncryptionParameters":
+    def from_dict(cls, data: Mapping[str, Any]) -> EncryptionParameters:
         cipher = _require(data, "cipher", str, "record.encryption")
         kdf = _require(data, "kdf", str, "record.encryption")
         salt = _require(data, "salt", str, "record.encryption")
@@ -223,7 +224,7 @@ class ErrorCorrectionParameters:
         return {"scheme": self.scheme, "factor": self.factor}
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "ErrorCorrectionParameters":
+    def from_dict(cls, data: Mapping[str, Any]) -> ErrorCorrectionParameters:
         scheme = _require(data, "scheme", str, "record.ecc")
         if scheme not in constants.ECC_SCHEMES:
             raise RecordError(
@@ -337,7 +338,7 @@ class VerificationRecord:
     # -- parsing ---------------------------------------------------------- #
 
     @classmethod
-    def from_dict(cls, data: Mapping[str, Any]) -> "VerificationRecord":
+    def from_dict(cls, data: Mapping[str, Any]) -> VerificationRecord:
         """Validate *data* and build a record.
 
         Call this only after the envelope signature has verified. Before that the
@@ -445,7 +446,7 @@ class VerificationRecord:
         )
 
     @classmethod
-    def from_bytes(cls, data: bytes) -> "VerificationRecord":
+    def from_bytes(cls, data: bytes) -> VerificationRecord:
         """Decode and validate a record from its serialised bytes."""
         return cls.from_dict(decode_record(data))
 

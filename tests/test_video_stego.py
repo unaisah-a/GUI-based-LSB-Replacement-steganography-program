@@ -41,6 +41,7 @@ from app.utils import constants
 from app.verification import media_compare, verdicts
 from app.verification.protect import protect_media
 from app.verification.verifier import verify_media
+
 from conftest import make_video_frames, write_video_file
 
 PAYLOAD = b"A payload carried by a video clip."
@@ -102,7 +103,7 @@ class TestDescribe:
         expected = make_video_frames()
 
         assert len(frames) == len(expected)
-        for actual, wanted in zip(frames, expected):
+        for actual, wanted in zip(frames, expected, strict=True):
             assert np.array_equal(actual, wanted)
 
     def test_the_generated_frames_really_do_differ(self):
@@ -214,7 +215,6 @@ class TestRoundTrip:
         assert video_stego.extract_video(result.output_path, 1, start) == payload
 
     def test_a_payload_spanning_many_frames_round_trips(self, big_cover, tmp_path):
-        descriptor = video_stego.describe_only(big_cover)
         payload = bytes(range(256)) * 12  # more than two frames' worth at depth 1
 
         result = video_stego.embed_video(
@@ -243,7 +243,7 @@ class TestRoundTrip:
         original = list(video_stego.iterate_frames(cover))
         stego = list(video_stego.iterate_frames(result.output_path))
 
-        for index, (a, b) in enumerate(zip(original, stego)):
+        for index, (a, b) in enumerate(zip(original, stego, strict=True)):
             if index > result.last_frame_touched:
                 assert np.array_equal(a, b), f"frame {index} changed"
 
@@ -743,6 +743,7 @@ class TestVideoTab:
 
         image = tmp_path / "not-video.png"
         from app.stego import image_io
+
         from conftest import make_cover
 
         image.write_bytes(image_io.encode_image(make_cover(8, 8, 3), image_io.PNG))

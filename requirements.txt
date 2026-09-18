@@ -48,9 +48,14 @@ opencv-python==4.10.0.84
 # Note: the analysis layer must not import PySide6 (Requirement 12.2).
 PySide6==6.8.0
 
-# --- Testing (shared) -------------------------------------------------------
+# --- Testing and linting (shared) -------------------------------------------
 # hypothesis drives the property-based tests required by Requirement 15.
 # pytest-qt drives the GUI widget smoke tests.
+# pytest-cov and coverage measure coverage (pytest --cov); settings in pyproject.toml.
+# ruff is the linter; settings in pyproject.toml.
 pytest==8.3.3
 hypothesis==6.115.5
 pytest-qt==4.4.0
+pytest-cov==7.1.0
+coverage==7.16.1
+ruff==0.16.8

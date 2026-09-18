@@ -214,7 +214,7 @@ class MainWindow(QMainWindow):
 
     # -- shutdown ---------------------------------------------------------- #
 
-    def closeEvent(self, event: QCloseEvent) -> None:  # noqa: N802 - Qt naming
+    def closeEvent(self, event: QCloseEvent) -> None:
         """Wait for background work before closing.
 
         A protect operation writes a stego file and then its manifest. Abandoning it

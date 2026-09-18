@@ -42,7 +42,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.crypto import key_manager, manifest as manifest_module
+from app.crypto import key_manager
+from app.crypto import manifest as manifest_module
 from app.gui.widgets.drop_zone import DropZone
 from app.gui.widgets.file_info_panel import FileInfoPanel
 from app.gui.widgets.media_preview import MediaPreview
@@ -249,7 +250,7 @@ class VerifyTab(QWidget):
 
         try:
             manifest = manifest_module.read_manifest(path)
-        except Exception as exc:  # noqa: BLE001 - shown, not raised
+        except Exception as exc:
             self.manifest_panel.clear()
             self.manifest_panel.set_notice(str(exc))
             return
@@ -393,7 +394,7 @@ class VerifyTab(QWidget):
             comparison = media_compare.compare(
                 original, self._stego_path, lsb_depth=depth
             )
-        except Exception as exc:  # noqa: BLE001 - shown, not raised
+        except Exception as exc:
             self.comparison_view.setPlainText(f"Comparison unavailable: {exc}")
             return
 

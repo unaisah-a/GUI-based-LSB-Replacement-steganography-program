@@ -21,9 +21,10 @@ import json
 import os
 import tempfile
 import time
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Final, Iterator
+from typing import Any, Final
 
 from app.errors import AppError
 from app.utils import constants
@@ -404,11 +405,10 @@ def _atomic_write(
             f"pass overwrite=True to replace it"
         )
 
-    with atomic_output(text) as temporary:
-        with open(temporary, "wb") as stream:
-            stream.write(data)
-            stream.flush()
-            os.fsync(stream.fileno())
+    with atomic_output(text) as temporary, open(temporary, "wb") as stream:
+        stream.write(data)
+        stream.flush()
+        os.fsync(stream.fileno())
     return text
 
 

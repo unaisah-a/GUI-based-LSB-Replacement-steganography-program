@@ -31,7 +31,8 @@ outcome rather than assumed.
 from __future__ import annotations
 
 import os
-from typing import Final, Iterator
+from collections.abc import Iterator
+from typing import Final
 
 import numpy as np
 

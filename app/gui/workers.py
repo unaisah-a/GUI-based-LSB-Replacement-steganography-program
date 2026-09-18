@@ -30,7 +30,8 @@ rather than a traceback printed to a console nobody is watching.
 from __future__ import annotations
 
 import traceback
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, Signal, Slot
 
@@ -92,7 +93,7 @@ class Worker(QRunnable):
     def run(self) -> None:  # pragma: no cover - exercised through BackgroundRunner
         try:
             result = self._function(*self._args, **self._kwargs)
-        except BaseException as error:  # noqa: BLE001 - see the module docstring
+        except BaseException as error:
             detail = traceback.format_exc()
             _log.exception("background task failed: %s", self._function)
             self.signals.failed.emit(describe_exception(error), detail)

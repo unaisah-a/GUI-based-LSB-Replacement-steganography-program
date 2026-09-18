@@ -38,8 +38,9 @@ meaningful.
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable, Final
+from typing import Any, Final
 
 from app.stego import audio_stego, image_stego, video_stego
 from app.stego.capacity import CapacityReport

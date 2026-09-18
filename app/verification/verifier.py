@@ -45,9 +45,9 @@ import os
 from typing import Any
 
 from app.crypto import envelope as envelope_module
+from app.crypto import hashing, signatures, start_location
 from app.crypto import manifest as manifest_module
 from app.crypto import payload as payload_module
-from app.crypto import hashing, signatures, start_location
 from app.crypto.errors import (
     EncryptionError,
     EnvelopeError,
@@ -135,7 +135,7 @@ def verify_media(
         notes=(
             result.notes
             if digest_matches
-            else result.notes + (constants.FILE_CHANGED_NOTICE,)
+            else (*result.notes, constants.FILE_CHANGED_NOTICE)
         ),
         details={**result.details, "file_digest_matches": digest_matches},
     )

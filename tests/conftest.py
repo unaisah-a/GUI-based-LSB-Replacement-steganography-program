@@ -21,6 +21,7 @@ import math
 import os
 import tempfile
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -37,6 +38,31 @@ from app.stego import image_io
 from app.stego.capacity import LENGTH_HEADER_BYTES, embeddable_channel_count
 from app.utils import logging_utils
 
+EVIDENCE_DIRECTORY = Path(__file__).resolve().parents[1] / "evidence" / "results"
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--write-evidence",
+        action="store_true",
+        default=False,
+        help="write the generated result tables into evidence/results/",
+    )
+
+
+@pytest.fixture(scope="session")
+def evidence_directory(request) -> Path | None:
+    """``evidence/results/`` under ``--write-evidence``, otherwise ``None``.
+
+    The experiments behind the committed evidence run and assert on every test run,
+    but only rewrite the committed files when asked, so an ordinary ``pytest`` leaves
+    the working tree untouched.
+    """
+    if not request.config.getoption("--write-evidence"):
+        return None
+    EVIDENCE_DIRECTORY.mkdir(parents=True, exist_ok=True)
+    return EVIDENCE_DIRECTORY
+
 
 @pytest.fixture(autouse=True, scope="session")
 def _keep_test_logs_out_of_the_repository(tmp_path_factory):
@@ -51,6 +77,7 @@ def _keep_test_logs_out_of_the_repository(tmp_path_factory):
     patch.setattr(logging_utils, "log_directory", lambda: log_directory)
     yield
     patch.undo()
+
 
 # Requirement 15.10: at most 100 examples per property, no per-example deadline,
 # and the whole property suite finishes within 120 seconds. The deadline is

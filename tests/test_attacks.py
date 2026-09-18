@@ -26,9 +26,11 @@ from app.attacks.base import AttackError
 from app.crypto import key_manager
 from app.crypto.encryption import MIN_SCRYPT_N
 from app.stego import image_io
+from app.stego.errors import FileError
 from app.utils import constants
 from app.verification import verdicts
 from app.verification.protect import protect_media
+
 from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 FAST_SCRYPT = {"scrypt_n": MIN_SCRYPT_N, "scrypt_r": 8, "scrypt_p": 1}
@@ -579,7 +581,7 @@ class TestOutputSafety:
         occupied.write_bytes(b"existing")
 
         context = registry.context_from_protect_result(result, str(occupied))
-        with pytest.raises(Exception):
+        with pytest.raises(FileError, match="already occupied"):
             registry.run_attack("payload.signature", context, public_key)
         assert occupied.read_bytes() == b"existing"
 
@@ -588,5 +590,5 @@ class TestOutputSafety:
         context = registry.context_from_protect_result(
             result, str(tmp_path / "absent" / "out.png")
         )
-        with pytest.raises(Exception):
+        with pytest.raises(FileError, match="does not exist"):
             registry.attack_by_key("payload.signature").invoke(context)

@@ -19,6 +19,7 @@ from app.stego import audio_stego, image_io, image_stego
 from app.stego.errors import ComparisonError, DecodeError, ValidationError
 from app.utils import constants
 from app.verification import media_compare
+
 from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 PAYLOAD = b"INF2005 comparison test payload"

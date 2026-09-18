@@ -394,7 +394,7 @@ class ProtectTab(QWidget):
         if candidate and os.path.isfile(candidate):
             try:
                 key = key_manager.load_private_key(candidate)
-            except Exception:  # noqa: BLE001 - an unusable key is reported on protect
+            except Exception:
                 pass
             else:
                 size = (key.key_size + 7) // 8
@@ -577,7 +577,8 @@ class ProtectTab(QWidget):
         if not path:
             return
         try:
-            data = open(path, "rb").read()
+            with open(path, "rb") as handle:
+                data = handle.read()
         except OSError as exc:
             QMessageBox.warning(self, "Load message", str(exc))
             return
@@ -727,7 +728,7 @@ class ProtectTab(QWidget):
             report = quality_metrics.compare_quality(
                 self._cover_path, result.stego_path, lsb_depth=result.record.lsb_depth
             )
-        except Exception as exc:  # noqa: BLE001 - a metrics failure must not hide the result
+        except Exception as exc:
             self.quality_panel.clear()
             self.quality_panel.set_notice(f"Quality metrics unavailable: {exc}")
             return

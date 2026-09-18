@@ -24,7 +24,6 @@ from app.crypto import envelope as env
 from app.crypto.errors import EnvelopeError, RecordError
 from app.utils import constants
 
-
 # --------------------------------------------------------------------------- #
 # Fixtures
 # --------------------------------------------------------------------------- #

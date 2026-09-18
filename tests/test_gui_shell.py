@@ -40,6 +40,7 @@ from app.stego import image_io, media
 from app.stego.errors import CapacityError
 from app.utils import constants, file_utils
 from app.verification.verdicts import VerificationResult
+
 from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 
@@ -213,7 +214,10 @@ class TestWorker:
         for function in (lambda: 1, lambda: 1 / 0):
             worker = Worker(function)
             finished: list[bool] = []
-            worker.signals.finished.connect(lambda: finished.append(True))
+            # Bound as a default so each iteration's lambda keeps its own list.
+            worker.signals.finished.connect(
+                lambda finished=finished: finished.append(True)
+            )
             worker.run()
             assert finished == [True]
 

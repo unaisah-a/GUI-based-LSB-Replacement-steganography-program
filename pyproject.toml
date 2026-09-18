@@ -1,0 +1,44 @@
+[project]
+name = "inf2005-media-integrity"
+version = "1.0.0"
+description = "GUI-based LSB steganography with signed payloads and verification"
+requires-python = ">=3.11"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes: unused names, undefined names
+    "B",    # bugbear: likely bugs, such as loop-variable closures
+    "UP",   # pyupgrade: syntax for the targeted Python version
+    "SIM",  # simplifications
+    "I",    # import sorting
+    "RUF",  # ruff's own checks
+]
+ignore = [
+    "E501",    # long lines are mostly user-facing message strings
+    "RUF022",  # __all__ lists are grouped by meaning, not sorted
+    "SIM105",  # try/except/pass is as clear as contextlib.suppress
+    "SIM108",  # a ternary is not always clearer than an if/else
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+known-local-folder = ["conftest"]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]

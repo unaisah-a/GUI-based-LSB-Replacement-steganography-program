@@ -660,11 +660,10 @@ def save_image(
             path,
             replace_attempts=replace_attempts,
             replace_delay_seconds=replace_delay_seconds,
-        ) as temporary:
-            with open(temporary, "wb") as stream:
-                stream.write(payload)
-                stream.flush()
-                os.fsync(stream.fileno())
+        ) as temporary, open(temporary, "wb") as stream:
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
     except PermissionError as exc:
         raise FileError(
             f"output path could not be replaced after {replace_attempts} attempts: "

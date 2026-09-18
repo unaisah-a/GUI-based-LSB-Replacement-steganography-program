@@ -29,6 +29,7 @@ from app.stego.errors import (
     StegoError,
     ValidationError,
 )
+
 from conftest import (
     AUDIO_SAMPLE_RATE,
     ScratchDirectory,
@@ -52,17 +53,16 @@ _ROUND_TRIP: list[dict[str, object]] = []
 
 
 @pytest.fixture(scope="module", autouse=True)
-def write_round_trip_evidence():
+def write_round_trip_evidence(evidence_directory):
     _ROUND_TRIP.clear()
     yield
 
-    if not _ROUND_TRIP:  # pragma: no cover - only when the module is deselected
+    if evidence_directory is None or not _ROUND_TRIP:
         return
 
     from app.utils import file_utils
 
-    directory = Path(__file__).resolve().parents[1] / "evidence" / "results"
-    directory.mkdir(parents=True, exist_ok=True)
+    directory = evidence_directory
     rows = sorted(_ROUND_TRIP, key=lambda row: row["lsb_depth"])
 
     file_utils.write_json_atomic(
