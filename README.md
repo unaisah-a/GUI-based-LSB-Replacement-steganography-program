@@ -14,6 +14,8 @@ message is authentic.
 
 Design and limits are documented in [`docs/`](docs/): start with
 [`architecture.md`](docs/architecture.md) and [`limitations.md`](docs/limitations.md).
+Responsible use, originality and AI use are covered in
+[`ethics_and_ai_use.md`](docs/ethics_and_ai_use.md).
 
 ---
 
@@ -62,6 +64,17 @@ warnings are treated as errors. The GUI tests use `pytest-qt` and need no visibl
 
 GitHub Actions runs the linter and the full suite on every push and pull request.
 
+## Package for submission
+
+```bash
+.venv\Scripts\python scripts/package_submission.py
+```
+
+This writes `dist/INF2005_ACW1_submission.zip` (choose another path with `--output`).
+It contains the source, tests, docs, samples, evidence and configuration. It leaves
+out the virtual environment, caches, the local demo key pair and the local
+application logs, and it refuses to build if any packaged file holds a private key.
+
 ---
 
 ## Demo walkthrough
@@ -75,7 +88,10 @@ Regenerate the samples with `python scripts/generate_samples.py`.
 
 1. **Create a key pair.** Open *Keys → Generate demo key pair*. This writes a private
    key to `keys/demo_private/` (git-ignored, unencrypted, demo use only) and a public
-   key to `keys/public/`. The Protect and Verify tabs pick them up automatically.
+   key to `keys/public/`. The Protect and Verify tabs pick them up automatically. No
+   private key is shipped with the project: every user generates their own. The
+   committed samples need only their public key; the private key that signed them
+   was discarded when they were generated.
 
 2. **Protect (party A).** On the **Protect** tab, drop in
    `samples/images/original/cover.png`, type a message (or switch the payload to
@@ -122,10 +138,12 @@ assets/styles/    the Qt stylesheet
 docs/             architecture, limitations, test cases, demo plan, contributions
 evidence/         generated test results and logs for submission
 samples/          committed demo media with manifests
-scripts/          sample-generation utilities
+scripts/          sample generation and submission packaging
 tests/            the pytest suite
 main.py           entry point
 ```
 
-[`docs/planning_reference.md`](docs/planning_reference.md) is the team's original
-planning brief (requirements, roles, Git workflow), kept for reference.
+[`docs/planning_reference.md`](docs/planning_reference.md) (the team's original
+planning brief) and [`docs/image_layer_requirements.md`](docs/image_layer_requirements.md)
+(the image layer's working specification, cited by requirement number in the code) are
+internal working documents, not deliverables.

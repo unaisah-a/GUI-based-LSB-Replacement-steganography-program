@@ -73,3 +73,6 @@ keys/public/demo_public.pem
 # docs/planning_reference.md section 5 lists evidence/screenshots, evidence/logs and
 # evidence/results as project folders, and the assignment requires this material
 # as submission evidence. Committing it is the point.
+
+# Built submission archives (scripts/package_submission.py).
+dist/

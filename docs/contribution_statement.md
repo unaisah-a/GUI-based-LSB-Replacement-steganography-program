@@ -30,6 +30,10 @@ Replace every `<...>` placeholder. Do not submit with placeholders left in.
 ## 2. Ownership by area
 
 The mapping from role to code, so that a marker can find each member's work directly.
+The test counts are per file as collected by `pytest --collect-only`. The five areas
+account for 1,712 tests. The remaining 14, in `test_package_submission.py`, cover the
+packaging script, which belongs to no single area. The full suite was 1,726 tests on
+18 September 2026.
 
 ### Member 1 — Cryptography and payload security
 
@@ -46,7 +50,7 @@ app/crypto/errors.py            the crypto error hierarchy
 ```
 
 Tests: `test_envelope.py`, `test_signatures.py`, `test_encryption.py`,
-`test_start_location.py`, `test_manifest.py`, `test_crypto.py` — 410 tests.
+`test_start_location.py`, `test_manifest.py`, `test_crypto.py` — 408 tests.
 
 Also responsible for the written justification of why the verification payload can be
 trusted, which is [`architecture.md`](architecture.md) §2, §4 and §5.
@@ -62,7 +66,8 @@ app/analysis/image_analysis.py  indicators, bit planes, difference images, histo
 ```
 
 Tests: `test_image_stego.py`, `test_image_io.py`, `test_image_analysis.py`,
-`test_bit_utils.py`, `test_capacity.py` — 358 tests.
+`test_bit_utils.py`, `test_capacity.py`, and the image, dispatch and honesty tests in
+`test_steganalysis.py` — 380 tests.
 
 `bit_utils.py` and `capacity.py` began as part of the image layer and were promoted to
 shared modules when the audio and video layers were built on them. That is why they are
@@ -78,7 +83,7 @@ app/robustness/error_correction.py  majority vote, correction reporting
 ```
 
 Tests: `test_audio_stego.py`, `test_audio_quality.py`, `test_robustness.py`,
-and the audio indicators in `test_steganalysis.py` — 190 tests.
+and the audio indicators in `test_steganalysis.py` — 163 tests.
 
 Also responsible for the measured robustness figures in
 [`architecture.md`](architecture.md) §8 and the audio round-trip evidence in
@@ -101,7 +106,7 @@ app/utils/                      constants, file utilities, logging
 ```
 
 Tests: `test_gui_shell.py`, `test_gui_tabs.py`, `test_gui_lab_tabs.py`,
-`test_utils.py` — 276 tests.
+`test_utils.py`, `test_payload_files.py` — 326 tests.
 
 Also responsible for the integration decision that no layer below the GUI imports Qt,
 which is what makes every workflow testable without a window.
@@ -123,7 +128,7 @@ app/utils/media_utils.py          video property inspection
 
 Tests: `test_verification.py`, `test_attacks.py`, `test_video_stego.py`,
 `test_media_compare.py`, `test_media_facade.py`, `test_size_preservation.py`,
-`test_e2e.py` — 402 tests.
+`test_e2e.py` — 435 tests.
 
 Also responsible for the end-to-end evidence artefacts and the
 [`test_cases.md`](test_cases.md) mapping.
@@ -214,6 +219,9 @@ Declared in full, with the reason each is present. Versions are pinned in
 | `pytest` | 8.3.3 | test runner |
 | `hypothesis` | 6.115.5 | property-based tests |
 | `pytest-qt` | 4.4.0 | testing Qt widgets without a display |
+| `pytest-cov` | 7.1.0 | coverage measurement through pytest |
+| `coverage` | 7.16.1 | the coverage engine behind `pytest-cov` |
+| `ruff` | 0.16.8 | linting |
 
 No external binary is required. In particular there is no dependency on a separately
 installed `ffmpeg`: the video layer uses the FFmpeg build bundled inside

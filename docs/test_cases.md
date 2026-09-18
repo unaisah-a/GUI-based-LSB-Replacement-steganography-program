@@ -14,7 +14,7 @@ Run everything with:
 .venv\Scripts\python -m pytest -q
 ```
 
-Total: **1 641 tests**, all passing, as of 17 September 2026. Suite runtime is about a minute.
+Total: **1,726 tests**, all passing, as of 18 September 2026. Suite runtime is about a minute.
 
 ---
 
@@ -35,6 +35,12 @@ the table below and the evidence cannot drift apart.
 | 4 | BMP with a manual start location | image | short | `AUTHENTIC` |
 | 5 | MKV video protected and verified | video | short | `AUTHENTIC` |
 
+| 6 | A PNG **file** as the payload, in a WAV cover | audio | a 1 KB PNG | `AUTHENTIC`, recovered byte for byte, with its file name |
+
+Case 6 is in `tests/test_verification.py::TestBinaryPayloads` and, through both tabs,
+in `tests/test_gui_tabs.py::TestFilePayloadThroughBothTabs`. It shows that the payload
+is bytes, not text: an image, a WAV or any other file round-trips unchanged.
+
 Case 5 exists to show that nothing in the workflow is video-specific: the same three
 files cross, the same secret is shared out of band, and the same call verifies them.
 
@@ -52,6 +58,8 @@ files cross, the same secret is shared out of band, and the same call verifies t
 | 7 | Tampered manifest, `message_length` | image | `TAMPERED` | The **cross-check** against the signed record |
 | 8 | Tampered manifest, `media_id` | image | `PAYLOAD_MISSING` | The **derivation** breaking |
 | 9 | Wrong message passphrase | image | `CANNOT_VERIFY` | Signature verified first, so the record is known genuine |
+| 10 | Pixels inverted inside the payload, depths 1 to 8 | image, audio, video | `SIGNATURE_INVALID` | The damage reaches the signature; `tests/test_attacks.py::TestInsideAttacksReachTheSignature` |
+| 11 | One sample of the length header inverted | image, audio, video | `PAYLOAD_MISSING` | The unsigned framing; the reason says a payload was expected; `TestLengthHeaderAttack`, `TestSingleBitFlips` |
 
 Cases 7 and 8 are separated on purpose. The manifest is unsigned, and an edit to it is
 caught by one of two different routes depending on whether the field feeds the
