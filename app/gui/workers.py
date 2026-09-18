@@ -34,6 +34,7 @@ from typing import Any, Callable
 
 from PySide6.QtCore import QObject, QRunnable, QThreadPool, Signal, Slot
 
+from app.errors import AppError
 from app.utils.logging_utils import get_logger
 
 __all__ = [
@@ -53,11 +54,7 @@ def describe_exception(error: BaseException) -> str:
     those are used as they are. Anything else gets its type name prefixed, because a
     bare ``KeyError: 'nonce'`` on its own tells a user nothing about what failed.
     """
-    from app.crypto.errors import CryptoError
-    from app.stego.errors import StegoError
-    from app.utils.file_utils import UnsupportedMediaError
-
-    if isinstance(error, (StegoError, CryptoError, UnsupportedMediaError)):
+    if isinstance(error, AppError):
         return str(error)
 
     message = str(error).strip()

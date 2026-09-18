@@ -15,8 +15,9 @@ field.
 
 from __future__ import annotations
 
+from app.errors import AppError
+
 __all__ = [
-    "MAX_MESSAGE_LENGTH",
     "CryptoError",
     "EnvelopeError",
     "RecordError",
@@ -27,18 +28,8 @@ __all__ = [
     "ManifestError",
 ]
 
-#: Error messages are capped so that a corrupt field cannot produce a megabyte
-#: of text in a GUI label. Matches app.stego.errors.MAX_MESSAGE_LENGTH.
-MAX_MESSAGE_LENGTH = 500
-
-
-class CryptoError(Exception):
+class CryptoError(AppError):
     """Common base type for every error raised by the cryptography layer."""
-
-    def __init__(self, message: str) -> None:
-        if len(message) > MAX_MESSAGE_LENGTH:
-            message = message[: MAX_MESSAGE_LENGTH - 3] + "..."
-        super().__init__(message)
 
 
 class EnvelopeError(CryptoError):

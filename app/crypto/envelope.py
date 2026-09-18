@@ -30,8 +30,10 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from functools import partial
 from typing import Any, Final, Mapping
 
+from app.crypto import fields
 from app.crypto.errors import EnvelopeError, RecordError
 from app.utils import constants
 
@@ -243,44 +245,9 @@ class ErrorCorrectionParameters:
 # --------------------------------------------------------------------------- #
 
 
-def _require(data: Mapping[str, Any], key: str, kind: type, where: str) -> Any:
-    if key not in data:
-        raise RecordError(f"{where} is missing the required field {key!r}")
-    value = data[key]
-    # bool is a subclass of int, so an explicit guard is needed wherever an
-    # integer is expected; True silently meaning 1 hides a caller mistake.
-    if kind is int and isinstance(value, bool):
-        raise RecordError(f"{where}.{key} must be an integer, got a boolean")
-    if not isinstance(value, kind):
-        raise RecordError(
-            f"{where}.{key} must be {kind.__name__}, got {type(value).__name__}"
-        )
-    return value
-
-
-def _require_positive(data: Mapping[str, Any], key: str, where: str) -> int:
-    value = _require(data, key, int, where)
-    if value <= 0:
-        raise RecordError(f"{where}.{key} must be a positive integer, got {value}")
-    return value
-
-
-def _require_hex(value: str, where: str, *, expected_length: int | None = None) -> str:
-    if expected_length is not None and len(value) != expected_length:
-        raise RecordError(
-            f"{where} must be {expected_length} hexadecimal characters, "
-            f"got {len(value)}"
-        )
-    if not value or len(value) % 2 != 0:
-        raise RecordError(
-            f"{where} must be a non-empty even-length hexadecimal string, "
-            f"got {len(value)} characters"
-        )
-    try:
-        bytes.fromhex(value)
-    except ValueError as exc:
-        raise RecordError(f"{where} is not valid hexadecimal") from exc
-    return value
+_require = partial(fields.require, error=RecordError)
+_require_positive = partial(fields.require_positive, error=RecordError)
+_require_hex = partial(fields.require_hex, error=RecordError)
 
 
 # --------------------------------------------------------------------------- #

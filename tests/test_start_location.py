@@ -10,10 +10,6 @@ The properties that matter:
   extraction parameter moves the location.
 * **No silent fallback.** A missing argument is reported, never defaulted to
   sample 0.
-
-The arithmetic is restated inside the crypto layer to keep it independent of the
-stego layer, so there is also a test asserting it agrees with
-``app.stego.capacity``.
 """
 
 from __future__ import annotations
@@ -27,7 +23,6 @@ from hypothesis import strategies as st
 
 from app.crypto import start_location as sl
 from app.crypto.errors import StartLocationError
-from app.stego import capacity
 from app.utils import constants
 
 SECRET = "shared start secret"
@@ -54,23 +49,7 @@ def derive(**overrides) -> int:
 # --------------------------------------------------------------------------- #
 
 
-class TestArithmeticAgreesWithTheStegoLayer:
-    """The duplication is deliberate; these tests keep it safe."""
-
-    @given(st.integers(0, 50_000), st.integers(1, 8))
-    def test_required_sample_count_matches_capacity(self, envelope_length, depth):
-        expected = capacity.required_position_count(
-            envelope_length + capacity.LENGTH_HEADER_BYTES, depth
-        )
-        assert sl.required_sample_count(envelope_length, depth) == expected
-
-    @given(st.integers(0, 100_000), st.integers(0, 20_000), st.integers(1, 8))
-    def test_highest_valid_start_matches_capacity(self, total, envelope_length, depth):
-        expected = capacity.highest_valid_start_location(
-            total, envelope_length + capacity.LENGTH_HEADER_BYTES, depth
-        )
-        assert sl.highest_valid_start_location(total, envelope_length, depth) == expected
-
+class TestArithmetic:
     def test_the_stego_length_header_is_accounted_for(self):
         """The envelope is the payload; the stego layer adds 4 bytes in front."""
         # 4 header bytes + 4 envelope bytes = 8 bytes = 64 bits, one bit per sample.

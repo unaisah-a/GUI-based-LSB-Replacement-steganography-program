@@ -51,10 +51,10 @@ from __future__ import annotations
 
 import dataclasses
 import os
-import tempfile
 from dataclasses import dataclass
 from typing import Any, Mapping
 
+from app.crypto import hashing
 from app.crypto import manifest as manifest_module
 from app.crypto import payload as payload_module
 from app.crypto import start_location
@@ -242,52 +242,45 @@ def protect_media(
         nonce_hex=prepared.record.nonce_hex,
     )
 
-    # 6. Embed, under a temporary name in the destination directory.
+    # 6. Embed, under a temporary name in the destination directory. Leaving the
+    # block normally is step 8, the rename into place; leaving it by an exception
+    # removes the temporary file.
     final_path = os.fspath(output_path)
-    handle, partial_path = tempfile.mkstemp(
-        prefix=".partial-",
-        suffix=os.path.basename(final_path),
-        dir=os.path.dirname(os.path.abspath(final_path)),
-    )
-    os.close(handle)
     written_manifest_path: str | None = None
     try:
-        embed_result = media.embed(
-            input_path,
-            partial_path,
-            embedded_payload,
-            lsb_depth,
-            start,
-            overwrite=True,
-        )
+        with file_utils.atomic_output(final_path) as partial_path:
+            embed_result = media.embed(
+                input_path,
+                partial_path,
+                embedded_payload,
+                lsb_depth,
+                start,
+                overwrite=True,
+            )
 
-        # 6b. Optionally rewrite the stego file at the cover's exact size.
-        #
-        # Before the manifest, because the manifest records the file's digest. The
-        # pixels are unchanged by this, so the payload still extracts and the
-        # signature still covers the same bytes; only the container's compression
-        # and padding differ.
-        size_result = None
-        if match_cover_size:
-            size_result = _match_cover_size(input_path, partial_path)
+            # 6b. Optionally rewrite the stego file at the cover's exact size.
+            #
+            # Before the manifest, because the manifest records the file's digest.
+            # The pixels are unchanged by this, so the payload still extracts and
+            # the signature still covers the same bytes; only the container's
+            # compression and padding differ.
+            size_result = None
+            if match_cover_size:
+                size_result = _match_cover_size(input_path, partial_path)
 
-        # 7. Publish the non-secret parameters.
-        manifest = manifest_module.Manifest.from_record(
-            prepared.record,
-            envelope_length=prepared.envelope_length,
-            container_format=embed_result.container_format,
-            resolved_start_location=start,
-            stego_file_name=file_utils.display_name(final_path),
-            stego_sha256=file_utils.file_sha256(partial_path),
-        )
-        written_manifest_path = manifest_module.write_manifest(
-            manifest, manifest_target, overwrite=overwrite
-        )
-
-        # 8. Only now does the stego file appear under its real name.
-        os.replace(partial_path, final_path)
+            # 7. Publish the non-secret parameters.
+            manifest = manifest_module.Manifest.from_record(
+                prepared.record,
+                envelope_length=prepared.envelope_length,
+                container_format=embed_result.container_format,
+                resolved_start_location=start,
+                stego_file_name=file_utils.display_name(final_path),
+                stego_sha256=hashing.file_sha256(partial_path),
+            )
+            written_manifest_path = manifest_module.write_manifest(
+                manifest, manifest_target, overwrite=overwrite
+            )
     except BaseException:
-        _discard(partial_path)
         if written_manifest_path is not None:
             _discard(written_manifest_path)
         raise

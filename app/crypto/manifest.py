@@ -38,22 +38,25 @@ Tampering with the manifest therefore produces a clear failure, not a false
 modified depth or length usually makes extraction fail with no payload found,
 which is indistinguishable from several other causes.
 
-``stego_sha256`` is a transport aid only
-----------------------------------------
-The recorded digest of the stego file lets a receiver notice a truncated download
-before spending time on extraction. It is not an integrity guarantee: anyone who
-modifies the stego file can recompute it. The signature over the verification
-record is the guarantee; this field is a convenience.
+``stego_sha256`` is a transport check only
+-----------------------------------------
+The verifier compares the file with this digest and reports a mismatch as a note:
+it is the one signal that the file changed *outside* the payload region, which the
+signature does not cover. It never changes the verdict and is not an integrity
+guarantee, because anyone who modifies the stego file can recompute it. The
+signature over the verification record is the guarantee.
 """
 
 from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from functools import partial
 from typing import Any, Final, Mapping
 
 from app.crypto import envelope as envelope_module
 from app.crypto.envelope import EncryptionParameters, ErrorCorrectionParameters
+from app.crypto import fields
 from app.crypto.errors import ManifestError
 from app.utils import constants, file_utils
 
@@ -76,50 +79,11 @@ _MAX_ENVELOPE_LENGTH: Final[int] = constants.MAX_ENVELOPE_SECTION_BYTES
 # --------------------------------------------------------------------------- #
 
 
-def _require(data: Mapping[str, Any], key: str, kind: type) -> Any:
-    if key not in data:
-        raise ManifestError(f"manifest is missing the required field {key!r}")
-    value = data[key]
-    if kind is int and isinstance(value, bool):
-        raise ManifestError(f"manifest field {key!r} must be an integer, got a boolean")
-    if not isinstance(value, kind):
-        raise ManifestError(
-            f"manifest field {key!r} must be {kind.__name__}, got "
-            f"{type(value).__name__}"
-        )
-    return value
-
-
-def _require_hex(value: str, key: str, *, expected_length: int | None = None) -> str:
-    if expected_length is not None and len(value) != expected_length:
-        raise ManifestError(
-            f"manifest field {key!r} must be {expected_length} hexadecimal "
-            f"characters, got {len(value)}"
-        )
-    if not value or len(value) % 2 != 0:
-        raise ManifestError(
-            f"manifest field {key!r} must be a non-empty even-length hexadecimal "
-            f"string"
-        )
-    try:
-        bytes.fromhex(value)
-    except ValueError as exc:
-        raise ManifestError(
-            f"manifest field {key!r} is not valid hexadecimal"
-        ) from exc
-    return value
-
-
-def _require_bounded_int(
-    data: Mapping[str, Any], key: str, *, minimum: int, maximum: int
-) -> int:
-    value = _require(data, key, int)
-    if not minimum <= value <= maximum:
-        raise ManifestError(
-            f"manifest field {key!r} must be from {minimum} to {maximum} inclusive, "
-            f"got {value}"
-        )
-    return value
+_require = partial(fields.require, where="manifest", error=ManifestError)
+_require_bounded_int = partial(
+    fields.require_bounded_int, where="manifest", error=ManifestError
+)
+_require_hex = partial(fields.require_hex, error=ManifestError)
 
 
 # --------------------------------------------------------------------------- #
@@ -334,7 +298,7 @@ class Manifest:
                     f"manifest field 'stego_sha256' must be a string or null, got "
                     f"{type(digest).__name__}"
                 )
-            _require_hex(digest, "stego_sha256", expected_length=64)
+            _require_hex(digest, "manifest.stego_sha256", expected_length=64)
 
         for optional in ("stego_file", "created"):
             value = data.get(optional)
@@ -364,7 +328,7 @@ class Manifest:
             media_id=_require(data, "media_id", str),
             media_type=media_type,
             container_format=container,
-            nonce_hex=_require_hex(_require(data, "nonce", str), "nonce"),
+            nonce_hex=_require_hex(_require(data, "nonce", str), "manifest.nonce"),
             lsb_depth=lsb_depth,
             start_method=start_method,
             envelope_length=envelope_length,

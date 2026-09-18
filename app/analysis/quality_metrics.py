@@ -1,9 +1,8 @@
 """One quality report for every medium.
 
-:mod:`app.analysis.image_analysis` and :mod:`app.analysis.audio_analysis` were
-written independently and report in different shapes: the image module returns a
-frozen ``QualityComparison`` dataclass with per-channel detail, the audio module
-returns a flat dictionary with different key names. Both are worth keeping as they
+:mod:`app.analysis.image_analysis` and :mod:`app.analysis.audio_analysis` report
+in different shapes: the image module returns a ``QualityComparison`` with
+per-channel detail, the audio module an ``AudioQuality`` with SNR and timing. Both are worth keeping as they
 are — each reports things the other has no concept of — so this module maps the
 figures they have in common onto one :class:`QualityReport`.
 
@@ -37,6 +36,7 @@ from typing import Any
 
 from app.analysis import audio_analysis, image_analysis
 from app.stego import media
+from app.stego.bit_utils import validate_lsb_depth
 from app.utils import constants
 
 __all__ = [
@@ -54,14 +54,7 @@ def distortion_bound(lsb_depth: int) -> int:
     the medium. An observed difference above this means more was written than the
     depth accounts for.
     """
-    if isinstance(lsb_depth, bool) or not isinstance(lsb_depth, int):
-        raise TypeError(f"lsb_depth must be an integer, got {type(lsb_depth).__name__}")
-    if not constants.MIN_LSB_DEPTH <= lsb_depth <= constants.MAX_LSB_DEPTH:
-        raise ValueError(
-            f"lsb_depth must be from {constants.MIN_LSB_DEPTH} to "
-            f"{constants.MAX_LSB_DEPTH} inclusive, got {lsb_depth}"
-        )
-    return (1 << lsb_depth) - 1
+    return (1 << validate_lsb_depth(lsb_depth)) - 1
 
 
 @dataclass(frozen=True)
@@ -174,49 +167,31 @@ def _image_report(
 def _audio_report(
     original_path: str, stego_path: str, lsb_depth: int | None
 ) -> QualityReport:
-    from app.stego.errors import ComparisonError
-
-    try:
-        report = audio_analysis.calculate_quality_report(
-            original_path, stego_path, lsb_count=lsb_depth
-        )
-    except ValueError as exc:
-        # audio_analysis predates the shared error hierarchy and raises bare
-        # ValueError when the two files differ in sample rate, channel count or
-        # length. Translated here so a caller of this facade sees the same
-        # ComparisonError it would get for a pair of mismatched images, rather
-        # than having to catch two unrelated exception types.
-        raise ComparisonError(
-            f"the two audio files cannot be compared: {exc}"
-        ) from exc
+    audio = audio_analysis.compare_audio(original_path, stego_path)
     bound = None if lsb_depth is None else distortion_bound(lsb_depth)
-    psnr = report["psnr_db"]
-    unbounded = math.isinf(psnr)
 
     return QualityReport(
         media_type=constants.MEDIA_AUDIO,
-        mse=report["mse"],
-        psnr_db=psnr,
-        psnr_unbounded=unbounded,
-        max_absolute_difference=report["max_absolute_difference"],
-        changed_samples=report["changed_samples"],
-        total_samples=report["total_scalar_samples"],
-        identical=report["changed_samples"] == 0,
-        snr_db=report["snr_db"],
+        mse=audio.mse,
+        psnr_db=audio.psnr_db,
+        psnr_unbounded=math.isinf(audio.psnr_db),
+        max_absolute_difference=float(audio.max_absolute_difference),
+        changed_samples=audio.changed_samples,
+        total_samples=audio.total_samples,
+        identical=audio.changed_samples == 0,
+        snr_db=audio.snr_db,
         within_distortion_bound=(
-            None
-            if bound is None
-            else report["max_absolute_difference"] <= bound
+            None if bound is None else audio.max_absolute_difference <= bound
         ),
         expected_distortion_bound=bound,
         extra={
-            "sample_rate": report["sample_rate"],
-            "channels": report["channels"],
-            "total_frames": report["total_frames"],
-            "duration_seconds": report["duration_seconds"],
-            "rmse": report["rmse"],
-            "mae": report["mae"],
-            "changed_percentage": report["changed_percentage"],
+            "sample_rate": audio.sample_rate,
+            "channels": audio.channels,
+            "total_frames": audio.total_frames,
+            "duration_seconds": audio.duration_seconds,
+            "rmse": audio.rmse,
+            "mae": audio.mae,
+            "changed_percentage": audio.changed_percentage,
         },
     )
 

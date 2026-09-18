@@ -623,7 +623,7 @@ class TestPreparePayload:
         assert prepared.envelope_length == parsed.total_length
 
     def test_records_the_plaintext_digest_even_when_encrypted(self, key_pair):
-        from app.crypto.hashing import compute_media_hash
+        from app.crypto.hashing import sha256_hex
 
         private_key, _ = key_pair
         message = b"a confidential message"
@@ -636,7 +636,7 @@ class TestPreparePayload:
             passphrase=SECRET_PASSPHRASE,
             **FAST_SCRYPT,
         )
-        assert prepared.record.message_hash == compute_media_hash(message)
+        assert prepared.record.message_hash == sha256_hex(message)
         assert prepared.record.message_length == len(message)
 
     def test_encryption_grows_the_stored_message_by_the_overhead(self, key_pair):

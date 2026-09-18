@@ -843,9 +843,10 @@ class TestCrossMediaParity:
         assert image_stego.extract_image(str(tmp_path / "s.png"), 3, 100) == PAYLOAD
         assert audio_stego.extract_audio(str(tmp_path / "s.wav"), 3, 100) == PAYLOAD
 
-    def test_both_layers_use_the_same_encoded_stream_layout(self):
-        assert audio_stego.LENGTH_HEADER_BITS == image_stego.LENGTH_HEADER_BITS
-        assert audio_stego.LENGTH_HEADER_BITS == 32
+    def test_the_shared_stream_has_a_32_bit_length_header(self):
+        from app.stego import lsb_core
+
+        assert lsb_core.LENGTH_HEADER_BITS == 32
 
     def test_both_layers_report_a_capacity_report(self, tmp_path):
         image_cover = write_cover(

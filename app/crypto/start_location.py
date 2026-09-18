@@ -52,6 +52,7 @@ import hmac
 from typing import Final
 
 from app.crypto.errors import StartLocationError
+from app.stego import capacity
 from app.utils import constants
 
 __all__ = [
@@ -118,19 +119,14 @@ def _validate_depth(lsb_depth: object) -> int:
 def required_sample_count(envelope_length: int, lsb_depth: int) -> int:
     """Return how many consecutive samples an envelope occupies.
 
-    The stego layer prepends its own 4-byte length header to the envelope, so the
-    encoded stream is ``envelope_length + 4`` bytes and the sample count is that
-    bit count divided by the depth, rounded up.
-
-    The arithmetic is restated here rather than imported from
-    :mod:`app.stego.capacity` so that the cryptography layer does not depend on
-    the steganography layer. ``tests/test_start_location.py`` asserts that this
-    agrees with ``capacity.required_position_count``, so the two cannot drift.
+    The stego layer prepends its own 4-byte length header to the envelope, so this
+    is the stego layer's own position count for ``envelope_length + 4`` bytes.
     """
     length = _validate_count(envelope_length, "envelope_length")
     depth = _validate_depth(lsb_depth)
-    encoded_bits = (length + constants.LENGTH_HEADER_BYTES) * 8
-    return -(-encoded_bits // depth)
+    return capacity.required_position_count(
+        length + constants.LENGTH_HEADER_BYTES, depth
+    )
 
 
 def highest_valid_start_location(

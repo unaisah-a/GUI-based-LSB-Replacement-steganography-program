@@ -1,49 +1,45 @@
-"""SHA-256 hashing helpers for the payload and verification layers.
+"""SHA-256, the one place the application computes it.
 
-Two forms of the same digest are offered because callers need both: the hex
-string goes into the JSON verification record, and the raw bytes are used for
-constant-time comparison.
+The verification record carries the digest of the plaintext message, the manifest
+carries the digest of the stego file, and the media comparison reports whether two
+files are byte-identical. All of them use these functions.
 """
 
 from __future__ import annotations
 
 import hashlib
 import hmac
+import os
+from typing import Final
 
 __all__ = [
-    "SHA256_DIGEST_BYTES",
     "SHA256_HEX_LENGTH",
-    "compute_media_hash",
-    "compute_raw_sha256",
+    "file_sha256",
     "hashes_equal",
+    "sha256_hex",
 ]
 
 #: A SHA-256 digest is 32 bytes, which is 64 hexadecimal characters.
-SHA256_DIGEST_BYTES = 32
-SHA256_HEX_LENGTH = SHA256_DIGEST_BYTES * 2
+SHA256_HEX_LENGTH: Final[int] = 64
 
 
-def compute_media_hash(media_bytes: bytes) -> str:
-    """Return the SHA-256 hex digest of *media_bytes*.
-
-    Used for the ``message_hash`` field of the verification record, which records
-    the digest of the **plaintext** message even when the message is carried
-    encrypted (see :mod:`app.crypto.envelope`).
-    """
-    if not isinstance(media_bytes, (bytes, bytearray, memoryview)):
-        raise TypeError(
-            f"media_bytes must be a bytes-like object, got {type(media_bytes).__name__}"
-        )
-    return hashlib.sha256(media_bytes).hexdigest()
-
-
-def compute_raw_sha256(data: bytes) -> bytes:
-    """Return the raw 32-byte SHA-256 digest of *data*."""
+def sha256_hex(data: bytes) -> str:
+    """Return the SHA-256 hex digest of *data*."""
     if not isinstance(data, (bytes, bytearray, memoryview)):
-        raise TypeError(
-            f"data must be a bytes-like object, got {type(data).__name__}"
-        )
-    return hashlib.sha256(data).digest()
+        raise TypeError(f"data must be a bytes-like object, got {type(data).__name__}")
+    return hashlib.sha256(data).hexdigest()
+
+
+def file_sha256(path: str | os.PathLike[str], *, chunk_bytes: int = 1 << 20) -> str:
+    """Return the SHA-256 hex digest of the file at *path*, read in chunks.
+
+    Chunked so a large video does not have to be held in memory at once.
+    """
+    digest = hashlib.sha256()
+    with open(os.fspath(path), "rb") as handle:
+        while chunk := handle.read(chunk_bytes):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def hashes_equal(left: str | bytes, right: str | bytes) -> bool:

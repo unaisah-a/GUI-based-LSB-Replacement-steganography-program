@@ -8,6 +8,7 @@ The order of operations is the whole design
 ::
 
     1. read and validate the companion manifest        (untrusted input)
+    1b. compare the file with the manifest's digest    (reported, never decisive)
     2. measure the medium                              (total sample count)
     3. resolve the start location                      (derive, or use the manual value)
     4. extract the payload bytes                       (opaque bytes out)
@@ -39,13 +40,14 @@ verdict is always something to display, never something to catch.
 
 from __future__ import annotations
 
+import dataclasses
 import os
 from typing import Any
 
 from app.crypto import envelope as envelope_module
 from app.crypto import manifest as manifest_module
 from app.crypto import payload as payload_module
-from app.crypto import signatures, start_location
+from app.crypto import hashing, signatures, start_location
 from app.crypto.errors import (
     EncryptionError,
     EnvelopeError,
@@ -113,6 +115,41 @@ def verify_media(
             details={"stage": "manifest", "stego_file": name},
         )
 
+    # --- 1b. The file digest, a transport check ----------------------------- #
+    # The manifest is unsigned, so a mismatch proves nothing on its own and does not
+    # change the verdict. It is reported because it is the one signal that the file
+    # was altered *outside* the payload, which the signature cannot see.
+    digest_matches: bool | None = None
+    if manifest.stego_sha256 is not None and os.path.isfile(stego_path):
+        digest_matches = hashing.hashes_equal(
+            hashing.file_sha256(stego_path), manifest.stego_sha256
+        )
+
+    result = _verify_with_manifest(
+        stego_path, manifest, key, name, start_secret, passphrase
+    )
+    if digest_matches is None:
+        return result
+    return dataclasses.replace(
+        result,
+        notes=(
+            result.notes
+            if digest_matches
+            else result.notes + (constants.FILE_CHANGED_NOTICE,)
+        ),
+        details={**result.details, "file_digest_matches": digest_matches},
+    )
+
+
+def _verify_with_manifest(
+    stego_path: str | os.PathLike[str],
+    manifest: manifest_module.Manifest,
+    key: Any,
+    name: str,
+    start_secret: str | bytes | None,
+    passphrase: str | bytes | None,
+) -> VerificationResult:
+    """Steps 2 to 10, once the manifest has been read."""
     # --- 2. The medium ---------------------------------------------------- #
     try:
         capacity = media.measure(stego_path, manifest.lsb_depth)

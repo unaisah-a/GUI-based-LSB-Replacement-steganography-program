@@ -16,7 +16,7 @@ import pytest
 
 from app.analysis import quality_metrics
 from app.stego import audio_stego, image_io, image_stego
-from app.stego.errors import ComparisonError, DecodeError
+from app.stego.errors import ComparisonError, DecodeError, ValidationError
 from app.utils import constants
 from app.verification import media_compare
 from conftest import make_audio, make_cover, write_audio_file, write_cover
@@ -59,11 +59,11 @@ class TestDistortionBound:
         assert quality_metrics.distortion_bound(depth) == (1 << depth) - 1
 
     def test_out_of_range_depth_is_refused(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError, match="lsb_count"):
             quality_metrics.distortion_bound(9)
 
     def test_boolean_depth_is_refused(self):
-        with pytest.raises(TypeError):
+        with pytest.raises(ValidationError, match="lsb_count"):
             quality_metrics.distortion_bound(True)
 
 

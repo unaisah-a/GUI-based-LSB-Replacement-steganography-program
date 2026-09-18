@@ -30,8 +30,6 @@ from __future__ import annotations
 
 import os
 import struct
-import tempfile
-import time
 from dataclasses import dataclass
 from typing import Final
 
@@ -40,7 +38,9 @@ import numpy.typing as npt
 from PIL import Image, UnidentifiedImageError
 
 from app.stego import paths
-from app.stego.errors import DecodeError, FileError, ValidationError, safe_path
+from app.stego.errors import DecodeError, FileError, ValidationError
+from app.utils import file_utils
+from app.utils.file_utils import display_name
 
 __all__ = [
     "PNG",
@@ -53,7 +53,6 @@ __all__ = [
     "load_image",
     "save_image",
     "encode_image",
-    "check_output_writable",
     "describe_only",
 ]
 
@@ -160,7 +159,7 @@ def _read_bytes(path: str | os.PathLike[str]) -> bytes:
     access while using the same error type, and Requirement 14.9 keeps the
     directory portion out of the message.
     """
-    name = safe_path(path)
+    name = display_name(path)
     text = os.fspath(path)
     if not os.path.exists(text):
         raise FileError(f"input file not found: {name}")
@@ -515,7 +514,7 @@ def _inspect(
     raw: bytes, path: str | os.PathLike[str]
 ) -> tuple[ImageDescriptor, int, bool]:
     """Detect and validate the container, returning a descriptor."""
-    name = safe_path(path)
+    name = display_name(path)
     container = _sniff_container(raw, name)
 
     if container == PNG:
@@ -631,20 +630,6 @@ def encode_image(array: npt.NDArray[np.uint8], container_format: str) -> bytes:
     )
 
 
-def check_output_writable(path: str | os.PathLike[str], overwrite: bool) -> None:
-    """Validate the output location before any sample is modified.
-
-    Requirement 14.5 (directory must exist and be writable) and Requirement 6.6
-    (an occupied output path is an error unless overwrite is enabled).
-
-    Kept as a name in this module because :func:`save_image` and
-    :func:`app.stego.image_stego.embed_image` both call it, but the implementation
-    now lives in :mod:`app.stego.paths` so that the audio and video layers apply
-    exactly the same checks.
-    """
-    paths.check_output_writable(path, overwrite)
-
-
 def save_image(
     array: npt.NDArray[np.uint8],
     path: str | os.PathLike[str],
@@ -667,37 +652,21 @@ def save_image(
     spaced at least 100 ms apart before giving up. The temporary file is removed
     on every failure path (Requirement 6.7).
     """
-    check_output_writable(path, overwrite)
+    paths.check_output_writable(path, overwrite)
     payload = encode_image(array, container_format)
 
-    text = os.fspath(path)
-    name = safe_path(path)
-    directory = os.path.dirname(os.path.abspath(text))
-    handle, temporary = tempfile.mkstemp(
-        prefix=".stego-", suffix=".tmp", dir=directory
-    )
     try:
-        with os.fdopen(handle, "wb") as stream:
-            stream.write(payload)
-            stream.flush()
-            os.fsync(stream.fileno())
-
-        last_error: OSError | None = None
-        for attempt in range(replace_attempts):
-            try:
-                os.replace(temporary, text)
-                return
-            except PermissionError as exc:
-                last_error = exc
-                if attempt < replace_attempts - 1:
-                    time.sleep(replace_delay_seconds)
+        with file_utils.atomic_output(
+            path,
+            replace_attempts=replace_attempts,
+            replace_delay_seconds=replace_delay_seconds,
+        ) as temporary:
+            with open(temporary, "wb") as stream:
+                stream.write(payload)
+                stream.flush()
+                os.fsync(stream.fileno())
+    except PermissionError as exc:
         raise FileError(
             f"output path could not be replaced after {replace_attempts} attempts: "
-            f"{name}; another process may be holding it open"
-        ) from last_error
-    finally:
-        if os.path.exists(temporary):
-            try:
-                os.unlink(temporary)
-            except OSError:
-                pass
+            f"{file_utils.display_name(path)}; another process may be holding it open"
+        ) from exc

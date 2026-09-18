@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from app.stego import bit_utils, capacity, image_io
+from app.stego import bit_utils, image_io
 from app.utils import constants, file_utils, logging_utils
 from app.utils.file_utils import UnsupportedMediaError
 from conftest import make_audio, make_cover, write_audio_file, write_cover
@@ -28,30 +28,12 @@ from conftest import make_audio, make_cover, write_audio_file, write_cover
 
 
 class TestConstantsAgreeWithTheLibraryLayer:
-    """``constants`` restates a few values to stay dependency-free.
-
-    The duplication is deliberate, so these tests exist to make it safe: if the
-    stego layer ever changes one of these, the copy here fails loudly instead of
-    letting the GUI offer a setting the stego layer rejects.
-    """
-
-    def test_lsb_depth_bounds_match_bit_utils(self):
-        assert constants.MIN_LSB_DEPTH == bit_utils.MIN_LSB_DEPTH
-        assert constants.MAX_LSB_DEPTH == bit_utils.MAX_LSB_DEPTH
-
     def test_every_offered_depth_is_accepted_by_the_stego_layer(self):
         for depth in constants.LSB_DEPTHS:
             assert bit_utils.validate_lsb_depth(depth) == depth
 
     def test_depth_list_is_exactly_one_to_eight(self):
         assert constants.LSB_DEPTHS == tuple(range(1, 9))
-
-    def test_length_header_matches_capacity(self):
-        assert constants.LENGTH_HEADER_BYTES == capacity.LENGTH_HEADER_BYTES
-
-    def test_sample_widths_are_supported_by_bit_utils(self):
-        assert constants.IMAGE_SAMPLE_WIDTH_BITS in bit_utils.SUPPORTED_SAMPLE_WIDTHS
-        assert constants.AUDIO_SAMPLE_WIDTH_BITS in bit_utils.SUPPORTED_SAMPLE_WIDTHS
 
     def test_image_containers_match_image_io(self):
         assert set(constants.SUPPORTED_CONTAINERS[constants.MEDIA_IMAGE]) == set(
@@ -317,31 +299,6 @@ class TestDisplayName:
 # --------------------------------------------------------------------------- #
 
 
-class TestDigests:
-    def test_empty_file_matches_the_known_constant(self, tmp_path):
-        path = tmp_path / "empty.bin"
-        path.write_bytes(b"")
-        assert file_utils.file_sha256(str(path)) == (
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        )
-
-    def test_file_and_bytes_digests_agree(self, tmp_path):
-        data = b"INF2005 media integrity"
-        path = tmp_path / "data.bin"
-        path.write_bytes(data)
-
-        assert file_utils.file_sha256(str(path)) == file_utils.sha256_of_bytes(data)
-
-    def test_chunking_does_not_change_the_digest(self, tmp_path):
-        data = os.urandom(70_000)
-        path = tmp_path / "big.bin"
-        path.write_bytes(data)
-
-        assert file_utils.file_sha256(str(path), chunk_bytes=7) == (
-            file_utils.sha256_of_bytes(data)
-        )
-
-
 # --------------------------------------------------------------------------- #
 # Paths
 # --------------------------------------------------------------------------- #
@@ -545,3 +502,36 @@ class TestLogging:
             check=True,
         )
         assert completed.stdout.strip() == "0"
+
+
+# --------------------------------------------------------------------------- #
+# Error hierarchy
+# --------------------------------------------------------------------------- #
+
+
+class TestErrorHierarchy:
+    def test_every_error_family_derives_from_app_error(self):
+        """The interface relies on this to tell expected failures from bugs."""
+        from app.attacks.base import AttackError
+        from app.crypto.errors import CryptoError
+        from app.errors import AppError
+        from app.robustness.redundancy import RedundancyError
+        from app.stego.errors import StegoError
+        from app.utils.media_utils import VideoInspectionError
+
+        for family in (
+            StegoError,
+            CryptoError,
+            RedundancyError,
+            AttackError,
+            UnsupportedMediaError,
+            VideoInspectionError,
+        ):
+            assert issubclass(family, AppError), family.__name__
+
+    def test_long_messages_are_capped(self):
+        from app.errors import MAX_MESSAGE_LENGTH, AppError
+
+        message = str(AppError("x" * (MAX_MESSAGE_LENGTH * 2)))
+        assert len(message) == MAX_MESSAGE_LENGTH
+        assert message.endswith("...")

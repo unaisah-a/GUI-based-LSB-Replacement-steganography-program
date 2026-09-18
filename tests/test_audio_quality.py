@@ -10,28 +10,9 @@ import math
 import numpy as np
 import pytest
 
-from app.analysis import audio_analysis
+from app.analysis import audio_analysis, quality_metrics
+from app.stego.errors import ComparisonError
 from conftest import AUDIO_SAMPLE_RATE, make_audio, write_audio_file
-
-
-class TestLoadAudio:
-    def test_reads_pcm16_and_reports_rate(self, wav_factory):
-        path = wav_factory(frame_count=1_024)
-        samples, rate = audio_analysis.load_audio(path)
-
-        assert rate == AUDIO_SAMPLE_RATE
-        assert samples.shape == (1_024,)
-        # Converted to float64 so downstream squared differences cannot overflow.
-        assert samples.dtype == np.float64
-
-    def test_missing_file_raises(self, tmp_path):
-        with pytest.raises(FileNotFoundError):
-            audio_analysis.load_audio(str(tmp_path / "absent.wav"))
-
-    def test_stereo_keeps_channel_axis(self, wav_factory):
-        path = wav_factory(frame_count=512, channels=2)
-        samples, _ = audio_analysis.load_audio(path)
-        assert samples.shape == (512, 2)
 
 
 class TestMetrics:
@@ -40,16 +21,16 @@ class TestMetrics:
         original = write_audio_file(str(tmp_path), samples, "original")
         copy = write_audio_file(str(tmp_path), samples, "copy")
 
-        report = audio_analysis.calculate_quality_report(original, copy)
+        report = audio_analysis.compare_audio(original, copy)
 
-        assert report["mse"] == 0.0
-        assert report["rmse"] == 0.0
-        assert report["mae"] == 0.0
-        assert report["max_absolute_difference"] == 0.0
-        assert report["changed_samples"] == 0
-        assert report["changed_percentage"] == 0.0
-        assert math.isinf(report["psnr_db"])
-        assert math.isinf(report["snr_db"])
+        assert report.mse == 0.0
+        assert report.rmse == 0.0
+        assert report.mae == 0.0
+        assert report.max_absolute_difference == 0.0
+        assert report.changed_samples == 0
+        assert report.changed_percentage == 0.0
+        assert math.isinf(report.psnr_db)
+        assert math.isinf(report.snr_db)
 
     def test_metrics_grow_with_distortion(self, tmp_path):
         base = make_audio(2_048, pattern="tone", seed=3)
@@ -67,14 +48,14 @@ class TestMetrics:
             str(tmp_path), np.clip(large, -32768, 32767).astype(np.int16), "far"
         )
 
-        near_report = audio_analysis.calculate_quality_report(original, near)
-        far_report = audio_analysis.calculate_quality_report(original, far)
+        near_report = audio_analysis.compare_audio(original, near)
+        far_report = audio_analysis.compare_audio(original, far)
 
-        assert 0 < near_report["mse"] < far_report["mse"]
-        assert near_report["psnr_db"] > far_report["psnr_db"]
-        assert near_report["snr_db"] > far_report["snr_db"]
-        assert near_report["max_absolute_difference"] == 1.0
-        assert far_report["max_absolute_difference"] == 64.0
+        assert 0 < near_report.mse < far_report.mse
+        assert near_report.psnr_db > far_report.psnr_db
+        assert near_report.snr_db > far_report.snr_db
+        assert near_report.max_absolute_difference == 1.0
+        assert far_report.max_absolute_difference == 64.0
 
     def test_changed_sample_count_is_exact(self, tmp_path):
         base = make_audio(1_024, pattern="noise", seed=7)
@@ -89,20 +70,20 @@ class TestMetrics:
             str(tmp_path), np.clip(modified, -32768, 32767).astype(np.int16), "stego"
         )
 
-        report = audio_analysis.calculate_quality_report(original, stego)
-        assert report["changed_samples"] == 37
+        report = audio_analysis.compare_audio(original, stego)
+        assert report.changed_samples == 37
 
     def test_report_carries_media_properties(self, tmp_path):
         samples = make_audio(AUDIO_SAMPLE_RATE, channels=2, pattern="ramp")
         original = write_audio_file(str(tmp_path), samples, "original")
         copy = write_audio_file(str(tmp_path), samples, "copy")
 
-        report = audio_analysis.calculate_quality_report(original, copy)
+        report = audio_analysis.compare_audio(original, copy)
 
-        assert report["sample_rate"] == AUDIO_SAMPLE_RATE
-        assert report["channels"] == 2
-        assert report["total_frames"] == AUDIO_SAMPLE_RATE
-        assert report["duration_seconds"] == pytest.approx(1.0)
+        assert report.sample_rate == AUDIO_SAMPLE_RATE
+        assert report.channels == 2
+        assert report.total_frames == AUDIO_SAMPLE_RATE
+        assert report.duration_seconds == pytest.approx(1.0)
 
 
 class TestValidation:
@@ -111,22 +92,15 @@ class TestValidation:
         original = write_audio_file(str(tmp_path), samples, "original", sample_rate=44_100)
         other = write_audio_file(str(tmp_path), samples, "other", sample_rate=22_050)
 
-        with pytest.raises(ValueError, match="Sample rates differ"):
-            audio_analysis.calculate_quality_report(original, other)
+        with pytest.raises(ComparisonError, match="sample rates differ"):
+            audio_analysis.compare_audio(original, other)
 
     def test_differing_shapes_are_rejected(self, tmp_path):
         original = write_audio_file(str(tmp_path), make_audio(1_024), "original")
         other = write_audio_file(str(tmp_path), make_audio(2_048), "other")
 
-        with pytest.raises(ValueError, match="shapes differ"):
-            audio_analysis.calculate_quality_report(original, other)
-
-
-class TestLsbBound:
-    @pytest.mark.parametrize("lsb_count", range(1, 9))
-    def test_theoretical_bound_matches_definition(self, lsb_count):
-        """Replacing the low n bits can move a sample by at most 2**n - 1."""
-        assert audio_analysis.calculate_lsb_max_difference(lsb_count) == (1 << lsb_count) - 1
+        with pytest.raises(ComparisonError, match="shapes differ"):
+            audio_analysis.compare_audio(original, other)
 
 
 # --------------------------------------------------------------------------- #
@@ -167,24 +141,23 @@ class TestDistortionAgainstDepth:
             audio_stego.embed_audio(cover, stego, payload, depth, 0)
             assert audio_stego.extract_audio(stego, depth, 0) == payload
 
-            report = audio_analysis.calculate_quality_report(
-                cover, stego, lsb_count=depth
-            )
+            report = audio_analysis.compare_audio(cover, stego)
+            bound = quality_metrics.distortion_bound(depth)
             rows.append(
                 {
                     "lsb_depth": depth,
                     "payload_bytes": payload_length,
-                    "mse": report["mse"],
-                    "rmse": report["rmse"],
-                    "psnr_db": report["psnr_db"],
-                    "snr_db": report["snr_db"],
-                    "max_absolute_difference": report["max_absolute_difference"],
-                    "theoretical_max_difference": report[
-                        "theoretical_max_difference"
-                    ],
-                    "within_expected_lsb_bound": report["within_expected_lsb_bound"],
-                    "changed_samples": report["changed_samples"],
-                    "changed_percentage": report["changed_percentage"],
+                    "mse": report.mse,
+                    "rmse": report.rmse,
+                    "psnr_db": report.psnr_db,
+                    "snr_db": report.snr_db,
+                    "max_absolute_difference": report.max_absolute_difference,
+                    "theoretical_max_difference": bound,
+                    "within_expected_lsb_bound": (
+                        report.max_absolute_difference <= bound
+                    ),
+                    "changed_samples": report.changed_samples,
+                    "changed_percentage": report.changed_percentage,
                 }
             )
 

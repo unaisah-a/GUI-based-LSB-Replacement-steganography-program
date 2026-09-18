@@ -16,6 +16,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 
+from app.errors import AppError
 from app.utils import file_utils
 
 __all__ = [
@@ -25,7 +26,7 @@ __all__ = [
 ]
 
 
-class VideoInspectionError(Exception):
+class VideoInspectionError(AppError):
     """A video file that cannot be opened or described."""
 
 

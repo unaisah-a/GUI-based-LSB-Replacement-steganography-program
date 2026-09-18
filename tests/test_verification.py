@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from app.crypto import key_manager, manifest as manifest_module
+from app.crypto import hashing, key_manager, manifest as manifest_module
 from app.crypto.encryption import MIN_SCRYPT_N
 from app.crypto.envelope import ErrorCorrectionParameters
 from app.crypto.errors import KeyMaterialError
@@ -654,6 +654,25 @@ class TestScopeOfAuthenticity:
 
         assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
         assert constants.AUTHENTIC_SCOPE_NOTICE in outcome.notes
+        # The signature cannot see the change, but the manifest's file digest can,
+        # and the receiver is told so without the verdict changing.
+        assert outcome.details["file_digest_matches"] is False
+        assert constants.FILE_CHANGED_NOTICE in outcome.notes
+
+    def test_an_unmodified_file_matches_the_manifest_digest(
+        self, png_cover, tmp_path, keys
+    ):
+        _, public_key = keys
+        result = do_protect(png_cover, tmp_path, keys)
+
+        outcome = verify_media(
+            result.stego_path, result.manifest_path, public_key,
+            start_secret=START_SECRET,
+        )
+
+        assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
+        assert outcome.details["file_digest_matches"] is True
+        assert constants.FILE_CHANGED_NOTICE not in outcome.notes
 
     def test_replay_of_an_unmodified_file_still_verifies(
         self, png_cover, tmp_path, keys
@@ -758,7 +777,7 @@ class TestProtect:
 
     def test_stego_digest_is_recorded(self, png_cover, tmp_path, keys):
         result = do_protect(png_cover, tmp_path, keys)
-        assert result.manifest.stego_sha256 == file_utils.file_sha256(
+        assert result.manifest.stego_sha256 == hashing.file_sha256(
             result.stego_path
         )
 

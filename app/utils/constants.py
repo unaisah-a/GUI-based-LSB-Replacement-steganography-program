@@ -90,12 +90,13 @@ MIN_LSB_DEPTH: Final[int] = 1
 MAX_LSB_DEPTH: Final[int] = 8
 LSB_DEPTHS: Final[tuple[int, ...]] = tuple(range(MIN_LSB_DEPTH, MAX_LSB_DEPTH + 1))
 
-#: Restated from app.stego.capacity.LENGTH_HEADER_BYTES.
+#: The stego framing's big-endian payload length header.
 LENGTH_HEADER_BYTES: Final[int] = 4
 
-#: Sample widths in bits: 8 for image channels, 16 for PCM audio samples.
+#: Sample widths in bits: 8 for image and decoded video channels, 16 for PCM audio.
 IMAGE_SAMPLE_WIDTH_BITS: Final[int] = 8
 AUDIO_SAMPLE_WIDTH_BITS: Final[int] = 16
+VIDEO_SAMPLE_WIDTH_BITS: Final[int] = 8
 
 
 # --------------------------------------------------------------------------- #
@@ -256,6 +257,13 @@ DEMO_KEY_NOTICE: Final[str] = (
     "Demo key pair. The private key is stored unencrypted (PKCS#8, no "
     "passphrase) so the demonstration can run unattended. Never use this key "
     "arrangement for anything real."
+)
+
+FILE_CHANGED_NOTICE: Final[str] = (
+    "This file is not byte-for-byte the one that was protected: its SHA-256 differs "
+    "from the digest in the manifest. The verdict concerns the embedded payload "
+    "only, and a change outside the payload region does not affect it. The manifest "
+    "is unsigned, so this is a transport check, not proof of tampering."
 )
 
 EXTRACTED_CONTENT_NOTICE: Final[str] = (

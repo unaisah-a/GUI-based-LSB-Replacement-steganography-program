@@ -41,6 +41,7 @@ Alpha channel handling is deliberately asymmetric, matching the specification:
 
 from __future__ import annotations
 
+import dataclasses
 import math
 import os
 from dataclasses import dataclass, field
@@ -64,7 +65,8 @@ __all__ = [
     "QualityComparison",
     "DifferenceResult",
     "BitPlaneResult",
-    "IndicatorResult",
+    "INDICATOR_EXPLANATIONS",
+    "Indicator",
     "HistogramComparison",
     "compare_quality",
     "extract_bit_plane",
@@ -198,27 +200,63 @@ class BitPlaneResult:
     scaled: bool
 
 
+#: Plain-language explanations, keyed by indicator name, shown beside each value so a
+#: reader knows what it measures without consulting the source.
+INDICATOR_EXPLANATIONS: Final[dict[str, str]] = {
+    "lsb_distribution": (
+        "The proportion of analysed samples whose lowest bit is 1. Replacement pushes "
+        "this toward 0.5, but plenty of unmodified media sits near 0.5 already."
+    ),
+    "bit0_uniformity_chi_square": (
+        "A chi-square p-value for how well the zero and one low bits fit an even "
+        "split. Near 1 means balanced, which replacement produces but which many "
+        "natural files already are."
+    ),
+    "pair_of_values_chi_square": (
+        "A chi-square p-value comparing the counts within each pair of adjacent "
+        "sample values. Replacement moves samples between the two members of a pair, "
+        "driving the counts together and the p-value toward 1."
+    ),
+    "pair_of_values_neighbour": (
+        "The proportion of adjacent same-channel sample pairs that differ only in "
+        "their lowest bit."
+    ),
+}
+
+
 @dataclass(frozen=True)
-class IndicatorResult:
-    """One steganalysis indicator (Requirement 11.5 to 11.8, 11.10).
+class Indicator:
+    """One steganalysis indicator, for any medium (Requirement 11.5 to 11.8, 11.10).
 
     ``value`` is ``None`` exactly when ``insufficient_sample`` is ``True``, in
-    which case no threshold flag is produced either.
+    which case no threshold flag is produced either. ``explanation`` defaults to the
+    standard wording for the indicator's name.
     """
 
-    indicator: str
+    name: str
     scope: str
-    channel_index: int | None
     value: float | None
     insufficient_sample: bool
     analysed_sample_count: int
-    region: dict[str, int] | None
+    channel_index: int | None = None
+    region: dict[str, int] | None = None
     degrees_of_freedom: int | None = None
     threshold: float | None = None
     threshold_exceeded: bool | None = None
     threshold_direction: str | None = None
     details: dict[str, float] = field(default_factory=dict)
+    explanation: str = ""
     disclaimer: str = INDICATOR_DISCLAIMER
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "details", dict(self.details))
+        if not self.explanation:
+            object.__setattr__(
+                self, "explanation", INDICATOR_EXPLANATIONS.get(self.name, "")
+            )
+
+    def as_dict(self) -> dict[str, object]:
+        return dataclasses.asdict(self)
 
 
 @dataclass(frozen=True)
@@ -630,7 +668,7 @@ def chi_square_p_value(statistic: float, degrees_of_freedom: int) -> float:
 
 def lsb_distribution(
     image: object, *, region: object = None
-) -> tuple[IndicatorResult, ...]:
+) -> tuple[Indicator, ...]:
     """Report how many analysed samples have bit 0 set.
 
     Requirement 11.1. Returns one result per colour channel plus an overall
@@ -652,7 +690,7 @@ def lsb_distribution(
     labels = _labels(array.shape[2])
     region_dict = bounds.as_dict() if bounds else None
 
-    results: list[IndicatorResult] = []
+    results: list[Indicator] = []
     total_analysed = 0
     total_ones = 0
 
@@ -664,8 +702,8 @@ def lsb_distribution(
         total_ones += ones
         proportion = ones / analysed if analysed else 0.0
         results.append(
-            IndicatorResult(
-                indicator="lsb_distribution",
+            Indicator(
+                name="lsb_distribution",
                 scope=f"channel:{index}:{labels[index]}",
                 channel_index=index,
                 value=proportion,
@@ -678,8 +716,8 @@ def lsb_distribution(
 
     overall_proportion = total_ones / total_analysed if total_analysed else 0.0
     results.append(
-        IndicatorResult(
-            indicator="lsb_distribution",
+        Indicator(
+            name="lsb_distribution",
             scope="overall",
             channel_index=None,
             value=overall_proportion,
@@ -697,7 +735,7 @@ def lsb_distribution(
 
 def bit0_uniformity(
     image: object, *, region: object = None, threshold: float | None = None
-) -> tuple[IndicatorResult, ...]:
+) -> tuple[Indicator, ...]:
     """Chi-square test of bit-0 values against an even split, as a p-value.
 
     Requirement 11.2. One degree of freedom; the statistic is in
@@ -713,7 +751,7 @@ def bit0_uniformity(
     labels = _labels(array.shape[2])
     region_dict = bounds.as_dict() if bounds else None
 
-    results: list[IndicatorResult] = []
+    results: list[Indicator] = []
     for index in range(colour_channels):
         samples = windowed[:, :, index]
         analysed = int(samples.size)
@@ -722,8 +760,8 @@ def bit0_uniformity(
 
         if analysed < MIN_ANALYSED_SAMPLES:
             results.append(
-                IndicatorResult(
-                    indicator="bit0_uniformity_chi_square",
+                Indicator(
+                    name="bit0_uniformity_chi_square",
                     scope=f"channel:{index}:{labels[index]}",
                     channel_index=index,
                     value=None,
@@ -743,8 +781,8 @@ def bit0_uniformity(
         p_value = chi_square_p_value(statistic, 1)
         limit, exceeded, direction = _threshold_fields(p_value, threshold)
         results.append(
-            IndicatorResult(
-                indicator="bit0_uniformity_chi_square",
+            Indicator(
+                name="bit0_uniformity_chi_square",
                 scope=f"channel:{index}:{labels[index]}",
                 channel_index=index,
                 value=p_value,
@@ -767,7 +805,7 @@ def bit0_uniformity(
 
 def pair_of_values_chi_square(
     image: object, *, region: object = None, threshold: float | None = None
-) -> tuple[IndicatorResult, ...]:
+) -> tuple[Indicator, ...]:
     """Pair-of-values chi-square over histogram bin pairs (2k, 2k+1), as a p-value.
 
     Requirement 11.9. The statistic is in ``details["statistic"]``. LSB replacement
@@ -793,7 +831,7 @@ def pair_of_values_chi_square(
     labels = _labels(array.shape[2])
     region_dict = bounds.as_dict() if bounds else None
 
-    results: list[IndicatorResult] = []
+    results: list[Indicator] = []
     for index in range(colour_channels):
         samples = windowed[:, :, index]
         analysed = int(samples.size)
@@ -808,8 +846,8 @@ def pair_of_values_chi_square(
 
         if analysed < MIN_ANALYSED_SAMPLES or included_pairs < MIN_INCLUDED_BIN_PAIRS:
             results.append(
-                IndicatorResult(
-                    indicator="pair_of_values_chi_square",
+                Indicator(
+                    name="pair_of_values_chi_square",
                     scope=f"channel:{index}:{labels[index]}",
                     channel_index=index,
                     value=None,
@@ -835,8 +873,8 @@ def pair_of_values_chi_square(
         p_value = chi_square_p_value(statistic, degrees_of_freedom)
         limit, exceeded, direction = _threshold_fields(p_value, threshold)
         results.append(
-            IndicatorResult(
-                indicator="pair_of_values_chi_square",
+            Indicator(
+                name="pair_of_values_chi_square",
                 scope=f"channel:{index}:{labels[index]}",
                 channel_index=index,
                 value=p_value,
@@ -859,7 +897,7 @@ def pair_of_values_chi_square(
 
 def pair_of_values_neighbour(
     image: object, *, region: object = None, threshold: float | None = None
-) -> tuple[IndicatorResult, ...]:
+) -> tuple[Indicator, ...]:
     """Proportion of horizontally adjacent sample pairs differing only in bit 0.
 
     Requirement 11.4. A pair is two samples of the same colour channel at
@@ -876,7 +914,7 @@ def pair_of_values_neighbour(
     region_dict = bounds.as_dict() if bounds else None
     height, width = windowed.shape[:2]
 
-    results: list[IndicatorResult] = []
+    results: list[Indicator] = []
     for index in range(colour_channels):
         samples = windowed[:, :, index]
         analysed = int(samples.size)
@@ -887,8 +925,8 @@ def pair_of_values_neighbour(
             or analysed < MIN_ANALYSED_SAMPLES
         ):
             results.append(
-                IndicatorResult(
-                    indicator="pair_of_values_neighbour",
+                Indicator(
+                    name="pair_of_values_neighbour",
                     scope=f"channel:{index}:{labels[index]}",
                     channel_index=index,
                     value=None,
@@ -909,8 +947,8 @@ def pair_of_values_neighbour(
         proportion = matches / examined
         limit, exceeded, direction = _threshold_fields(proportion, threshold)
         results.append(
-            IndicatorResult(
-                indicator="pair_of_values_neighbour",
+            Indicator(
+                name="pair_of_values_neighbour",
                 scope=f"channel:{index}:{labels[index]}",
                 channel_index=index,
                 value=float(proportion),

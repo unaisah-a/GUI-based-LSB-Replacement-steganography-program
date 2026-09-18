@@ -31,7 +31,6 @@ outcome rather than assumed.
 from __future__ import annotations
 
 import os
-import tempfile
 from typing import Final, Iterator
 
 import numpy as np
@@ -284,43 +283,26 @@ def drop_frames(
     )
 
 
-def _open_lossy_writer(
-    descriptor: video_stego.VideoDescriptor, directory: str
-) -> tuple[object, str, str]:
-    """Return an opened lossy writer, the file it writes to, and its codec name.
+class _CodecUnavailable(Exception):
+    """The installed OpenCV build cannot open this codec."""
 
-    Tries the candidates in order because codec availability is a property of the
-    installed FFmpeg build, not of this application, and hardcoding one would make
-    the attack fail on a machine that is otherwise fine. See the module docstring.
-    """
+
+def _open_lossy_writer(
+    target: str, descriptor: video_stego.VideoDescriptor, codec: str
+) -> object | None:
+    """Return an opened writer for *codec*, or ``None`` if this build lacks it."""
     import cv2
 
-    attempted: list[str] = []
-    for codec, extension in LOSSY_CODEC_CANDIDATES:
-        handle, temporary = tempfile.mkstemp(
-            prefix=".lossy-", suffix=extension, dir=directory
-        )
-        os.close(handle)
-        writer = cv2.VideoWriter(
-            temporary,
-            cv2.VideoWriter_fourcc(*codec),
-            float(descriptor.frame_rate),
-            (descriptor.width, descriptor.height),
-        )
-        if writer.isOpened():
-            return writer, temporary, codec
-        writer.release()
-        try:
-            os.unlink(temporary)
-        except OSError:
-            pass
-        attempted.append(codec)
-
-    raise AttackError(
-        f"the installed OpenCV build could not open any lossy encoder; tried "
-        f"{', '.join(attempted)}. This attack needs one to demonstrate that lossy "
-        f"re-encoding destroys the payload"
+    writer = cv2.VideoWriter(
+        target,
+        cv2.VideoWriter_fourcc(*codec),
+        float(descriptor.frame_rate),
+        (descriptor.width, descriptor.height),
     )
+    if writer.isOpened():
+        return writer
+    writer.release()
+    return None
 
 
 def recompress_lossy(
@@ -350,37 +332,45 @@ def recompress_lossy(
             f"{file_utils.display_name(target)}"
         )
 
-    writer, temporary, codec = _open_lossy_writer(descriptor, directory)
-    extension = os.path.splitext(temporary)[1]
-    final = os.path.splitext(target)[0] + extension
-
-    if os.path.exists(final) and not overwrite:
-        writer.release()
+    # Codec availability is a property of the installed FFmpeg build, so the
+    # candidates are tried in order and the first one that opens is used. An
+    # unavailable codec leaves the block by an exception, so its empty temporary
+    # file is discarded rather than moved into place.
+    attempted: list[str] = []
+    for codec, extension in LOSSY_CODEC_CANDIDATES:
+        final = os.path.splitext(target)[0] + extension
         try:
-            os.unlink(temporary)
-        except OSError:
-            pass
+            with file_utils.atomic_output(final, suffix=extension) as temporary:
+                writer = _open_lossy_writer(temporary, descriptor, codec)
+                if writer is None:
+                    raise _CodecUnavailable(codec)
+                if os.path.exists(final) and not overwrite:
+                    writer.release()
+                    raise AttackError(
+                        f"attack output path is already occupied: "
+                        f"{file_utils.display_name(final)}"
+                    )
+                written = 0
+                try:
+                    for frame in video_stego.iterate_frames(source, descriptor):
+                        writer.write(frame)
+                        written += 1
+                finally:
+                    writer.release()
+                if written == 0:  # pragma: no cover - guarded by describe_only
+                    raise AttackError(
+                        f"no frames could be decoded from {descriptor.file_name}"
+                    )
+        except _CodecUnavailable:
+            attempted.append(codec)
+            continue
+        break
+    else:
         raise AttackError(
-            f"attack output path is already occupied: "
-            f"{file_utils.display_name(final)}"
+            f"the installed OpenCV build could not open any lossy encoder; tried "
+            f"{', '.join(attempted)}. This attack needs one to demonstrate that "
+            f"lossy re-encoding destroys the payload"
         )
-
-    written = 0
-    try:
-        for frame in video_stego.iterate_frames(source, descriptor):
-            writer.write(frame)
-            written += 1
-    finally:
-        writer.release()
-
-    if written == 0:  # pragma: no cover - guarded by describe_only
-        try:
-            os.unlink(temporary)
-        except OSError:
-            pass
-        raise AttackError(f"no frames could be decoded from {descriptor.file_name}")
-
-    os.replace(temporary, final)
 
     return AttackOutcome(
         name="re-encode with a lossy codec",

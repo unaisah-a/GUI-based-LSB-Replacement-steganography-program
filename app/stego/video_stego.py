@@ -24,45 +24,23 @@ sequence as verified.
 from __future__ import annotations
 
 import os
-import tempfile
 from dataclasses import dataclass
 from typing import Any, Final, Iterator
 
 import numpy as np
 import numpy.typing as npt
 
-from app.stego import paths
-from app.stego.bit_utils import (
-    bits_to_bytes,
-    bytes_to_bits,
-    groups_needed,
-    pack_bits_to_groups,
-    read_low_bits,
-    unpack_groups_to_bits,
-    validate_lsb_depth,
-    write_low_bits,
-)
-from app.stego.capacity import (
-    LENGTH_HEADER_BYTES,
-    MAX_PAYLOAD_LENGTH,
-    CapacityReport,
-    capacity_report,
-)
-from app.stego.errors import (
-    CapacityError,
-    DecodeError,
-    ExtractionError,
-    ValidationError,
-    safe_path,
-)
-from app.utils import constants, media_utils
+from app.stego import lsb_core, paths
+from app.stego.bit_utils import validate_lsb_depth, write_low_bits
+from app.stego.capacity import CapacityReport, capacity_report
+from app.stego.errors import DecodeError, ExtractionError, ValidationError
+from app.utils import constants, file_utils, media_utils
+from app.utils.file_utils import display_name
 
 __all__ = [
-    "LENGTH_HEADER_BITS",
     "OUTPUT_CODEC",
     "OUTPUT_CONTAINER",
     "VIDEO_CHANNEL_COUNT",
-    "VIDEO_SAMPLE_WIDTH_BITS",
     "VideoDescriptor",
     "VideoEmbedResult",
     "describe_only",
@@ -74,14 +52,11 @@ __all__ = [
     "write_frames",
 ]
 
-#: Decoded frames are 8-bit BGR, as they are for an image.
-VIDEO_SAMPLE_WIDTH_BITS: Final[int] = 8
-
 #: OpenCV always hands back three colour channels, even for a greyscale source, so
 #: the sample count per frame is fixed rather than codec-dependent.
 VIDEO_CHANNEL_COUNT: Final[int] = 3
 
-LENGTH_HEADER_BITS: Final[int] = LENGTH_HEADER_BYTES * 8
+_WIDTH = constants.VIDEO_SAMPLE_WIDTH_BITS
 
 #: FFV1 is lossless and available in the FFmpeg build bundled with
 #: ``opencv-python``, so no external encoder has to be installed.
@@ -169,8 +144,6 @@ def describe_only(path: str | os.PathLike[str]) -> VideoDescriptor:
     except media_utils.VideoInspectionError as exc:
         raise DecodeError(str(exc)) from exc
 
-    from app.utils import file_utils
-
     try:
         container = file_utils.detect_container(path)
     except file_utils.UnsupportedMediaError as exc:
@@ -186,7 +159,7 @@ def describe_only(path: str | os.PathLike[str]) -> VideoDescriptor:
         * VIDEO_CHANNEL_COUNT
     )
     return VideoDescriptor(
-        file_name=safe_path(path),
+        file_name=display_name(path),
         container_format=container,
         codec=properties.codec,
         width=properties.width,
@@ -215,7 +188,7 @@ def iterate_frames(
     import cv2
 
     target = os.fspath(path)
-    name = safe_path(path)
+    name = display_name(path)
 
     capture = cv2.VideoCapture(target)
     try:
@@ -330,15 +303,8 @@ def write_frames(
     """
     paths.check_output_writable(path, overwrite)
 
-    target = os.fspath(path)
-    directory = os.path.dirname(os.path.abspath(target)) or "."
-    handle, temporary = tempfile.mkstemp(
-        prefix=".partial-", suffix=constants.CONTAINER_EXTENSIONS[OUTPUT_CONTAINER],
-        dir=directory,
-    )
-    os.close(handle)
-
-    try:
+    suffix = constants.CONTAINER_EXTENSIONS[OUTPUT_CONTAINER]
+    with file_utils.atomic_output(path, suffix=suffix) as temporary:
         writer = _open_writer(temporary, descriptor, codec)
         written = 0
         try:
@@ -350,17 +316,10 @@ def write_frames(
 
         if written == 0:
             raise DecodeError(
-                f"no frames were written for {safe_path(target)}; the cover clip "
+                f"no frames were written for {display_name(path)}; the cover clip "
                 f"decoded to nothing"
             )
-        os.replace(temporary, target)
-        return written
-    except BaseException:
-        try:
-            os.unlink(temporary)
-        except OSError:
-            pass
-        raise
+    return written
 
 
 # --------------------------------------------------------------------------- #
@@ -389,46 +348,6 @@ def measure_capacity(
         embeddable_channels=descriptor.channel_count,
     )
     return report, descriptor
-
-
-# --------------------------------------------------------------------------- #
-# Validation
-# --------------------------------------------------------------------------- #
-
-
-def _validate_payload(payload: object) -> bytes:
-    if not isinstance(payload, (bytes, bytearray)):
-        raise ValidationError(
-            f"payload must be bytes or bytearray, got type {type(payload).__name__}"
-        )
-    data = bytes(payload)
-    if len(data) > MAX_PAYLOAD_LENGTH:
-        raise ValidationError(
-            f"payload is {len(data)} bytes, which cannot be represented in the "
-            f"{LENGTH_HEADER_BYTES}-byte length header (maximum "
-            f"{MAX_PAYLOAD_LENGTH})"
-        )
-    return data
-
-
-def _validate_start_location(start_location: object, total_samples: int) -> int:
-    """Same rules as the other two media: integers only, ``bool`` refused."""
-    if isinstance(start_location, bool) or not isinstance(
-        start_location, (int, np.integer)
-    ):
-        raise ValidationError(
-            f"start_location must be an integer, got type "
-            f"{type(start_location).__name__}"
-        )
-    value = int(start_location)
-    if total_samples == 0:
-        raise CapacityError("video file has no embeddable samples")
-    if not 0 <= value < total_samples:
-        raise ValidationError(
-            f"start_location must be an integer from 0 to {total_samples - 1} "
-            f"inclusive, got {value}"
-        )
-    return value
 
 
 # --------------------------------------------------------------------------- #
@@ -468,7 +387,7 @@ def _embedding_frames(
                 flat[low - base : high - base],
                 groups[low - start : high - start],
                 depth,
-                VIDEO_SAMPLE_WIDTH_BITS,
+                _WIDTH,
             )
             touched += 1
             if first < 0:
@@ -517,40 +436,20 @@ def embed_video(
     paths.assert_readable(input_path)
     paths.assert_distinct_paths(input_path, output_path)
     paths.check_output_writable(output_path, overwrite)
-    data = _validate_payload(payload)
+    data = lsb_core.validate_payload(payload)
     depth = validate_lsb_depth(lsb_count)
 
     descriptor = describe_only(input_path)
     total_samples = descriptor.total_samples
-    start = _validate_start_location(start_location, total_samples)
-
-    encoded = len(data).to_bytes(LENGTH_HEADER_BYTES, "big") + data
-    bits = bytes_to_bits(encoded)
-    group_count = groups_needed(int(bits.size), depth)
-
-    report = capacity_report(
-        total_samples,
-        depth,
-        start,
-        len(data),
-        embeddable_channels=descriptor.channel_count,
+    start = lsb_core.validate_start_location(
+        start_location, total_samples, "video file"
     )
+    stream = lsb_core.encode_stream(data, depth, total_samples, start)
 
-    available = total_samples - start
-    if group_count > available:
-        raise CapacityError(
-            f"payload does not fit: the encoded stream needs {len(encoded)} bytes "
-            f"({group_count} samples) at depth {depth} from start location {start}, "
-            f"but only {report.available_capacity_bytes} bytes ({available} samples) "
-            f"are available; the largest payload that fits is "
-            f"{report.max_payload_length} bytes"
-        )
-
-    groups = pack_bits_to_groups(bits, depth)
     counters: dict[str, int] = {}
     written_frames = write_frames(
         _embedding_frames(
-            os.fspath(input_path), descriptor, groups, depth, start, counters
+            os.fspath(input_path), descriptor, stream.groups, depth, start, counters
         ),
         output_path,
         descriptor,
@@ -574,19 +473,25 @@ def embed_video(
 
     if verify_round_trip:
         _assert_round_trip(
-            output_path, depth, start, encoded, written_frames, descriptor
+            output_path, depth, start, data, written_frames, descriptor
         )
 
     return VideoEmbedResult(
         output_path=os.fspath(output_path),
         container_format=OUTPUT_CONTAINER,
         descriptor=descriptor,
-        capacity=report,
+        capacity=capacity_report(
+            total_samples,
+            depth,
+            start,
+            len(data),
+            embeddable_channels=descriptor.channel_count,
+        ),
         lsb_count=depth,
         start_location=start,
         payload_length=len(data),
-        encoded_length=len(encoded),
-        samples_written=group_count,
+        encoded_length=stream.encoded_length,
+        samples_written=stream.samples_needed,
         frames_touched=counters.get("frames_touched", 0),
         first_frame_touched=counters.get("first_frame_touched", -1),
         last_frame_touched=counters.get("last_frame_touched", -1),
@@ -605,7 +510,7 @@ def _assert_round_trip(
     output_path: str | os.PathLike[str],
     depth: int,
     start: int,
-    encoded: bytes,
+    expected: bytes,
     written_frames: int,
     cover: VideoDescriptor,
 ) -> None:
@@ -650,7 +555,6 @@ def _assert_round_trip(
             f"written: {exc}. The encoder did not preserve the pixels exactly"
         ) from exc
 
-    expected = encoded[LENGTH_HEADER_BYTES:]
     if recovered != expected:
         _discard(output_path)
         differing = sum(1 for a, b in zip(recovered, expected) if a != b)
@@ -699,60 +603,16 @@ def extract_video(
 
     descriptor = describe_only(input_path)
     total_samples = descriptor.total_samples
-    start = _validate_start_location(start_location, total_samples)
-
-    available = total_samples - start
-    header_groups = groups_needed(LENGTH_HEADER_BITS, depth)
-    if available < header_groups:
-        raise ExtractionError(
-            f"bit stream is truncated: reading a {LENGTH_HEADER_BITS}-bit length "
-            f"header at depth {depth} needs {header_groups} samples from start "
-            f"location {start}, but only {available} are available"
-        )
-
-    header_samples = read_sample_range(
-        input_path, descriptor, start, start + header_groups
-    )
-    header_bits = unpack_groups_to_bits(
-        read_low_bits(header_samples, depth, VIDEO_SAMPLE_WIDTH_BITS), depth
-    )
-    payload_length = int.from_bytes(
-        bits_to_bytes(header_bits[:LENGTH_HEADER_BITS]), "big"
+    start = lsb_core.validate_start_location(
+        start_location, total_samples, "video file"
     )
 
-    available_capacity = (available * depth) // 8
-    max_payload = max(0, available_capacity - LENGTH_HEADER_BYTES)
-    if payload_length > max_payload:
-        raise ExtractionError(
-            f"decoded payload length {payload_length} is inconsistent with the "
-            f"video capacity: at depth {depth} from start location {start} the clip "
-            f"can hold at most {max_payload} payload bytes"
-        )
-
-    if manifest_payload_length is not None and payload_length != manifest_payload_length:
-        raise ExtractionError(
-            f"decoded payload length {payload_length} disagrees with the manifest "
-            f"payload length {manifest_payload_length}"
-        )
-
-    if payload_length == 0:
-        return b""
-
-    total_bits = LENGTH_HEADER_BITS + payload_length * 8
-    needed_groups = groups_needed(total_bits, depth)
-    if needed_groups > available:
-        raise ExtractionError(
-            f"bit stream is truncated: a {payload_length}-byte payload needs "
-            f"{needed_groups} samples at depth {depth} from start location {start}, "
-            f"but only {available} are available"
-        )
-
-    stream_samples = read_sample_range(
-        input_path, descriptor, start, start + needed_groups
+    return lsb_core.extract_stream(
+        lambda begin, end: read_sample_range(input_path, descriptor, begin, end),
+        total_samples,
+        depth,
+        start,
+        _WIDTH,
+        "video file",
+        manifest_payload_length=manifest_payload_length,
     )
-    stream_bits = unpack_groups_to_bits(
-        read_low_bits(stream_samples, depth, VIDEO_SAMPLE_WIDTH_BITS), depth
-    )
-    # Continuous stream: payload bits follow the header with no realignment, and
-    # trailing padding bits beyond the payload are discarded.
-    return bits_to_bytes(stream_bits[LENGTH_HEADER_BITS:total_bits])

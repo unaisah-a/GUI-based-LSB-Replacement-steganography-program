@@ -17,28 +17,29 @@ all of them.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import tempfile
+import time
+from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Final
+from typing import Any, Final, Iterator
 
+from app.errors import AppError
 from app.utils import constants
 
 __all__ = [
     "MediaDescription",
     "UnsupportedMediaError",
+    "atomic_output",
     "describe_file",
     "detect_container",
     "detect_media_type",
     "display_name",
     "ensure_directory",
-    "file_sha256",
     "human_size",
     "manifest_path_for",
     "read_json",
-    "sha256_of_bytes",
     "suggest_output_path",
     "unique_path",
     "write_bytes_atomic",
@@ -47,7 +48,7 @@ __all__ = [
 ]
 
 
-class UnsupportedMediaError(Exception):
+class UnsupportedMediaError(AppError):
     """A file whose content is not a container this application can carry data in.
 
     Carries the detected format name when detection succeeded but the format is
@@ -276,31 +277,6 @@ def human_size(size_bytes: int) -> str:
 
 
 # --------------------------------------------------------------------------- #
-# Digests
-# --------------------------------------------------------------------------- #
-
-
-def sha256_of_bytes(data: bytes) -> str:
-    """Return the SHA-256 hex digest of *data*."""
-    return hashlib.sha256(data).hexdigest()
-
-
-def file_sha256(path: str | os.PathLike[str], *, chunk_bytes: int = 1 << 20) -> str:
-    """Return the SHA-256 hex digest of the file at *path*, read in chunks.
-
-    Chunked so a large video does not have to be held in memory at once.
-    """
-    digest = hashlib.sha256()
-    with open(os.fspath(path), "rb") as handle:
-        while True:
-            chunk = handle.read(chunk_bytes)
-            if not chunk:
-                break
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-# --------------------------------------------------------------------------- #
 # Paths
 # --------------------------------------------------------------------------- #
 
@@ -361,6 +337,57 @@ def unique_path(path: str | os.PathLike[str]) -> str:
 # --------------------------------------------------------------------------- #
 
 
+@contextmanager
+def atomic_output(
+    path: str | os.PathLike[str],
+    *,
+    suffix: str | None = None,
+    replace_attempts: int = 3,
+    replace_delay_seconds: float = 0.1,
+) -> Iterator[str]:
+    """Yield a temporary path beside *path*, and move it into place on success.
+
+    The caller writes the temporary file however it likes: raw bytes, a WAV through
+    ``soundfile``, a clip through OpenCV. When the ``with`` block finishes normally
+    the file replaces *path* in one :func:`os.replace`, so a reader sees either the
+    old file or the complete new one, never a partial one. If the block raises, the
+    temporary file is removed, on every path including ``KeyboardInterrupt``.
+
+    *suffix* defaults to *path*'s own name; pass an extension when a library picks
+    its output format from the file name, as OpenCV does.
+
+    On Windows :func:`os.replace` fails with ``PermissionError`` while another
+    process holds the destination open, which is common when a viewer is showing the
+    previous output, so the replace is retried *replace_attempts* times.
+
+    :raises PermissionError: the destination stayed locked for every attempt.
+    """
+    target = os.fspath(path)
+    directory = os.path.dirname(os.path.abspath(target)) or "."
+    handle, temporary = tempfile.mkstemp(
+        prefix=".partial-",
+        suffix=os.path.basename(target) if suffix is None else suffix,
+        dir=directory,
+    )
+    os.close(handle)
+    try:
+        yield temporary
+        for attempt in range(replace_attempts):
+            try:
+                os.replace(temporary, target)
+                break
+            except PermissionError:
+                if attempt == replace_attempts - 1:
+                    raise
+                time.sleep(replace_delay_seconds)
+    finally:
+        if os.path.exists(temporary):
+            try:
+                os.unlink(temporary)
+            except OSError:
+                pass
+
+
 def _atomic_write(
     path: str | os.PathLike[str], data: bytes, *, overwrite: bool
 ) -> str:
@@ -377,23 +404,11 @@ def _atomic_write(
             f"pass overwrite=True to replace it"
         )
 
-    handle, temporary = tempfile.mkstemp(
-        prefix=".partial-", suffix=os.path.basename(text), dir=directory
-    )
-    try:
-        with os.fdopen(handle, "wb") as stream:
+    with atomic_output(text) as temporary:
+        with open(temporary, "wb") as stream:
             stream.write(data)
             stream.flush()
             os.fsync(stream.fileno())
-        os.replace(temporary, text)
-    except BaseException:
-        # Leave no partial file behind on any failure path, including
-        # KeyboardInterrupt.
-        try:
-            os.unlink(temporary)
-        except OSError:
-            pass
-        raise
     return text
 
 

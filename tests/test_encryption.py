@@ -324,7 +324,7 @@ class TestEncryptThenSign:
     def test_signature_verifies_before_decryption_is_attempted(self):
         from app.crypto import envelope as env
         from app.crypto import key_manager, signatures
-        from app.crypto.hashing import compute_media_hash
+        from app.crypto.hashing import sha256_hex
 
         private_key, public_key = key_manager.generate_key_pair(
             constants.RSA_MIN_KEY_SIZE
@@ -339,7 +339,7 @@ class TestEncryptThenSign:
             timestamp=env.utc_timestamp(),
             nonce_hex="0f" * 16,
             # The digest is of the PLAINTEXT, not the ciphertext.
-            message_hash=compute_media_hash(MESSAGE),
+            message_hash=sha256_hex(MESSAGE),
             message_length=len(MESSAGE),
             lsb_depth=3,
             start_method=constants.START_METHOD_HMAC,
@@ -357,7 +357,7 @@ class TestEncryptThenSign:
             parsed.message, PASSPHRASE, recorded
         )
         assert recovered == MESSAGE
-        assert compute_media_hash(recovered) == record.message_hash
+        assert sha256_hex(recovered) == record.message_hash
 
     def test_wrong_signing_key_is_a_signature_failure_not_a_cipher_failure(self):
         from app.crypto import envelope as env

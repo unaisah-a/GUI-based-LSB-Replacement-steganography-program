@@ -51,7 +51,7 @@ from app.crypto.envelope import (
     VerificationRecord,
 )
 from app.crypto.errors import RecordError
-from app.crypto.hashing import compute_media_hash, hashes_equal
+from app.crypto.hashing import sha256_hex, hashes_equal
 from app.utils import constants
 
 __all__ = [
@@ -156,7 +156,7 @@ def prepare_payload(
         )
 
     # 1. The digest is always of the plaintext, encrypted or not.
-    message_hash = compute_media_hash(plaintext)
+    message_hash = sha256_hex(plaintext)
 
     # 2. Encrypt, if asked.
     stored_message = plaintext
@@ -270,7 +270,7 @@ def recover_message(
         message=plaintext,
         hash_matches=(
             len(plaintext) == record.message_length
-            and hashes_equal(compute_media_hash(plaintext), record.message_hash)
+            and hashes_equal(sha256_hex(plaintext), record.message_hash)
         ),
         was_encrypted=was_encrypted,
     )

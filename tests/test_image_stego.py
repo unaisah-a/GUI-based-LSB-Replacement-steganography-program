@@ -638,7 +638,7 @@ class TestAtomicWriting:
         image_stego.embed_image(
             cover, os.path.join(workspace, "stego.png"), b"payload", 1, 0
         )
-        assert [name for name in os.listdir(workspace) if name.startswith(".stego-")] == []
+        assert [name for name in os.listdir(workspace) if name.startswith(".partial-")] == []
 
     def test_no_temporary_files_survive_failure(self, workspace):
         cover = write_cover(
@@ -648,7 +648,7 @@ class TestAtomicWriting:
             image_stego.embed_image(
                 cover, os.path.join(workspace, "stego.png"), b"x" * 9000, 1, 0
             )
-        assert [name for name in os.listdir(workspace) if name.startswith(".stego-")] == []
+        assert [name for name in os.listdir(workspace) if name.startswith(".partial-")] == []
 
     def test_existing_output_is_preserved_when_embedding_fails(self, workspace):
         cover = write_cover(

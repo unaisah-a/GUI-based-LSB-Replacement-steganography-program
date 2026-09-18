@@ -27,6 +27,7 @@ from typing import Any
 import pytest
 
 from app.analysis import size_preservation
+from app.crypto import hashing
 from app.analysis.size_preservation import (
     DEFLATE_LEVELS,
     MIN_PNG_CHUNK_OVERHEAD,
@@ -666,7 +667,7 @@ class TestThroughProtect:
         result, _ = self._protect(noisy_png_cover, tmp_path, keys, match=True, depth=8)
 
         assert result.size_preservation.exact is True
-        assert result.manifest.stego_sha256 == file_utils.file_sha256(
+        assert result.manifest.stego_sha256 == hashing.file_sha256(
             result.stego_path
         )
 

@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import os
 
-from app.stego.errors import FileError, ValidationError, safe_path
+from app.stego.errors import FileError, ValidationError
+from app.utils.file_utils import display_name
 
 __all__ = [
     "assert_distinct_paths",
@@ -28,7 +29,7 @@ def assert_readable(path: str | os.PathLike[str]) -> None:
     missing input is reported before anything about the destination.
     """
     text = os.fspath(path)
-    name = safe_path(path)
+    name = display_name(path)
 
     if not os.path.exists(text):
         raise FileError(f"input file not found: {name}")
@@ -68,7 +69,7 @@ def assert_distinct_paths(
     if same:
         raise ValidationError(
             f"output path must differ from the input path, both resolve to "
-            f"{safe_path(source)}"
+            f"{display_name(source)}"
         )
 
 
@@ -80,7 +81,7 @@ def check_output_writable(path: str | os.PathLike[str], overwrite: bool) -> None
     set).
     """
     text = os.fspath(path)
-    name = safe_path(path)
+    name = display_name(path)
     directory = os.path.dirname(os.path.abspath(text))
 
     if not os.path.isdir(directory):

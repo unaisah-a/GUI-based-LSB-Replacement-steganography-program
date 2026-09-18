@@ -33,7 +33,7 @@ than as a number that would look precise and mean nothing.
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
@@ -41,11 +41,12 @@ import numpy as np
 from app.analysis import image_analysis
 from app.analysis.image_analysis import (
     INDICATOR_DISCLAIMER,
+    INDICATOR_EXPLANATIONS,
     MIN_ANALYSED_SAMPLES,
     BitPlaneResult,
     DifferenceResult,
     HistogramComparison,
-    IndicatorResult,
+    Indicator,
     Region,
 )
 from app.analysis.quality_metrics import QualityReport
@@ -60,83 +61,6 @@ __all__ = [
     "analyse",
     "audio_indicators",
 ]
-
-
-@dataclass(frozen=True)
-class Indicator:
-    """One statistical indicator, in terms shared by every medium."""
-
-    name: str
-    scope: str
-    #: ``None`` when there was too little data for the value to mean anything.
-    value: float | None
-    insufficient_sample: bool
-    analysed_sample_count: int
-    #: What the number is measuring, in words, for display beside it.
-    explanation: str
-    details: dict[str, float] = field(default_factory=dict)
-    threshold: float | None = None
-    threshold_exceeded: bool | None = None
-    disclaimer: str = INDICATOR_DISCLAIMER
-
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "details", dict(self.details))
-
-    def as_dict(self) -> dict[str, Any]:
-        return {
-            "name": self.name,
-            "scope": self.scope,
-            "value": self.value,
-            "insufficient_sample": self.insufficient_sample,
-            "analysed_sample_count": self.analysed_sample_count,
-            "explanation": self.explanation,
-            "threshold": self.threshold,
-            "threshold_exceeded": self.threshold_exceeded,
-            "details": dict(self.details),
-            "disclaimer": self.disclaimer,
-        }
-
-
-#: Plain-language explanations, keyed by indicator name. Shown beside each value so a
-#: reader knows what it measures without consulting the source.
-_EXPLANATIONS: dict[str, str] = {
-    "lsb_distribution": (
-        "The proportion of analysed samples whose lowest bit is 1. Replacement pushes "
-        "this toward 0.5, but plenty of unmodified media sits near 0.5 already."
-    ),
-    "bit0_uniformity_chi_square": (
-        "A chi-square p-value for how well the zero and one low bits fit an even "
-        "split. Near 1 means balanced, which replacement produces but which many "
-        "natural files already are."
-    ),
-    "pair_of_values_chi_square": (
-        "A chi-square p-value comparing the counts within each pair of adjacent "
-        "sample values. Replacement moves samples between the two members of a pair, "
-        "driving the counts together and the p-value toward 1."
-    ),
-    "pair_of_values_neighbour": (
-        "The proportion of adjacent same-channel sample pairs that differ only in "
-        "their lowest bit."
-    ),
-}
-
-
-def _explain(name: str) -> str:
-    return _EXPLANATIONS.get(name, "")
-
-
-def _from_image_indicator(result: IndicatorResult) -> Indicator:
-    return Indicator(
-        name=result.indicator,
-        scope=result.scope,
-        value=result.value,
-        insufficient_sample=result.insufficient_sample,
-        analysed_sample_count=result.analysed_sample_count,
-        explanation=_explain(result.indicator),
-        details=dict(result.details),
-        threshold=getattr(result, "threshold", None),
-        threshold_exceeded=getattr(result, "threshold_exceeded", None),
-    )
 
 
 @dataclass(frozen=True)
@@ -206,7 +130,6 @@ def audio_indicators(
             value=(ones / analysed) if analysed else 0.0,
             insufficient_sample=insufficient,
             analysed_sample_count=analysed,
-            explanation=_explain("lsb_distribution"),
             details={"ones_count": float(ones), "zeros_count": float(zeros)},
         )
     ]
@@ -219,7 +142,6 @@ def audio_indicators(
                 value=None,
                 insufficient_sample=True,
                 analysed_sample_count=analysed,
-                explanation=_explain("bit0_uniformity_chi_square"),
                 details={"minimum_analysed_samples": float(MIN_ANALYSED_SAMPLES)},
             )
         )
@@ -234,7 +156,6 @@ def audio_indicators(
                 value=p_value,
                 insufficient_sample=False,
                 analysed_sample_count=analysed,
-                explanation=_explain("bit0_uniformity_chi_square"),
                 details={"statistic": float(statistic), "degrees_of_freedom": 1.0},
                 threshold=threshold,
                 threshold_exceeded=(
@@ -266,7 +187,6 @@ def audio_indicators(
                 value=None,
                 insufficient_sample=True,
                 analysed_sample_count=analysed,
-                explanation=_explain("pair_of_values_neighbour"),
                 details={"examined_pair_count": float(examined)},
             )
         )
@@ -279,7 +199,6 @@ def audio_indicators(
                 value=float(proportion),
                 insufficient_sample=False,
                 analysed_sample_count=analysed,
-                explanation=_explain("pair_of_values_neighbour"),
                 details={
                     "examined_pair_count": float(examined),
                     "matching_pair_count": float(matches),
@@ -302,7 +221,7 @@ def audio_indicators(
             insufficient_sample=True,
             analysed_sample_count=analysed,
             explanation=(
-                _explain("pair_of_values_chi_square")
+                INDICATOR_EXPLANATIONS["pair_of_values_chi_square"]
                 + " Not reported for 16-bit audio: with 65,536 possible values, most "
                 "pair counts fall below the level at which the chi-square "
                 "approximation is valid."
@@ -337,7 +256,7 @@ def _image_report(
             results = function(path, region=region)
         else:
             results = function(path, region=region, threshold=threshold)
-        indicators.extend(_from_image_indicator(result) for result in results)
+        indicators.extend(results)
 
     difference = None
     histograms = None

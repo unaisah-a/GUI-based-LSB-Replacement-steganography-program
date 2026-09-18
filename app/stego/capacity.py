@@ -28,6 +28,7 @@ from typing import Final
 
 from app.stego.bit_utils import validate_lsb_depth
 from app.stego.errors import ValidationError
+from app.utils import constants
 
 __all__ = [
     "LENGTH_HEADER_BYTES",
@@ -42,10 +43,10 @@ __all__ = [
 ]
 
 #: Requirement 4.1: the length header is a fixed 4-byte big-endian integer.
-LENGTH_HEADER_BYTES: Final[int] = 4
+LENGTH_HEADER_BYTES: Final[int] = constants.LENGTH_HEADER_BYTES
 
-#: Requirement 4.3: the largest payload length a 4-byte header can represent.
-MAX_PAYLOAD_LENGTH: Final[int] = 0xFFFF_FFFF
+#: Requirement 4.3: the largest payload length the header can represent.
+MAX_PAYLOAD_LENGTH: Final[int] = (1 << (8 * LENGTH_HEADER_BYTES)) - 1
 
 
 @dataclass(frozen=True)

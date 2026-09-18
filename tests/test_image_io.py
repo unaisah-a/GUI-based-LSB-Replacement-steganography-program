@@ -373,7 +373,7 @@ class TestAtomicSave:
         )
         assert attempts["count"] == 3
         assert os.path.isfile(path)
-        assert [n for n in os.listdir(workspace) if n.startswith(".stego-")] == []
+        assert [n for n in os.listdir(workspace) if n.startswith(".partial-")] == []
 
     def test_replace_gives_up_after_the_attempt_limit(self, workspace, monkeypatch):
         array = make_cover(4, 4, 3, "noise", 1)
@@ -386,7 +386,7 @@ class TestAtomicSave:
         with pytest.raises(FileError, match="could not be replaced"):
             image_io.save_image(array, path, image_io.PNG, replace_delay_seconds=0.0)
         # Requirement 6.7: the temporary file is cleaned up on the failure path.
-        assert [n for n in os.listdir(workspace) if n.startswith(".stego-")] == []
+        assert [n for n in os.listdir(workspace) if n.startswith(".partial-")] == []
         assert not os.path.exists(path)
 
     def test_no_temporary_file_survives_an_encode_failure(self, workspace):
@@ -396,4 +396,4 @@ class TestAtomicSave:
                 os.path.join(workspace, "out.bmp"),
                 image_io.BMP,
             )
-        assert [n for n in os.listdir(workspace) if n.startswith(".stego-")] == []
+        assert [n for n in os.listdir(workspace) if n.startswith(".partial-")] == []

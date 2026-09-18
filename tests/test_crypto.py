@@ -7,6 +7,7 @@ Behavioural tests for each module live in their own test files.
 from __future__ import annotations
 
 import importlib
+import os
 
 import pytest
 
@@ -28,43 +29,55 @@ def test_module_imports(module_name):
     assert importlib.import_module(module_name) is not None
 
 
+EMPTY_SHA256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+
 class TestHashing:
     def test_known_digest(self):
-        from app.crypto.hashing import compute_media_hash
+        from app.crypto.hashing import sha256_hex
 
         # The SHA-256 of the empty string is a well-known constant, so this pins
         # the algorithm rather than merely checking self-consistency.
-        assert compute_media_hash(b"") == (
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        )
-
-    def test_hex_and_raw_agree(self):
-        from app.crypto.hashing import compute_media_hash, compute_raw_sha256
-
-        data = b"INF2005"
-        assert compute_raw_sha256(data).hex() == compute_media_hash(data)
+        assert sha256_hex(b"") == EMPTY_SHA256
 
     def test_digest_length(self):
-        from app.crypto.hashing import (
-            SHA256_DIGEST_BYTES,
-            SHA256_HEX_LENGTH,
-            compute_media_hash,
-            compute_raw_sha256,
-        )
+        from app.crypto.hashing import SHA256_HEX_LENGTH, sha256_hex
 
-        assert len(compute_raw_sha256(b"x")) == SHA256_DIGEST_BYTES
-        assert len(compute_media_hash(b"x")) == SHA256_HEX_LENGTH
+        assert len(sha256_hex(b"x")) == SHA256_HEX_LENGTH
 
     def test_non_bytes_rejected(self):
-        from app.crypto.hashing import compute_media_hash
+        from app.crypto.hashing import sha256_hex
 
         with pytest.raises(TypeError):
-            compute_media_hash("a string is not bytes")
+            sha256_hex("a string is not bytes")
+
+    def test_empty_file_matches_the_known_constant(self, tmp_path):
+        from app.crypto.hashing import file_sha256
+
+        path = tmp_path / "empty.bin"
+        path.write_bytes(b"")
+        assert file_sha256(str(path)) == EMPTY_SHA256
+
+    def test_file_and_bytes_digests_agree(self, tmp_path):
+        from app.crypto.hashing import file_sha256, sha256_hex
+
+        data = b"INF2005 media integrity"
+        path = tmp_path / "data.bin"
+        path.write_bytes(data)
+        assert file_sha256(str(path)) == sha256_hex(data)
+
+    def test_chunking_does_not_change_the_digest(self, tmp_path):
+        from app.crypto.hashing import file_sha256, sha256_hex
+
+        data = os.urandom(70_000)
+        path = tmp_path / "big.bin"
+        path.write_bytes(data)
+        assert file_sha256(str(path), chunk_bytes=7) == sha256_hex(data)
 
     def test_hashes_equal_is_case_insensitive_for_hex(self):
-        from app.crypto.hashing import compute_media_hash, hashes_equal
+        from app.crypto.hashing import hashes_equal, sha256_hex
 
-        digest = compute_media_hash(b"payload")
+        digest = sha256_hex(b"payload")
         assert hashes_equal(digest, digest.upper())
 
     def test_hashes_equal_rejects_mixed_forms(self):
@@ -74,6 +87,6 @@ class TestHashing:
             hashes_equal("abc", b"abc")
 
     def test_hashes_equal_detects_difference(self):
-        from app.crypto.hashing import compute_media_hash, hashes_equal
+        from app.crypto.hashing import hashes_equal, sha256_hex
 
-        assert not hashes_equal(compute_media_hash(b"a"), compute_media_hash(b"b"))
+        assert not hashes_equal(sha256_hex(b"a"), sha256_hex(b"b"))

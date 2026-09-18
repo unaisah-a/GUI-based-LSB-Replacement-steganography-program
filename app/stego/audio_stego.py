@@ -20,7 +20,6 @@ verified.
 from __future__ import annotations
 
 import os
-import tempfile
 from dataclasses import dataclass
 from typing import Final
 
@@ -28,34 +27,14 @@ import numpy as np
 import numpy.typing as npt
 import soundfile as sf
 
-from app.stego import paths
-from app.stego.bit_utils import (
-    bits_to_bytes,
-    bytes_to_bits,
-    groups_needed,
-    pack_bits_to_groups,
-    read_low_bits,
-    unpack_groups_to_bits,
-    validate_lsb_depth,
-    write_low_bits,
-)
-from app.stego.capacity import (
-    LENGTH_HEADER_BYTES,
-    MAX_PAYLOAD_LENGTH,
-    CapacityReport,
-    capacity_report,
-)
-from app.stego.errors import (
-    CapacityError,
-    DecodeError,
-    ExtractionError,
-    ValidationError,
-    safe_path,
-)
+from app.stego import lsb_core, paths
+from app.stego.bit_utils import validate_lsb_depth
+from app.stego.capacity import CapacityReport, capacity_report
+from app.stego.errors import DecodeError
+from app.utils import constants, file_utils
+from app.utils.file_utils import display_name
 
 __all__ = [
-    "AUDIO_SAMPLE_WIDTH_BITS",
-    "LENGTH_HEADER_BITS",
     "SUPPORTED_FORMAT",
     "SUPPORTED_SUBTYPE",
     "AudioDescriptor",
@@ -68,20 +47,10 @@ __all__ = [
     "write_audio",
 ]
 
-#: PCM samples are 16 bits wide.
-AUDIO_SAMPLE_WIDTH_BITS: Final[int] = 16
-
-#: The length header occupies the first 32 bits of the continuous bit stream,
-#: exactly as in the image layer.
-LENGTH_HEADER_BITS: Final[int] = LENGTH_HEADER_BYTES * 8
-
 SUPPORTED_FORMAT: Final[str] = "WAV"
 SUPPORTED_SUBTYPE: Final[str] = "PCM_16"
 
-
-# --------------------------------------------------------------------------- #
-# Descriptors
-# --------------------------------------------------------------------------- #
+_WIDTH = constants.AUDIO_SAMPLE_WIDTH_BITS
 
 
 @dataclass(frozen=True)
@@ -129,7 +98,7 @@ def _describe(path: str | os.PathLike[str], info: "sf._SoundFileInfo") -> AudioD
     channels = int(info.channels)
     frames = int(info.frames)
     return AudioDescriptor(
-        file_name=safe_path(path),
+        file_name=display_name(path),
         container_format=info.format,
         subtype=info.subtype,
         sample_rate=int(info.samplerate),
@@ -147,7 +116,7 @@ def describe_only(path: str | os.PathLike[str]) -> AudioDescriptor:
     count it would be wasteful.
     """
     paths.assert_readable(path)
-    name = safe_path(path)
+    name = display_name(path)
     try:
         info = sf.info(os.fspath(path))
     except Exception as exc:
@@ -212,19 +181,13 @@ def write_audio(
     moved into place, so an interrupted write cannot leave a truncated WAV that a
     receiver would later try to verify. The container and subtype are passed
     explicitly rather than inferred from the extension, both because the temporary
-    name has none and because inferring the format from a path is exactly the
+    name is not a plain ``.wav`` and because inferring the format from a path is exactly the
     mistake the image layer avoids.
     """
     array = np.ascontiguousarray(samples, dtype=np.int16)
     paths.check_output_writable(path, overwrite)
 
-    target = os.fspath(path)
-    directory = os.path.dirname(os.path.abspath(target)) or "."
-    handle, temporary = tempfile.mkstemp(
-        prefix=".partial-", suffix=os.path.basename(target), dir=directory
-    )
-    os.close(handle)
-    try:
+    with file_utils.atomic_output(path) as temporary:
         sf.write(
             temporary,
             array,
@@ -232,13 +195,6 @@ def write_audio(
             format=SUPPORTED_FORMAT,
             subtype=SUPPORTED_SUBTYPE,
         )
-        os.replace(temporary, target)
-    except BaseException:
-        try:
-            os.unlink(temporary)
-        except OSError:
-            pass
-        raise
 
 
 # --------------------------------------------------------------------------- #
@@ -296,56 +252,6 @@ def measure_capacity(
     return report, descriptor
 
 
-# --------------------------------------------------------------------------- #
-# Validation
-# --------------------------------------------------------------------------- #
-
-
-def _validate_payload(payload: object) -> bytes:
-    if not isinstance(payload, (bytes, bytearray)):
-        raise ValidationError(
-            f"payload must be bytes or bytearray, got type {type(payload).__name__}"
-        )
-    data = bytes(payload)
-    if len(data) > MAX_PAYLOAD_LENGTH:
-        raise ValidationError(
-            f"payload is {len(data)} bytes, which cannot be represented in the "
-            f"{LENGTH_HEADER_BYTES}-byte length header (maximum "
-            f"{MAX_PAYLOAD_LENGTH})"
-        )
-    return data
-
-
-def _validate_start_location(start_location: object, total_samples: int) -> int:
-    """Accepts ``numpy`` integers as well as ``int``, and rejects ``bool``.
-
-    ``True`` silently meaning index 1 would hide a caller mistake. Accepting
-    ``np.integer`` matters because a start location may arrive from numpy-derived
-    arithmetic.
-    """
-    if isinstance(start_location, bool) or not isinstance(
-        start_location, (int, np.integer)
-    ):
-        raise ValidationError(
-            f"start_location must be an integer, got type "
-            f"{type(start_location).__name__}"
-        )
-    value = int(start_location)
-    if total_samples == 0:
-        raise CapacityError("audio file has no embeddable samples")
-    if not 0 <= value < total_samples:
-        raise ValidationError(
-            f"start_location must be an integer from 0 to {total_samples - 1} "
-            f"inclusive, got {value}"
-        )
-    return value
-
-
-# --------------------------------------------------------------------------- #
-# Embedding
-# --------------------------------------------------------------------------- #
-
-
 def embed_audio(
     input_path: str,
     output_path: str,
@@ -356,15 +262,6 @@ def embed_audio(
     overwrite: bool = False,
 ) -> AudioEmbedResult:
     """Embed *payload* into the WAV cover at *input_path*.
-
-    The encoded stream is a 4-byte big-endian payload length followed by the
-    payload bytes. Its bits are written most-significant-bit first into the
-    ``lsb_count`` lowest-order bits of consecutive scalar samples from
-    *start_location*, never wrapping.
-
-    As in the image layer there is no realignment to a sample boundary after the
-    header: at depths that do not divide 32 the first payload bit sits partway
-    through a sample, and extraction reads the same continuous stream.
 
     Validation runs in a fixed order — input existence, input readability, output
     path distinct from input, output writability, payload type, LSB depth, start
@@ -379,45 +276,15 @@ def embed_audio(
     paths.assert_readable(input_path)
     paths.assert_distinct_paths(input_path, output_path)
     paths.check_output_writable(output_path, overwrite)
-    data = _validate_payload(payload)
+    data = lsb_core.validate_payload(payload)
     depth = validate_lsb_depth(lsb_count)
 
     samples, descriptor = read_audio(input_path)
     flat, channels = embeddable_stream(samples)
-    total_samples = int(flat.size)
-    start = _validate_start_location(start_location, total_samples)
+    total = int(flat.size)
+    start = lsb_core.validate_start_location(start_location, total, "audio file")
 
-    encoded = len(data).to_bytes(LENGTH_HEADER_BYTES, "big") + data
-    bits = bytes_to_bits(encoded)
-    group_count = groups_needed(int(bits.size), depth)
-
-    report = capacity_report(
-        total_samples,
-        depth,
-        start,
-        len(data),
-        embeddable_channels=channels,
-    )
-
-    available = total_samples - start
-    if group_count > available:
-        raise CapacityError(
-            f"payload does not fit: the encoded stream needs {len(encoded)} bytes "
-            f"({group_count} samples) at depth {depth} from start location {start}, "
-            f"but only {report.available_capacity_bytes} bytes ({available} samples) "
-            f"are available; the largest payload that fits is "
-            f"{report.max_payload_length} bytes"
-        )
-
-    groups = pack_bits_to_groups(bits, depth)
-    stego_flat = flat.copy()
-    stego_flat[start : start + group_count] = write_low_bits(
-        flat[start : start + group_count],
-        groups,
-        depth,
-        AUDIO_SAMPLE_WIDTH_BITS,
-    )
-
+    stego_flat, stream = lsb_core.embed_stream(flat, data, depth, start, _WIDTH)
     write_audio(
         _restore_shape(stego_flat, samples),
         output_path,
@@ -429,22 +296,15 @@ def embed_audio(
         output_path=os.fspath(output_path),
         container_format=descriptor.container_format,
         descriptor=descriptor,
-        capacity=report,
+        capacity=capacity_report(
+            total, depth, start, len(data), embeddable_channels=channels
+        ),
         lsb_count=depth,
         start_location=start,
         payload_length=len(data),
-        encoded_length=len(encoded),
-        samples_written=group_count,
+        encoded_length=stream.encoded_length,
+        samples_written=stream.samples_needed,
     )
-
-
-# --------------------------------------------------------------------------- #
-# Extraction
-# --------------------------------------------------------------------------- #
-
-
-def _decode_length_header(header_bits: npt.NDArray[np.uint8]) -> int:
-    return int.from_bytes(bits_to_bytes(header_bits[:LENGTH_HEADER_BITS]), "big")
 
 
 def extract_audio(
@@ -456,14 +316,8 @@ def extract_audio(
 ) -> bytes:
     """Extract an embedded payload from the stego WAV at *input_path*.
 
-    Reads in two stages, as the image layer does: only the samples needed for the
-    32-bit length header first, then a bounds check on the decoded length *before*
-    any payload buffer is sized. Without that check a corrupt or crafted header
-    could request a multi-gigabyte allocation.
-
     :param manifest_payload_length: when supplied, the decoded header must agree
-        with it. The header still determines how many bytes are read; the manifest
-        value is a cross-check, not an override.
+        with it; it is a cross-check, not an override.
     :raises ExtractionError: the decoded length is inconsistent with the file's
         capacity, the bit stream is truncated, or the manifest length disagrees.
         The message never asserts which cause applies, because they are
@@ -474,59 +328,15 @@ def extract_audio(
 
     samples, _ = read_audio(input_path)
     flat, _ = embeddable_stream(samples)
-    total_samples = int(flat.size)
-    start = _validate_start_location(start_location, total_samples)
+    total = int(flat.size)
+    start = lsb_core.validate_start_location(start_location, total, "audio file")
 
-    available = total_samples - start
-    header_groups = groups_needed(LENGTH_HEADER_BITS, depth)
-    if available < header_groups:
-        raise ExtractionError(
-            f"bit stream is truncated: reading a {LENGTH_HEADER_BITS}-bit length "
-            f"header at depth {depth} needs {header_groups} samples from start "
-            f"location {start}, but only {available} are available"
-        )
-
-    header_bits = unpack_groups_to_bits(
-        read_low_bits(
-            flat[start : start + header_groups], depth, AUDIO_SAMPLE_WIDTH_BITS
-        ),
+    return lsb_core.extract_stream(
+        lambda begin, end: flat[begin:end],
+        total,
         depth,
+        start,
+        _WIDTH,
+        "audio file",
+        manifest_payload_length=manifest_payload_length,
     )
-    payload_length = _decode_length_header(header_bits)
-
-    available_capacity = (available * depth) // 8
-    max_payload = max(0, available_capacity - LENGTH_HEADER_BYTES)
-    if payload_length > max_payload:
-        raise ExtractionError(
-            f"decoded payload length {payload_length} is inconsistent with the "
-            f"audio capacity: at depth {depth} from start location {start} the file "
-            f"can hold at most {max_payload} payload bytes"
-        )
-
-    if manifest_payload_length is not None and payload_length != manifest_payload_length:
-        raise ExtractionError(
-            f"decoded payload length {payload_length} disagrees with the manifest "
-            f"payload length {manifest_payload_length}"
-        )
-
-    if payload_length == 0:
-        return b""
-
-    total_bits = LENGTH_HEADER_BITS + payload_length * 8
-    needed_groups = groups_needed(total_bits, depth)
-    if needed_groups > available:
-        raise ExtractionError(
-            f"bit stream is truncated: a {payload_length}-byte payload needs "
-            f"{needed_groups} samples at depth {depth} from start location {start}, "
-            f"but only {available} are available"
-        )
-
-    stream_bits = unpack_groups_to_bits(
-        read_low_bits(
-            flat[start : start + needed_groups], depth, AUDIO_SAMPLE_WIDTH_BITS
-        ),
-        depth,
-    )
-    # Continuous stream: payload bits follow the header with no realignment, and
-    # trailing padding bits beyond the payload are discarded.
-    return bits_to_bytes(stream_bits[LENGTH_HEADER_BITS:total_bits])

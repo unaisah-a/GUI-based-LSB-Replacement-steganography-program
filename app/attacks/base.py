@@ -28,6 +28,7 @@ import shutil
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
+from app.errors import AppError
 from app.utils import file_utils
 
 __all__ = [
@@ -39,7 +40,7 @@ __all__ = [
 ]
 
 
-class AttackError(Exception):
+class AttackError(AppError):
     """An attack that could not be carried out on the supplied file."""
 
 

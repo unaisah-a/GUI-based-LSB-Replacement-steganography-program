@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from app.errors import AppError
 
 __all__ = [
     "encoded_length",
@@ -53,7 +54,7 @@ __all__ = [
 ]
 
 
-class RedundancyError(Exception):
+class RedundancyError(AppError):
     """A repetition factor or an encoded payload that cannot be used."""
 
 

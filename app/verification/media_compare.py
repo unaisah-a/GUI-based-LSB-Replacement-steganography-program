@@ -33,6 +33,7 @@ from typing import Any
 
 from app.analysis import quality_metrics
 from app.analysis.quality_metrics import QualityReport
+from app.crypto import hashing
 from app.stego import audio_stego, image_io, media
 from app.stego.errors import ComparisonError
 from app.utils import constants, file_utils, media_utils
@@ -175,10 +176,10 @@ def _common_rows(original_path: str, stego_path: str) -> list[ComparisonRow]:
         ),
         ComparisonRow(
             label="SHA-256",
-            original=file_utils.file_sha256(original_path)[:16] + "...",
-            stego=file_utils.file_sha256(stego_path)[:16] + "...",
-            equal=file_utils.file_sha256(original_path)
-            == file_utils.file_sha256(stego_path),
+            original=hashing.file_sha256(original_path)[:16] + "...",
+            stego=hashing.file_sha256(stego_path)[:16] + "...",
+            equal=hashing.file_sha256(original_path)
+            == hashing.file_sha256(stego_path),
             structural=False,
             note=_DIGEST_NOTE,
         ),

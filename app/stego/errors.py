@@ -4,22 +4,18 @@ Requirement 14.7 asks for exactly five distinct exception types, each a direct
 subclass of a single common base type, so that a caller can catch one named
 category or the whole layer with a single handler.
 
-This module lives in ``app/stego/`` rather than ``app/utils/constants.py``
-because the hierarchy is owned by this layer. The audio layer reuses
-``bit_utils`` and ``capacity``, both of which raise :class:`ValidationError`,
-so the audio layer will import from here too. That is the coordination cost of
-the choice: ``app/stego/errors.py`` becomes a shared module rather than a
-private one. The alternative, putting the base class in ``app/utils/``, would
-have spread one layer's error vocabulary across two owners for no gain.
+Image, audio and video all raise from this hierarchy, and :class:`StegoError`
+derives from :class:`app.errors.AppError`, which caps every message at 500
+characters (Requirement 14.9).
 
-Requirement 14.9 requires every message to name the failed check and report the
-offending value, and to exclude the directory portion of any filesystem path.
-Use :func:`safe_path` when a path appears in a message.
+Requirement 14.9 also requires every message to name the failed check and report
+the offending value, and to exclude the directory portion of any filesystem path.
+Use :func:`app.utils.file_utils.display_name` when a path appears in a message.
 """
 
 from __future__ import annotations
 
-import os
+from app.errors import AppError
 
 __all__ = [
     "StegoError",
@@ -29,36 +25,14 @@ __all__ = [
     "CapacityError",
     "ExtractionError",
     "ComparisonError",
-    "safe_path",
-    "MAX_MESSAGE_LENGTH",
 ]
 
-#: Requirement 14.9 caps error messages at 500 characters.
-MAX_MESSAGE_LENGTH = 500
 
-
-def safe_path(path: object) -> str:
-    """Return only the file name component of *path*.
-
-    Requirement 14.9 forbids the directory portion of a filesystem path from
-    appearing in an error message, so that messages surfaced in the GUI do not
-    leak the user's directory layout.
-    """
-    text = os.fspath(path) if hasattr(path, "__fspath__") else str(path)
-    name = os.path.basename(text.rstrip("\\/"))
-    return name or text
-
-
-class StegoError(Exception):
-    """Common base type for every error raised by the image steganography layer.
+class StegoError(AppError):
+    """Common base type for every error raised by the steganography layer.
 
     Requirement 14.7. Catching this catches every category below.
     """
-
-    def __init__(self, message: str) -> None:
-        if len(message) > MAX_MESSAGE_LENGTH:
-            message = message[: MAX_MESSAGE_LENGTH - 3] + "..."
-        super().__init__(message)
 
 
 class FileError(StegoError):

@@ -29,6 +29,7 @@ import numpy as np
 import numpy.typing as npt
 
 from app.stego.errors import ValidationError
+from app.utils import constants
 
 __all__ = [
     "MIN_LSB_DEPTH",
@@ -47,11 +48,14 @@ __all__ = [
 ]
 
 #: Requirement 13.4 and 14.3: LSB depth is an integer from 1 to 8 inclusive.
-MIN_LSB_DEPTH: Final[int] = 1
-MAX_LSB_DEPTH: Final[int] = 8
+MIN_LSB_DEPTH: Final[int] = constants.MIN_LSB_DEPTH
+MAX_LSB_DEPTH: Final[int] = constants.MAX_LSB_DEPTH
 
-#: Requirement 13.4: 8-bit image samples and 16-bit PCM audio samples.
-SUPPORTED_SAMPLE_WIDTHS: Final[tuple[int, ...]] = (8, 16)
+#: Requirement 13.4: 8-bit image and video samples and 16-bit PCM audio samples.
+SUPPORTED_SAMPLE_WIDTHS: Final[tuple[int, ...]] = (
+    constants.IMAGE_SAMPLE_WIDTH_BITS,
+    constants.AUDIO_SAMPLE_WIDTH_BITS,
+)
 
 #: Requirement 13.1 and 13.3: conversion is specified for up to 64 MiB.
 MAX_CONVERTIBLE_BYTES: Final[int] = 67_108_864

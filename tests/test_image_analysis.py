@@ -583,7 +583,7 @@ class TestHonestReporting:
 
     def test_every_result_names_itself_and_its_scope(self, every_indicator):
         for result in every_indicator:
-            assert result.indicator
+            assert result.name
             assert result.scope
             assert result.analysed_sample_count >= 0
 
@@ -598,7 +598,7 @@ class TestHonestReporting:
             "is_stego",
             "score",
         )
-        names = {field.name for field in dataclasses.fields(analysis.IndicatorResult)}
+        names = {field.name for field in dataclasses.fields(analysis.Indicator)}
         for token in forbidden:
             assert not any(token in name for name in names), token
         for result in every_indicator:
