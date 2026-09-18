@@ -285,7 +285,7 @@ it is not shipped.
 in the sense the literature means, recovering the cover from the stego object alone. It
 is also a different embedding scheme: it shares none of the bit and capacity primitives
 this project is built on, carries far less payload at comparable distortion, and would
-stand beside the required LSB implementation rather than extend it. README §11 asks for
+stand beside the required LSB implementation rather than extend it. The planning reference (docs/planning_reference.md §11) asks for
 it as an optional innovation and explicitly not as a replacement for the LSB spine. The
 three innovations that were built — repetition coding with majority voting, video
 embedding, and the file-size preservation experiments — reuse the existing layers and

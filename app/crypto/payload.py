@@ -1,6 +1,6 @@
 """Composition of the protected payload, and recovery of the message from it.
 
-This module is the cryptography layer's front door. It is what the README's
+This module is the cryptography layer's front door. It is what the planning reference's
 shared interface calls ``create_payload``: everything the sender side needs, in
 one call, producing the opaque bytes the steganography layer embeds.
 
