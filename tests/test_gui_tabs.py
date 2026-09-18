@@ -786,3 +786,207 @@ class TestProtectThenVerifyThroughTheTabs:
         verify.drop_zone.accept_path(result.stego_path)
         assert verify.passphrase_edit.isEnabled() is True
         assert verify.start_secret_edit.isEnabled() is True
+
+
+# --------------------------------------------------------------------------- #
+# File payloads: any bytes in, the same bytes out
+# --------------------------------------------------------------------------- #
+
+
+@pytest.fixture()
+def png_payload(tmp_path):
+    """A real PNG file to carry as the payload, not as the cover."""
+    path = tmp_path / "logo.png"
+    path.write_bytes(image_io.encode_image(make_cover(16, 16, 3), image_io.PNG))
+    return str(path)
+
+
+@pytest.fixture()
+def wav_payload(tmp_path):
+    directory = tmp_path / "payloads"
+    directory.mkdir()
+    return write_audio_file(str(directory), make_audio(800), name="clip")
+
+
+class TestProtectTabFilePayload:
+    def test_text_mode_is_the_default(self, protect_tab):
+        assert protect_tab.payload_mode == ProtectTab.PAYLOAD_TEXT
+        assert protect_tab.payload_metadata() == {}
+
+    def test_the_file_dialog_offers_images_and_audio(
+        self, protect_tab, png_payload, monkeypatch
+    ):
+        offered = []
+
+        def fake_dialog(parent, caption, directory, filters):
+            offered.append(filters)
+            return png_payload, ""
+
+        monkeypatch.setattr(
+            "app.gui.protect_tab.QFileDialog.getOpenFileName", fake_dialog
+        )
+        protect_tab._load_message_from_file()
+
+        for pattern in ("*.txt", "*.png", "*.bmp", "*.jpg", "*.wav", "*.mp3"):
+            assert pattern in offered[0]
+        assert protect_tab.payload_file_path == png_payload
+
+    def test_choosing_a_file_switches_to_file_mode_and_keeps_raw_bytes(
+        self, protect_tab, png_payload
+    ):
+        raw = Path(png_payload).read_bytes()
+        assert protect_tab.set_payload_file(png_payload)
+
+        assert protect_tab.payload_mode == ProtectTab.PAYLOAD_FILE
+        assert protect_tab.message_bytes() == raw
+        assert protect_tab.message_length_label.text() == f"{len(raw):,} bytes"
+
+    def test_a_binary_file_is_accepted_not_rejected(self, protect_tab, tmp_path):
+        """The old control refused anything that was not UTF-8."""
+        path = tmp_path / "blob.bin"
+        path.write_bytes(bytes(range(256)))
+        assert protect_tab.set_payload_file(str(path))
+        assert protect_tab.message_bytes() == bytes(range(256))
+
+    def test_the_file_is_described(self, protect_tab, png_payload):
+        protect_tab.set_payload_file(png_payload)
+        text = protect_tab.payload_file_label.text()
+        assert "logo.png" in text
+        assert "PNG image" in text
+        assert "bytes" in text
+
+    def test_the_name_and_type_are_recorded_as_metadata(
+        self, protect_tab, png_payload
+    ):
+        protect_tab.set_payload_file(png_payload)
+        assert protect_tab.payload_metadata() == {
+            "filename": "logo.png",
+            "content_type": "image/png",
+        }
+
+    def test_switching_back_to_text_uses_the_typed_message(
+        self, protect_tab, png_payload
+    ):
+        protect_tab.message_edit.setPlainText("typed")
+        protect_tab.set_payload_file(png_payload)
+        protect_tab.payload_mode_combo.setCurrentIndex(
+            protect_tab.payload_mode_combo.findData(ProtectTab.PAYLOAD_TEXT)
+        )
+        assert protect_tab.message_bytes() == b"typed"
+        assert protect_tab.payload_metadata() == {}
+
+    def test_file_mode_without_a_file_is_refused(
+        self, protect_tab, png_cover, key_files, tmp_path
+    ):
+        private_path, _ = key_files
+        configure(protect_tab, png_cover, private_path, str(tmp_path / "s.png"))
+        protect_tab.payload_mode_combo.setCurrentIndex(
+            protect_tab.payload_mode_combo.findData(ProtectTab.PAYLOAD_FILE)
+        )
+        assert "payload file" in protect_tab.validation_error()
+
+    def test_the_prediction_counts_the_metadata(
+        self, protect_tab, wav_cover, png_payload, key_files, tmp_path
+    ):
+        """The read-out must still match what is embedded, to the byte."""
+        private_path, _ = key_files
+        configure(protect_tab, wav_cover, private_path, str(tmp_path / "s.wav"))
+        protect_tab.set_payload_file(png_payload)
+
+        predicted = protect_tab._estimated_envelope_length()
+        result = protect_tab._run_protect(protect_tab._collect_inputs())
+
+        assert predicted == result.envelope_length
+        assert result.record.metadata["filename"] == "logo.png"
+
+
+class TestFilePayloadThroughBothTabs:
+    def _send_and_receive(self, qtbot, cover, payload, key_files, tmp_path, output):
+        private_path, public_path = key_files
+        protect = ProtectTab()
+        verify = VerifyTab()
+        qtbot.addWidget(protect)
+        qtbot.addWidget(verify)
+
+        configure(protect, cover, private_path, str(tmp_path / output))
+        protect.set_payload_file(payload)
+        result = protect._run_protect(protect._collect_inputs())
+
+        verify.drop_zone.accept_path(result.stego_path)
+        verify.key_edit.setText(public_path)
+        verify.start_secret_edit.setText(START_SECRET)
+        outcome = verify._run_verify(verify._collect_inputs())
+        verify._on_verified(outcome)
+        return verify, outcome
+
+    def test_a_png_in_a_wav_is_recovered_previewed_and_saved(
+        self, qtbot, wav_cover, png_payload, key_files, tmp_path
+    ):
+        verify, outcome = self._send_and_receive(
+            qtbot, wav_cover, png_payload, key_files, tmp_path, "sent.wav"
+        )
+        raw = Path(png_payload).read_bytes()
+
+        assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
+        assert outcome.message == raw
+
+        preview = verify.payload_preview_path
+        assert preview is not None and preview.endswith(".png")
+        assert Path(preview).read_bytes() == raw
+
+        panel = verify.result_panel
+        assert panel.save_enabled
+        assert panel.suggested_filename() == "logo.png"
+        assert "PNG image" in panel.payload_info_text
+
+        saved = panel.save_payload(str(tmp_path / "restored.png"))
+        assert Path(saved).read_bytes() == raw
+
+    def test_a_wav_payload_is_offered_for_playback(
+        self, qtbot, wav_payload, key_files, tmp_path
+    ):
+        cover = write_cover(str(tmp_path), make_cover(128, 128, 3), image_io.PNG, "big")
+        verify, outcome = self._send_and_receive(
+            qtbot, cover, wav_payload, key_files, tmp_path, "sent.png"
+        )
+
+        assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
+        assert verify.payload_preview_path.endswith(".wav")
+        assert verify.result_panel.suggested_filename() == "clip.wav"
+
+    def test_the_temporary_copy_is_removed_when_the_next_file_is_loaded(
+        self, qtbot, wav_cover, png_payload, key_files, tmp_path
+    ):
+        verify, _ = self._send_and_receive(
+            qtbot, wav_cover, png_payload, key_files, tmp_path, "sent.wav"
+        )
+        preview = verify.payload_preview_path
+
+        verify.drop_zone.accept_path(wav_cover)
+
+        assert verify.payload_preview_path is None
+        assert not Path(preview).exists()
+
+    def test_a_text_payload_is_not_previewed(
+        self, qtbot, png_cover, key_files, tmp_path
+    ):
+        private_path, public_path = key_files
+        protect = ProtectTab()
+        verify = VerifyTab()
+        qtbot.addWidget(protect)
+        qtbot.addWidget(verify)
+        configure(protect, png_cover, private_path, str(tmp_path / "sent.png"))
+        result = protect._run_protect(protect._collect_inputs())
+
+        verify.drop_zone.accept_path(result.stego_path)
+        verify.key_edit.setText(public_path)
+        verify.start_secret_edit.setText(START_SECRET)
+        verify._on_verified(verify._run_verify(verify._collect_inputs()))
+
+        assert verify.payload_preview_path is None
+        assert verify.result_panel.payload_text == MESSAGE
+        assert verify.result_panel.suggested_filename() == "recovered_payload.txt"
+
+    def test_nothing_to_save_without_a_message(self, verify_tab):
+        assert not verify_tab.result_panel.save_enabled
+        assert verify_tab.result_panel.suggested_filename() is None

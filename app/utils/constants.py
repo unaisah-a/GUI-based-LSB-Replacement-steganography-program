@@ -267,6 +267,7 @@ FILE_CHANGED_NOTICE: Final[str] = (
 )
 
 EXTRACTED_CONTENT_NOTICE: Final[str] = (
-    "Recovered content is displayed as inert text or a hex dump only. It is "
-    "never executed, and never handed to the operating system to open."
+    "Recovered content is displayed as inert text or a hex dump, and a recognised "
+    "image or audio file is previewed inside this application. It is never "
+    "executed, and never handed to the operating system to open."
 )

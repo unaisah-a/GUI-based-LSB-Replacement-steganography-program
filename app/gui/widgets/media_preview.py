@@ -78,6 +78,7 @@ class MediaPreview(QWidget):
         self._message_label.setObjectName("mediaPreviewMessage")
         self._message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._message_label.setWordWrap(True)
+        self._message_label.setTextFormat(Qt.TextFormat.PlainText)
         self._stack.addWidget(self._message_label)
 
         # Page 1: a still image.
@@ -116,6 +117,7 @@ class MediaPreview(QWidget):
         self._caption = QLabel("", self)
         self._caption.setObjectName("mediaPreviewCaption")
         self._caption.setWordWrap(True)
+        self._caption.setTextFormat(Qt.TextFormat.PlainText)
         outer.addWidget(self._caption)
 
     # -- state ------------------------------------------------------------- #
@@ -133,6 +135,10 @@ class MediaPreview(QWidget):
 
     def clear(self) -> None:
         self.stop()
+        if self._player is not None:
+            # Release the file, so a temporary copy can be deleted on Windows.
+            self._player.setSource(QUrl())
+        self._pixmap = None
         self._path = None
         self._image_label.clear()
         self._caption.setText("")
@@ -145,8 +151,20 @@ class MediaPreview(QWidget):
 
     # -- loading ----------------------------------------------------------- #
 
-    def show_file(self, path: str | os.PathLike[str]) -> bool:
-        """Present the file at *path*. Returns whether it could be presented."""
+    def show_file(
+        self,
+        path: str | os.PathLike[str],
+        *,
+        media_type: str | None = None,
+        caption: str | None = None,
+    ) -> bool:
+        """Present the file at *path*. Returns whether it could be presented.
+
+        By default the type is detected with the cover-object rules, which refuse
+        lossy formats. A recovered payload may legitimately be a JPEG or an MP3, so
+        a caller that has already identified the content passes *media_type*
+        (``"image"`` or ``"audio"``) and a *caption* instead.
+        """
         target = os.fspath(path)
         self.stop()
         self._path = target
@@ -154,19 +172,22 @@ class MediaPreview(QWidget):
         if not os.path.isfile(target):
             return self._fail(f"{file_utils.display_name(target)} is not a file")
 
-        try:
-            description = file_utils.describe_file(target)
-        except file_utils.UnsupportedMediaError as exc:
-            return self._fail(str(exc))
+        if media_type is None:
+            try:
+                description = file_utils.describe_file(target)
+            except file_utils.UnsupportedMediaError as exc:
+                return self._fail(str(exc))
+            media_type = description.media_type
+            caption = (
+                f"{description.name} - {description.container_format}, "
+                f"{description.size_human}"
+            )
 
-        self._caption.setText(
-            f"{description.name} - {description.container_format}, "
-            f"{description.size_human}"
-        )
+        self._caption.setText(caption or file_utils.display_name(target))
 
-        if description.media_type == constants.MEDIA_IMAGE:
+        if media_type == constants.MEDIA_IMAGE:
             return self._show_image(target)
-        return self._show_playable(target, description.media_type)
+        return self._show_playable(target, media_type)
 
     def _fail(self, reason: str) -> bool:
         self._controls.setVisible(False)
@@ -217,7 +238,6 @@ class MediaPreview(QWidget):
                 f"file cannot be played. Its properties and quality metrics are "
                 f"still shown."
             )
-
 
         self._player.setSource(QUrl.fromLocalFile(os.path.abspath(path)))
         self._controls.setVisible(True)

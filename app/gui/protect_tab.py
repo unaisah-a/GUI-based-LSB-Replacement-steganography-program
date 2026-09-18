@@ -28,7 +28,8 @@ to write over its own input, it is difficult to destroy a cover object by accide
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
 
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (
@@ -46,6 +47,7 @@ from PySide6.QtWidgets import (
     QSlider,
     QSpinBox,
     QSplitter,
+    QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -61,7 +63,7 @@ from app.gui.workers import BackgroundRunner
 from app.robustness import error_correction
 from app.stego import media
 from app.stego.errors import StegoError
-from app.utils import constants, file_utils
+from app.utils import constants, file_utils, payload_files
 from app.utils.logging_utils import get_logger
 from app.verification.protect import ProtectResult, protect_media
 
@@ -101,6 +103,8 @@ class ProtectInputs:
     passphrase: str | None
     ecc: ErrorCorrectionParameters | None
     match_cover_size: bool
+    #: The original file name and type of a file payload; empty for typed text.
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 def _cover_prompt() -> str:
@@ -120,6 +124,10 @@ class ProtectTab(QWidget):
 
     TITLE = "Protect"
 
+    #: The two ways of supplying the payload.
+    PAYLOAD_TEXT = "text"
+    PAYLOAD_FILE = "file"
+
     #: Emitted with the result so other tabs can pick the file up.
     mediaProtected = Signal(object)
     #: Emitted with a message for the window's status bar.
@@ -133,6 +141,8 @@ class ProtectTab(QWidget):
         self._cover_path: str | None = None
         self._cover_media_type: str = constants.MEDIA_IMAGE
         self._result: ProtectResult | None = None
+        # A file payload: its path and raw bytes. The bytes are never decoded.
+        self._payload_file: tuple[str, bytes] | None = None
         # The signature length depends on the modulus of the key actually selected,
         # so the capacity read-out cannot assume the default size. Kept up to date by
         # _read_key_size and used by _estimated_envelope_length.
@@ -254,15 +264,38 @@ class ProtectTab(QWidget):
 
         layout.addWidget(settings)
 
-        message_box = QGroupBox("Message", container)
+        message_box = QGroupBox("Payload", container)
         message_layout = QVBoxLayout(message_box)
-        self.message_edit = QPlainTextEdit(message_box)
+
+        self.payload_mode_combo = QComboBox(message_box)
+        self.payload_mode_combo.addItem("Typed text", self.PAYLOAD_TEXT)
+        self.payload_mode_combo.addItem(
+            "A file (text, image, audio or any other)", self.PAYLOAD_FILE
+        )
+        self.payload_mode_combo.currentIndexChanged.connect(self._on_payload_mode_changed)
+        message_layout.addWidget(self.payload_mode_combo)
+
+        self.payload_stack = QStackedWidget(message_box)
+
+        self.message_edit = QPlainTextEdit(self.payload_stack)
         self.message_edit.setPlaceholderText("Type the message to protect...")
         self.message_edit.textChanged.connect(self._update_readout)
-        message_layout.addWidget(self.message_edit)
+        self.payload_stack.addWidget(self.message_edit)
+
+        file_page = QWidget(self.payload_stack)
+        file_layout = QVBoxLayout(file_page)
+        file_layout.setContentsMargins(0, 0, 0, 0)
+        self.payload_file_label = QLabel("No file selected.", file_page)
+        # The name is the user's own, but it is still shown as plain text.
+        self.payload_file_label.setTextFormat(Qt.TextFormat.PlainText)
+        self.payload_file_label.setWordWrap(True)
+        file_layout.addWidget(self.payload_file_label)
+        file_layout.addStretch(1)
+        self.payload_stack.addWidget(file_page)
+        message_layout.addWidget(self.payload_stack, 1)
 
         message_buttons = QHBoxLayout()
-        self.load_message_button = QPushButton("Load from file...", message_box)
+        self.load_message_button = QPushButton("Choose payload file...", message_box)
         self.load_message_button.clicked.connect(self._load_message_from_file)
         message_buttons.addWidget(self.load_message_button)
         self.message_length_label = QLabel("0 bytes", message_box)
@@ -351,8 +384,26 @@ class ProtectTab(QWidget):
     def lsb_depth(self) -> int:
         return self.depth_slider.value()
 
+    @property
+    def payload_mode(self) -> str:
+        return self.payload_mode_combo.currentData()
+
+    @property
+    def payload_file_path(self) -> str | None:
+        return None if self._payload_file is None else self._payload_file[0]
+
     def message_bytes(self) -> bytes:
+        """The exact bytes that will be signed and embedded."""
+        if self.payload_mode == self.PAYLOAD_FILE:
+            return b"" if self._payload_file is None else self._payload_file[1]
         return self.message_edit.toPlainText().encode("utf-8")
+
+    def payload_metadata(self) -> dict[str, Any]:
+        """What the receiver needs to restore a file payload under a sensible name."""
+        if self.payload_mode != self.PAYLOAD_FILE or self._payload_file is None:
+            return {}
+        path, data = self._payload_file
+        return payload_files.metadata_for_file(path, data)
 
     def _load_default_key(self) -> None:
         """Pre-fill the demo private key path when it already exists."""
@@ -361,6 +412,12 @@ class ProtectTab(QWidget):
             self.key_edit.setText(private_path)
 
     # -- reactions --------------------------------------------------------- #
+
+    def _on_payload_mode_changed(self) -> None:
+        self.payload_stack.setCurrentIndex(
+            1 if self.payload_mode == self.PAYLOAD_FILE else 0
+        )
+        self._update_readout()
 
     def _on_depth_changed(self, value: int) -> None:
         self.depth_label.setText(str(value))
@@ -468,6 +525,7 @@ class ProtectTab(QWidget):
             ),
             encryption=encryption,
             ecc=self._ecc_parameters(),
+            metadata=self.payload_metadata(),
         )
 
     def _ecc_parameters(self) -> ErrorCorrectionParameters | None:
@@ -572,26 +630,47 @@ class ProtectTab(QWidget):
 
     def _load_message_from_file(self) -> None:
         path, _ = QFileDialog.getOpenFileName(
-            self, "Load a message", "", "Text files (*.txt);;All files (*)"
+            self, "Choose the payload file", "", payload_files.PAYLOAD_FILE_FILTER
         )
-        if not path:
-            return
+        if path:
+            self.set_payload_file(path)
+
+    def set_payload_file(self, path: str) -> bool:
+        """Use the file at *path* as the payload, byte for byte.
+
+        The bytes are kept exactly as read and never decoded, so an image, a WAV or
+        any other file round-trips unchanged. Switches the tab to file mode.
+        Returns whether the file was accepted.
+        """
         try:
+            size = os.path.getsize(path)
+            if size > payload_files.MAX_PAYLOAD_FILE_BYTES:
+                raise OSError(
+                    f"{file_utils.display_name(path)} is "
+                    f"{file_utils.human_size(size)}, larger than any cover here can "
+                    f"carry"
+                )
             with open(path, "rb") as handle:
                 data = handle.read()
         except OSError as exc:
-            QMessageBox.warning(self, "Load message", str(exc))
-            return
+            QMessageBox.warning(self, "Payload file", str(exc))
+            return False
 
-        try:
-            self.message_edit.setPlainText(data.decode("utf-8"))
-        except UnicodeDecodeError:
-            QMessageBox.warning(
-                self,
-                "Load message",
-                f"{file_utils.display_name(path)} is not UTF-8 text. The message box "
-                f"holds text; a binary payload is not supported through this control.",
-            )
+        self._payload_file = (path, data)
+        detected = payload_files.detect_payload_type(data)
+        self.payload_file_label.setText(
+            f"{file_utils.display_name(path)}\n"
+            f"{file_utils.human_size(len(data))} ({len(data):,} bytes)\n"
+            f"Detected type: {detected.label} ({detected.content_type})\n\n"
+            f"The file is embedded exactly as it is. Its name and type are recorded "
+            f"in the signed record so the receiver can save it under the same name."
+        )
+        index = self.payload_mode_combo.findData(self.PAYLOAD_FILE)
+        if self.payload_mode_combo.currentIndex() != index:
+            self.payload_mode_combo.setCurrentIndex(index)
+        else:
+            self._update_readout()
+        return True
 
     def _choose_output_path(self) -> None:
         suggested = self.output_edit.text() or ""
@@ -620,6 +699,8 @@ class ProtectTab(QWidget):
             return "Select a cover object first."
         if not self.media_id_edit.text().strip():
             return "Enter a media ID. It identifies this file in the signed record."
+        if self.payload_mode == self.PAYLOAD_FILE and self._payload_file is None:
+            return "Choose the payload file, or switch back to typed text."
         if not self.output_edit.text().strip():
             return "Choose where to write the stego file."
         if not self.key_edit.text().strip():
@@ -674,6 +755,7 @@ class ProtectTab(QWidget):
             ),
             ecc=self._ecc_parameters(),
             match_cover_size=self.match_size_check.isChecked(),
+            metadata=self.payload_metadata(),
         )
 
     @staticmethod
@@ -691,6 +773,7 @@ class ProtectTab(QWidget):
             manual_start_location=inputs.manual_start_location,
             passphrase=inputs.passphrase,
             ecc=inputs.ecc,
+            metadata=inputs.metadata or None,
             match_cover_size=inputs.match_cover_size,
         )
 

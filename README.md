@@ -78,7 +78,8 @@ Regenerate the samples with `python scripts/generate_samples.py`.
    key to `keys/public/`. The Protect and Verify tabs pick them up automatically.
 
 2. **Protect (party A).** On the **Protect** tab, drop in
-   `samples/images/original/cover.png`, type a message, pick an LSB depth, keep the
+   `samples/images/original/cover.png`, type a message (or switch the payload to
+   *A file* and choose any text, image or audio file), pick an LSB depth, keep the
    *derived* start method and enter a start secret. Optionally tick *Encrypt* and
    enter a passphrase. Click **Protect**. You get a stego PNG and its
    `.manifest.json`, and the tab lists which secrets the receiver needs.
@@ -86,7 +87,9 @@ Regenerate the samples with `python scripts/generate_samples.py`.
 3. **Verify (party B).** On the **Verify** tab, load the stego file. The manifest is
    found beside it and the demo public key is filled in. Enter the same start secret
    (and passphrase, if you used one) and click **Verify**. The verdict should be
-   `AUTHENTIC`, with the recovered message. A wrong secret gives `PAYLOAD_MISSING`,
+   `AUTHENTIC`, with the recovered message. A recovered image or audio file is shown
+   or played in the tab, and **Save recovered payload...** writes it out under its
+   original name. A wrong secret gives `PAYLOAD_MISSING`,
    and a different public key gives `SIGNATURE_INVALID`.
 
 4. **Attack it.** On the **Attack Lab** tab, load the same stego file, choose an attack

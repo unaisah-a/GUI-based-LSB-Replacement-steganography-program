@@ -700,6 +700,37 @@ class TestScopeOfAuthenticity:
             assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
 
 
+class TestBinaryPayloads:
+    """A payload is bytes, not text: a whole file must survive byte for byte."""
+
+    def test_a_png_payload_in_a_wav_cover_round_trips(self, tmp_path, keys):
+        _, public_key = keys
+        cover = write_audio_file(str(tmp_path), make_audio(40_000))
+        payload = image_io.encode_image(make_cover(24, 24, 3), image_io.PNG)
+        assert payload.startswith(b"\x89PNG") and len(payload) > 1_000
+
+        result = do_protect(
+            cover,
+            tmp_path,
+            keys,
+            message=payload,
+            metadata={"filename": "logo.png", "content_type": "image/png"},
+        )
+        outcome = verify_media(
+            result.stego_path,
+            result.manifest_path,
+            public_key,
+            start_secret=START_SECRET,
+        )
+
+        assert outcome.verdict == verdicts.VERDICT_AUTHENTIC
+        assert outcome.message == payload
+        assert outcome.record.metadata == {
+            "filename": "logo.png",
+            "content_type": "image/png",
+        }
+
+
 # --------------------------------------------------------------------------- #
 # Protect-side behaviour
 # --------------------------------------------------------------------------- #

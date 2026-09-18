@@ -20,11 +20,22 @@ The manifest is picked up automatically from the conventional
 ``<stego file>.manifest.json`` beside the file, because that is where the Protect tab
 writes it and it is what a receiver will normally have. It can still be chosen
 explicitly, for the case where the two arrived separately or were renamed.
+
+Previewing a recovered file
+---------------------------
+When the recovered bytes are an image or an audio file, they are written to a
+private temporary directory and shown in a :class:`MediaPreview`, the same widget
+that shows cover objects. The type is decided by sniffing the bytes, not by the
+sender's type hint, and the copy is only ever rendered or played inside this
+process. It is deleted when the next file or result replaces it.
 """
 
 from __future__ import annotations
 
 import os
+import shutil
+import tempfile
+import weakref
 from dataclasses import dataclass
 
 from PySide6.QtCore import Qt, Signal
@@ -49,7 +60,7 @@ from app.gui.widgets.file_info_panel import FileInfoPanel
 from app.gui.widgets.media_preview import MediaPreview
 from app.gui.widgets.result_panel import ResultPanel
 from app.gui.workers import BackgroundRunner
-from app.utils import constants, file_utils
+from app.utils import constants, file_utils, payload_files
 from app.utils.logging_utils import get_logger
 from app.verification import media_compare
 from app.verification.verdicts import VerificationResult
@@ -88,6 +99,10 @@ class VerifyTab(QWidget):
         self._stego_path: str | None = None
         self._original_path: str | None = None
         self._result: VerificationResult | None = None
+        # Removes the temporary copy of a recovered file that is being previewed.
+        # A finalizer, so the copy is also removed if the tab is simply discarded
+        # or the application exits.
+        self._payload_cleanup: weakref.finalize | None = None
 
         outer = QVBoxLayout(self)
 
@@ -182,6 +197,13 @@ class VerifyTab(QWidget):
         self.result_panel = ResultPanel(container, title="Verification Result")
         layout.addWidget(self.result_panel, 3)
 
+        self.payload_preview_box = QGroupBox("Recovered file preview", container)
+        payload_preview_layout = QVBoxLayout(self.payload_preview_box)
+        self.payload_preview = MediaPreview(self.payload_preview_box)
+        payload_preview_layout.addWidget(self.payload_preview)
+        self.payload_preview_box.setVisible(False)
+        layout.addWidget(self.payload_preview_box, 2)
+
         comparison_box = QGroupBox("Comparison with the original", container)
         comparison_layout = QVBoxLayout(comparison_box)
         self.comparison_view = QPlainTextEdit(comparison_box)
@@ -206,6 +228,11 @@ class VerifyTab(QWidget):
     def result(self) -> VerificationResult | None:
         return self._result
 
+    @property
+    def payload_preview_path(self) -> str | None:
+        """The temporary copy being previewed, if any."""
+        return None if self._payload_cleanup is None else self.payload_preview.path
+
     def _load_default_key(self) -> None:
         _, public_path = key_manager.demo_key_paths()
         if os.path.isfile(public_path):
@@ -217,6 +244,7 @@ class VerifyTab(QWidget):
         self._stego_path = path
         self._result = None
         self.result_panel.clear()
+        self._clear_payload_preview()
         self.comparison_view.setPlainText("")
         self.preview.show_file(path)
 
@@ -373,6 +401,7 @@ class VerifyTab(QWidget):
         """Every one of the six verdicts arrives here; none is an error."""
         self._result = result
         self.result_panel.show_result(result)
+        self._show_payload_preview(result.message)
         self._show_comparison(result)
 
         self.statusMessage.emit(f"{result.verdict}: {result.reason}")
@@ -382,6 +411,39 @@ class VerifyTab(QWidget):
             result.verdict,
         )
         self.mediaVerified.emit(result)
+
+    def _clear_payload_preview(self) -> None:
+        self.payload_preview.clear()
+        self.payload_preview_box.setVisible(False)
+        if self._payload_cleanup is not None:
+            self._payload_cleanup()
+            self._payload_cleanup = None
+
+    def _show_payload_preview(self, message: bytes | None) -> None:
+        """Preview a recovered image or audio file; anything else is text or hex."""
+        self._clear_payload_preview()
+        if message is None:
+            return
+        detected = payload_files.detect_payload_type(message)
+        if not detected.previewable:
+            return
+
+        directory = tempfile.mkdtemp(prefix="stego-payload-")
+        # ignore_errors: on Windows the media backend can hold the file a moment
+        # after it is released, and a stale temporary file is harmless.
+        self._payload_cleanup = weakref.finalize(self, shutil.rmtree, directory, True)
+        # A fixed name with the sniffed extension: the sender's recorded name is
+        # never used as a path.
+        path = os.path.join(directory, "recovered_payload" + detected.extension)
+        with open(path, "wb") as handle:
+            handle.write(message)
+
+        self.payload_preview_box.setVisible(True)
+        self.payload_preview.show_file(
+            path,
+            media_type=detected.kind,
+            caption=f"Recovered {detected.label}, {len(message):,} bytes",
+        )
 
     def _show_comparison(self, result: VerificationResult) -> None:
         original = self.original_edit.text().strip()
@@ -434,6 +496,7 @@ class VerifyTab(QWidget):
     def _on_verify_failed(self, message: str, detail: str) -> None:
         """Only genuinely exceptional failures reach here, such as an unusable key."""
         self.result_panel.show_error(message)
+        self._clear_payload_preview()
         self.statusMessage.emit(message)
         _log.error("verification could not run: %s", message)
         QMessageBox.warning(self, "Verify", message)

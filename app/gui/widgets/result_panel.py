@@ -10,6 +10,9 @@ The plan is explicit that extracted content must not be executed automatically, 
 this widget is where that rule is enforced. Recovered bytes are shown as plain text
 in a read-only view, or as a hex dump when they are not valid UTF-8. Nothing is
 passed to ``QDesktopServices``, no rich text is rendered, and no path is opened.
+The bytes can be saved, but only to a path the user picks in a save dialog, and the
+default name offered is the sender's recorded name reduced to a bare file name by
+:func:`app.utils.payload_files.safe_filename`.
 
 Rich text matters more than it sounds: a ``QLabel`` renders HTML by default, so a
 recovered message containing markup would be interpreted rather than displayed, and
@@ -23,10 +26,12 @@ from collections.abc import Iterable
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
+    QFileDialog,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
     QLabel,
+    QMessageBox,
     QPlainTextEdit,
     QPushButton,
     QSizePolicy,
@@ -34,7 +39,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from app.utils import constants
+from app.utils import constants, file_utils, payload_files
 from app.verification.verdicts import VERDICT_DESCRIPTIONS, VerificationResult
 
 __all__ = ["ResultPanel", "hex_dump"]
@@ -138,6 +143,13 @@ class ResultPanel(QGroupBox):
         inert_notice.setWordWrap(True)
         payload_layout.addWidget(inert_notice)
 
+        self._payload_info_label = QLabel("", payload_box)
+        self._payload_info_label.setObjectName("payloadInfo")
+        # The recorded file name comes from the sender, so it is never rendered.
+        self._payload_info_label.setTextFormat(Qt.TextFormat.PlainText)
+        self._payload_info_label.setWordWrap(True)
+        payload_layout.addWidget(self._payload_info_label)
+
         self._payload_view = QPlainTextEdit(payload_box)
         self._payload_view.setObjectName("payloadView")
         self._payload_view.setReadOnly(True)
@@ -153,6 +165,10 @@ class ResultPanel(QGroupBox):
         self._as_hex_button = QPushButton("Show as hex", payload_box)
         self._as_hex_button.clicked.connect(lambda: self._render_payload(True))
         toggle_row.addWidget(self._as_hex_button)
+
+        self._save_button = QPushButton("Save recovered payload...", payload_box)
+        self._save_button.clicked.connect(self._choose_save_path)
+        toggle_row.addWidget(self._save_button)
         toggle_row.addStretch(1)
         payload_layout.addLayout(toggle_row)
 
@@ -181,6 +197,23 @@ class ResultPanel(QGroupBox):
     def payload_text(self) -> str:
         return self._payload_view.toPlainText()
 
+    @property
+    def payload_info_text(self) -> str:
+        return self._payload_info_label.text()
+
+    @property
+    def save_enabled(self) -> bool:
+        return self._save_button.isEnabled()
+
+    def suggested_filename(self) -> str | None:
+        """The default name offered when saving, or ``None`` with nothing to save."""
+        if self._message is None:
+            return None
+        metadata = None if self._result is None or self._result.record is None else (
+            self._result.record.metadata
+        )
+        return payload_files.suggested_filename(metadata, self._message)
+
     def clear(self) -> None:
         self._result = None
         self._message = None
@@ -191,6 +224,7 @@ class ResultPanel(QGroupBox):
         self._reason_label.setText("")
         self._notes_label.setText("")
         self._payload_view.setPlainText("")
+        self._payload_info_label.setText("")
         self._set_payload_buttons(False)
 
         while self._flags_form.rowCount():
@@ -249,8 +283,15 @@ class ResultPanel(QGroupBox):
         self._message = message
         if message is None:
             self._payload_view.setPlainText("")
+            self._payload_info_label.setText("")
             self._set_payload_buttons(False)
             return
+
+        detected = payload_files.detect_payload_type(message)
+        self._payload_info_label.setText(
+            f"{len(message):,} bytes, detected as {detected.label}. "
+            f"Saved by default as: {self.suggested_filename()}"
+        )
 
         self._set_payload_buttons(True)
         # Prefer text when the bytes are valid UTF-8, since that is what a reader
@@ -282,6 +323,31 @@ class ResultPanel(QGroupBox):
     def _set_payload_buttons(self, enabled: bool) -> None:
         self._as_text_button.setEnabled(enabled)
         self._as_hex_button.setEnabled(enabled)
+        self._save_button.setEnabled(enabled)
+
+    def _choose_save_path(self) -> None:
+        suggested = self.suggested_filename()
+        if suggested is None:
+            return
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save the recovered payload as", suggested, "All files (*)"
+        )
+        if not path:
+            return
+        try:
+            self.save_payload(path)
+        except OSError as exc:
+            QMessageBox.warning(self, "Save recovered payload", str(exc))
+
+    def save_payload(self, path: str) -> str:
+        """Write the recovered bytes to *path*, exactly as recovered.
+
+        The save dialog has already asked about replacing an existing file, so this
+        overwrites. Nothing is opened afterwards.
+        """
+        if self._message is None:
+            raise OSError("there is no recovered payload to save")
+        return file_utils.write_bytes_atomic(path, self._message, overwrite=True)
 
     def show_error(self, message: str) -> None:
         """Show an operational failure that is not a verdict."""
