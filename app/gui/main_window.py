@@ -82,6 +82,11 @@ class MainWindow(QMainWindow):
             signal = getattr(tab, "statusMessage", None)
             if signal is not None:
                 signal.connect(self.set_status)
+            # Without this, keys generated from the menu only reached the tabs after
+            # a restart, because each tab looks for them once, when it is built.
+            use_demo_keys = getattr(tab, "use_demo_keys", None)
+            if use_demo_keys is not None:
+                self.demoKeysReady.connect(use_demo_keys)
 
         self._build_menus()
         self._build_status_bar()

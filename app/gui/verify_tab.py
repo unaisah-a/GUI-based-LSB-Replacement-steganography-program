@@ -238,6 +238,11 @@ class VerifyTab(QWidget):
         if os.path.isfile(public_path):
             self.key_edit.setText(public_path)
 
+    def use_demo_keys(self, private_path: str, public_path: str) -> None:
+        """Fill in a newly generated demo public key, unless a key is already set."""
+        if not self.key_edit.text().strip():
+            self.key_edit.setText(public_path)
+
     # -- reactions --------------------------------------------------------- #
 
     def _on_stego_selected(self, path: str) -> None:

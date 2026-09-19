@@ -152,6 +152,27 @@ class TestMainWindow:
         assert window.generate_keys_action.isEnabled()
         assert window.show_key_paths_action is not None
 
+    def test_generated_keys_reach_the_tabs_without_a_restart(self, qtbot):
+        window = MainWindow()
+        qtbot.addWidget(window)
+        for tab in (window.protect_tab, window.verify_tab, window.attack_tab):
+            tab.key_edit.setText("")
+
+        window.demoKeysReady.emit("private.pem", "public.pem")
+
+        assert window.protect_tab.key_edit.text() == "private.pem"
+        assert window.verify_tab.key_edit.text() == "public.pem"
+        assert window.attack_tab.key_edit.text() == "public.pem"
+
+    def test_generated_keys_do_not_replace_a_chosen_key(self, qtbot):
+        window = MainWindow()
+        qtbot.addWidget(window)
+        window.verify_tab.key_edit.setText("senders_key.pem")
+
+        window.demoKeysReady.emit("private.pem", "public.pem")
+
+        assert window.verify_tab.key_edit.text() == "senders_key.pem"
+
     def test_closing_an_idle_window_does_not_block(self, qtbot):
         window = MainWindow()
         qtbot.addWidget(window)

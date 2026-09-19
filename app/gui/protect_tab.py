@@ -411,6 +411,11 @@ class ProtectTab(QWidget):
         if os.path.isfile(private_path):
             self.key_edit.setText(private_path)
 
+    def use_demo_keys(self, private_path: str, public_path: str) -> None:
+        """Fill in a newly generated demo private key, unless a key is already set."""
+        if not self.key_edit.text().strip():
+            self.key_edit.setText(private_path)
+
     # -- reactions --------------------------------------------------------- #
 
     def _on_payload_mode_changed(self) -> None:
