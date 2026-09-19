@@ -31,9 +31,9 @@ Replace every `<...>` placeholder. Do not submit with placeholders left in.
 
 The mapping from role to code, so that a marker can find each member's work directly.
 The test counts are per file as collected by `pytest --collect-only`. The five areas
-account for 1,712 tests. The remaining 14, in `test_package_submission.py`, cover the
-packaging script, which belongs to no single area. The full suite was 1,726 tests on
-18 September 2026.
+account for 1,714 tests. The remaining 14, in `test_package_submission.py`, cover the
+packaging script, which belongs to no single area. The full suite was 1,728 tests on
+19 September 2026.
 
 ### Member 1 — Cryptography and payload security
 
@@ -106,7 +106,7 @@ app/utils/                      constants, file utilities, logging
 ```
 
 Tests: `test_gui_shell.py`, `test_gui_tabs.py`, `test_gui_lab_tabs.py`,
-`test_utils.py`, `test_payload_files.py` — 326 tests.
+`test_utils.py`, `test_payload_files.py` — 328 tests.
 
 Also responsible for the integration decision that no layer below the GUI imports Qt,
 which is what makes every workflow testable without a window.
