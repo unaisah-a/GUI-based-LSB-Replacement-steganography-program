@@ -265,8 +265,12 @@ class AttackTab(QWidget):
             self.key_edit.setText(public_path)
 
     def use_demo_keys(self, private_path: str, public_path: str) -> None:
-        """Fill in a newly generated demo public key, unless a key is already set."""
-        if not self.key_edit.text().strip():
+        """Fill in a newly generated demo public key, unless a real key is already set.
+
+        A field holding something that is not a file, such as a name typed by
+        mistake or a key that has since been deleted, is replaced too.
+        """
+        if not os.path.isfile(self.key_edit.text().strip()):
             self.key_edit.setText(public_path)
 
     # -- reactions --------------------------------------------------------- #

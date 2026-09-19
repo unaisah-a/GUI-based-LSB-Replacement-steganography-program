@@ -14,7 +14,7 @@ Run everything with:
 .venv\Scripts\python -m pytest -q
 ```
 
-Total: **1,728 tests**, all passing, as of 19 September 2026. Suite runtime is about a minute.
+Total: **1,729 tests**, all passing, as of 19 September 2026. Suite runtime is about a minute.
 
 ---
 

@@ -164,14 +164,28 @@ class TestMainWindow:
         assert window.verify_tab.key_edit.text() == "public.pem"
         assert window.attack_tab.key_edit.text() == "public.pem"
 
-    def test_generated_keys_do_not_replace_a_chosen_key(self, qtbot):
+    def test_generated_keys_do_not_replace_a_chosen_key(self, qtbot, tmp_path):
+        chosen = tmp_path / "senders_key.pem"
+        chosen.write_text("a key the user picked")
         window = MainWindow()
         qtbot.addWidget(window)
-        window.verify_tab.key_edit.setText("senders_key.pem")
+        window.verify_tab.key_edit.setText(str(chosen))
 
         window.demoKeysReady.emit("private.pem", "public.pem")
 
-        assert window.verify_tab.key_edit.text() == "senders_key.pem"
+        assert window.verify_tab.key_edit.text() == str(chosen)
+
+    def test_generated_keys_replace_text_that_is_not_a_key_file(self, qtbot, tmp_path):
+        """A name typed into the key field by mistake must not block the new key."""
+        window = MainWindow()
+        qtbot.addWidget(window)
+        window.protect_tab.key_edit.setText("tristan")
+        window.verify_tab.key_edit.setText(str(tmp_path / "deleted.pem"))
+
+        window.demoKeysReady.emit("private.pem", "public.pem")
+
+        assert window.protect_tab.key_edit.text() == "private.pem"
+        assert window.verify_tab.key_edit.text() == "public.pem"
 
     def test_closing_an_idle_window_does_not_block(self, qtbot):
         window = MainWindow()
