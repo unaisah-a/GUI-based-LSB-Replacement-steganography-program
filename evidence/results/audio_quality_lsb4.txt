@@ -1,4 +1,4 @@
-PS C:\Users\unaisah\OneDrive\Documents\GitHub\GUI-based-LSB-Replacement-steganography-program> python -m tests.test_audio_quality
+PS <repository-root>> python -m tests.test_audio_quality
 sample_rate: 44100
 channels: 1
 total_frames: 441000

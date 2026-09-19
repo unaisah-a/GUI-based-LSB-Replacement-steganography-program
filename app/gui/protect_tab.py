@@ -6,6 +6,7 @@ import mimetypes
 from dataclasses import replace
 from pathlib import Path
 
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -54,9 +55,14 @@ class ProtectTab(QWidget):
         self.private_key_path = QLineEdit()
         self.key_password = QLineEdit()
         self.key_password.setEchoMode(QLineEdit.EchoMode.Password)
+        self.key_password.setPlaceholderText("Optional; blank saves an unencrypted private key")
         self.media_id = QLineEdit("MEDIA-001")
         self.lsb_count = QSpinBox()
         self.lsb_count.setRange(1, 8)
+        self.bit_help = QLabel()
+        self.bit_help.setWordWrap(True)
+        self.lsb_count.valueChanged.connect(self._update_bit_help)
+        self._update_bit_help()
         self.video_frame_index = QSpinBox()
         self.video_frame_index.setRange(0, 299)
         self.robustness = QComboBox()
@@ -73,6 +79,10 @@ class ProtectTab(QWidget):
         self.encryption_key.setEchoMode(QLineEdit.EchoMode.Password)
         self.encryption_key.setEnabled(False)
         self.preserve_size = QCheckBox("Attempt exact original file size")
+        self.preserve_size.setToolTip(
+            "Supported BMP/WAV layouts can retain exact size. PNG is conditional; "
+            "video size preservation is unsupported. This excludes the manifest and sidecar."
+        )
         self.size_report_path = QLineEdit()
         self.create_recovery = QCheckBox(
             "Create encrypted recovery sidecar for byte-exact restoration"
@@ -101,6 +111,16 @@ class ProtectTab(QWidget):
         self.progress.setRange(0, 0)
         self.progress.hide()
         self.runner = TaskRunner(self)
+        self.capacity_runner = TaskRunner(self)
+        self._capacity_revision = 0
+        self._capacity_pending = False
+        self._shutting_down = False
+        self.capacity_timer = QTimer(self)
+        self.capacity_timer.setSingleShot(True)
+        self.capacity_timer.setInterval(250)
+        self.capacity_timer.timeout.connect(self._start_capacity)
+        self.capacity_runner.succeeded.connect(self._capacity_ready)
+        self.capacity_runner.finished.connect(self._capacity_finished)
 
         root = QVBoxLayout(self)
         drop = DropZone("Drop a PNG, BMP, PCM-16 WAV, or bounded video cover here")
@@ -132,10 +152,18 @@ class ProtectTab(QWidget):
         settings_form = QFormLayout(settings)
         settings_form.addRow("Media ID", self.media_id)
         settings_form.addRow("LSB depth", self.lsb_count)
+        settings_form.addRow(self.bit_help)
         settings_form.addRow("Video frame index", self.video_frame_index)
         settings_form.addRow("Robustness", self.robustness)
         settings_form.addRow("Start method", self.start_method)
         settings_form.addRow("Secret / index", self.start_value)
+        location_help = QLabel(
+            "Embedding starts at a zero-based sample index: image color channels "
+            "(alpha excluded), interleaved audio samples, or the selected video frame. "
+            "A secret-derived start is reproduced by the receiver using the same secret."
+        )
+        location_help.setWordWrap(True)
+        settings_form.addRow(location_help)
         settings_form.addRow(self.encrypt)
         key_row = QHBoxLayout()
         key_row.addWidget(self.encryption_key)
@@ -144,6 +172,13 @@ class ProtectTab(QWidget):
         key_row.addWidget(generate_encryption)
         settings_form.addRow("Encryption key", key_row)
         settings_form.addRow(self.preserve_size)
+        size_help = QLabel(
+            "The original is kept. Embedding changes output bits and may change appearance "
+            "or sound. Exact media-file size is conditional; manifests and recovery backups "
+            "add storage. See the measured size result after protection."
+        )
+        size_help.setWordWrap(True)
+        settings_form.addRow(size_help)
         settings_form.addRow(self.create_recovery)
         recovery_row = QHBoxLayout()
         recovery_row.addWidget(self.recovery_key)
@@ -196,6 +231,7 @@ class ProtectTab(QWidget):
             lambda: self._set_input(self.input_path.text())
         )
         self.lsb_count.valueChanged.connect(self._update_capacity)
+        self.input_path.textChanged.connect(self._update_capacity)
         self.video_frame_index.valueChanged.connect(self._update_capacity)
         self.message.textChanged.connect(self._update_capacity)
         self.private_key_path.textChanged.connect(self._update_capacity)
@@ -302,9 +338,9 @@ class ProtectTab(QWidget):
         self.message.setEnabled(not file_mode)
         self._update_capacity()
 
-    def _payload(self) -> tuple[bytes, str, dict[str, str]]:
-        if self.payload_mode.currentData() == "file":
-            path_text = self.payload_file_path.text().strip()
+    @staticmethod
+    def _read_payload(mode: str, path_text: str, text: str) -> tuple[bytes, str, dict[str, str]]:
+        if mode == "file":
             if not path_text:
                 raise ValueError("choose a payload file")
             path = Path(path_text)
@@ -317,9 +353,23 @@ class ProtectTab(QWidget):
             content_type = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
             return path.read_bytes(), content_type, {"payload_filename": path.name}
         return (
-            self.message.toPlainText().encode("utf-8"),
+            text.encode("utf-8"),
             "text/plain; charset=utf-8",
             {},
+        )
+
+    def _payload(self) -> tuple[bytes, str, dict[str, str]]:
+        return self._read_payload(
+            self.payload_mode.currentData(), self.payload_file_path.text().strip(),
+            self.message.toPlainText(),
+        )
+
+    def _update_bit_help(self):
+        depth = self.lsb_count.value()
+        self.bit_help.setText(
+            f"Replace the lowest {depth} bit(s) of each used sample: "
+            f"{'·' * (8 - depth)}{'X' * depth} (lowest 8 bits shown; X = replaced). "
+            "Depth 3 uses the lowest three bits, not only bit 3. Higher depth can increase distortion."
         )
 
     def _generate_keys(self):
@@ -344,7 +394,8 @@ class ProtectTab(QWidget):
         self.private_key_path.setText(str(private_path))
         self.status.setText(
             f"Generated demo keys. Give the receiver {public_path.name}; keep "
-            f"{private_path.name} private."
+            f"{private_path.name} private. Private key is "
+            + ("password-protected." if self.key_password.text() else "unencrypted (no password supplied).")
         )
         self.signer_fingerprint.setText(
             "Signer fingerprint (SHA-256): " + public_key_fingerprint(public_key)
@@ -457,8 +508,23 @@ class ProtectTab(QWidget):
         )
 
     def _update_capacity(self):
+        if self._shutting_down:
+            return
+        self._capacity_revision += 1
+        self._capacity_pending = True
+        self.capacity_runner.cancel()
+        self.capacity.setText("Updating capacity…")
+        self.signer_fingerprint.setText("Signer fingerprint: checking current inputs…")
+        self.capacity_timer.start()
+
+    def _start_capacity(self):
+        if self._shutting_down or self.capacity_runner.busy:
+            return
+        self._capacity_pending = False
+        revision = self._capacity_revision
+        self.signer_fingerprint.setText("Signer fingerprint unavailable for current inputs.")
         path = self.input_path.text().strip()
-        if not path or not Path(path).is_file():
+        if not path:
             self.capacity.setText("Select a cover object to estimate capacity.")
             return
         try:
@@ -468,20 +534,43 @@ class ProtectTab(QWidget):
                     "Choose a private signing key for an exact signed-envelope estimate."
                 )
                 return
-            private_key = load_private_key_from_pem(
-                key_path, self.key_password.text() or None
-            )
-            self.signer_fingerprint.setText(
-                "Signer fingerprint (SHA-256): "
-                + public_key_fingerprint(private_key.public_key())
-            )
-            payload, content_type, payload_metadata = self._payload()
-            estimate = estimate_protection_capacity(
-                path,
-                payload,
-                private_key,
-                self._payload_options(content_type, payload_metadata),
-            )
+            password = self.key_password.text() or None
+            mode = self.payload_mode.currentData()
+            payload_path = self.payload_file_path.text().strip()
+            text = self.message.toPlainText()
+            options = self._payload_options()
+        except Exception as exc:
+            self.capacity.setText(str(exc))
+            return
+
+        def calculate(token, _progress):
+            # Only immutable snapshots enter the worker; never read Qt widgets here.
+            try:
+                private_key = load_private_key_from_pem(key_path, password)
+                token.checkpoint()
+                payload, content_type, metadata = ProtectTab._read_payload(mode, payload_path, text)
+                token.checkpoint()
+                estimate = estimate_protection_capacity(
+                    path, payload, private_key,
+                    replace(options, content_type=content_type,
+                            metadata={**options.metadata, **metadata}),
+                )
+                token.checkpoint()
+                return revision, estimate, public_key_fingerprint(private_key.public_key()), None
+            except Exception as exc:
+                return revision, None, None, exc
+
+        self.capacity_runner.start(calculate)
+
+    def _capacity_ready(self, result):
+        revision, estimate, fingerprint, error = result
+        if self._shutting_down or revision != self._capacity_revision:
+            return
+        if error is not None:
+            self.capacity.setText(str(error))
+            self.signer_fingerprint.setText("Signer fingerprint unavailable for current inputs.")
+        else:
+            self.signer_fingerprint.setText("Signer fingerprint (SHA-256): " + fingerprint)
             carrier = estimate.carrier
             outcome = "fits" if estimate.fits else "does not fit"
             self.capacity.setText(
@@ -491,8 +580,10 @@ class ProtectTab(QWidget):
                 f"{carrier.required_samples:,} of {carrier.available_samples:,} available "
                 f"samples from index {carrier.start_location:,}: {outcome}."
             )
-        except Exception as exc:
-            self.capacity.setText(str(exc))
+
+    def _capacity_finished(self):
+        if self._capacity_pending and not self._shutting_down and not self.capacity_timer.isActive():
+            self._start_capacity()
 
     def _protect(self):
         if self.runner.busy:
@@ -594,6 +685,15 @@ class ProtectTab(QWidget):
         )
 
     def shutdown(self) -> None:
+        self._shutting_down = True
+        self.capacity_timer.stop()
+        self._capacity_revision += 1
+        # A running bounded media probe must finish before its QThread is destroyed.
+        self.capacity_runner.shutdown(timeout_ms=None)
         self.runner.shutdown()
         self.original_preview.clear()
         self.output_preview.clear()
+
+    def closeEvent(self, event) -> None:
+        self.shutdown()
+        super().closeEvent(event)

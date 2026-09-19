@@ -1,0 +1,257 @@
+{
+  "format": "SMIV-EXTENSION-EVALUATION",
+  "robustness": {
+    "cases": [
+      {
+        "bit_flip_probability": 0.0,
+        "exact_recoveries": 50,
+        "mode": "none",
+        "recovered_bit_errors": 0,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 256,
+        "trials": 50
+      },
+      {
+        "bit_flip_probability": 0.0,
+        "exact_recoveries": 50,
+        "mode": "repetition-3",
+        "recovered_bit_errors": 0,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 768,
+        "trials": 50
+      },
+      {
+        "bit_flip_probability": 0.001,
+        "exact_recoveries": 9,
+        "mode": "none",
+        "recovered_bit_errors": 85,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 256,
+        "trials": 50
+      },
+      {
+        "bit_flip_probability": 0.001,
+        "exact_recoveries": 50,
+        "mode": "repetition-3",
+        "recovered_bit_errors": 0,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 768,
+        "trials": 50
+      },
+      {
+        "bit_flip_probability": 0.01,
+        "exact_recoveries": 0,
+        "mode": "none",
+        "recovered_bit_errors": 1019,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 256,
+        "trials": 50
+      },
+      {
+        "bit_flip_probability": 0.01,
+        "exact_recoveries": 29,
+        "mode": "repetition-3",
+        "recovered_bit_errors": 30,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 768,
+        "trials": 50
+      },
+      {
+        "bit_flip_probability": 0.05,
+        "exact_recoveries": 0,
+        "mode": "none",
+        "recovered_bit_errors": 5269,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 256,
+        "trials": 50
+      },
+      {
+        "bit_flip_probability": 0.05,
+        "exact_recoveries": 0,
+        "mode": "repetition-3",
+        "recovered_bit_errors": 801,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 768,
+        "trials": 50
+      },
+      {
+        "bit_flip_probability": 0.1,
+        "exact_recoveries": 0,
+        "mode": "none",
+        "recovered_bit_errors": 10197,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 256,
+        "trials": 50
+      },
+      {
+        "bit_flip_probability": 0.1,
+        "exact_recoveries": 0,
+        "mode": "repetition-3",
+        "recovered_bit_errors": 2849,
+        "recovered_bits_evaluated": 102400,
+        "stored_bytes": 768,
+        "trials": 50
+      }
+    ],
+    "message_bytes": 256,
+    "scope": "Independent random flips across all stored payload bits, including every repetition copy. Same error probability, three times the storage with repetition. No carrier header, signature, compression, resampling, or burst-error resilience claim."
+  },
+  "seed": 2005,
+  "steganalysis": {
+    "cases": [
+      {
+        "chi_square_per_degree": [
+          129.00787401574803,
+          129.00787401574803,
+          129.00787401574803
+        ],
+        "cover": 0,
+        "embedded": false,
+        "fraction": 0.0,
+        "input_sha256": "bbbb2e15d827a15c216353c2e5c5d0dbcb5736bcba47ba1890e5930ee00f0a7f",
+        "suspected": false
+      },
+      {
+        "chi_square_per_degree": [
+          104.96899606299213,
+          104.38631889763779,
+          103.53272637795276
+        ],
+        "cover": 0,
+        "embedded": true,
+        "fraction": 0.1,
+        "message_bytes": 614,
+        "output_sha256": "ff87e1db34c6b386acf20264425a4b96873f2ed77e77f1a2d8099a1b08430b16",
+        "suspected": false
+      },
+      {
+        "chi_square_per_degree": [
+          33.145669291338585,
+          32.698080708661415,
+          31.651820866141733
+        ],
+        "cover": 0,
+        "embedded": true,
+        "fraction": 0.5,
+        "message_bytes": 3070,
+        "output_sha256": "db6744e96840844c04756531fccf96a654e52b021c08d17a99aa008110c3ba5a",
+        "suspected": false
+      },
+      {
+        "chi_square_per_degree": [
+          2.668307086614173,
+          1.9264271653543308,
+          2.534694881889764
+        ],
+        "cover": 0,
+        "embedded": true,
+        "fraction": 0.9,
+        "message_bytes": 5526,
+        "output_sha256": "d1ed007342ba775c418c46cda8390f382c9dc4b0e490174d98f7f4851aeccffe",
+        "suspected": false
+      },
+      {
+        "chi_square_per_degree": [
+          0.9124600611786365,
+          1.1851803249867034,
+          0.9708097229462902
+        ],
+        "cover": 1,
+        "embedded": false,
+        "fraction": 0.0,
+        "input_sha256": "1ed76464410abb17a1d0065e3142062d91591ff858e8a940787cbe0e92d4c568",
+        "suspected": true
+      },
+      {
+        "chi_square_per_degree": [
+          0.8820207554350377,
+          1.1983854087617376,
+          1.042143893311784
+        ],
+        "cover": 1,
+        "embedded": true,
+        "fraction": 0.1,
+        "message_bytes": 614,
+        "output_sha256": "acf992fd9acfb123973068fcc22d3c4e8d0847e5d0437dbe33248ef5c80f2d97",
+        "suspected": true
+      },
+      {
+        "chi_square_per_degree": [
+          0.9878620399958421,
+          0.9611956471092875,
+          1.167577674175005
+        ],
+        "cover": 1,
+        "embedded": true,
+        "fraction": 0.5,
+        "message_bytes": 3070,
+        "output_sha256": "e6d9112ecf4c8d0536bfac27205c09b742d1c97332c29306311b44f94f638858",
+        "suspected": true
+      },
+      {
+        "chi_square_per_degree": [
+          0.9528260962218081,
+          1.040196283237761,
+          1.0495036809502367
+        ],
+        "cover": 1,
+        "embedded": true,
+        "fraction": 0.9,
+        "message_bytes": 5526,
+        "output_sha256": "908d75f9493e7e527b0e86e4a0625593592caeaf33b892b9b66aad410ae61b36",
+        "suspected": true
+      },
+      {
+        "chi_square_per_degree": [],
+        "cover": 2,
+        "embedded": false,
+        "fraction": 0.0,
+        "input_sha256": "4a0945534329d26ce523a2f096e203aae59a9fffaec71895599fa3ef42d23f22",
+        "suspected": null
+      },
+      {
+        "chi_square_per_degree": [],
+        "cover": 2,
+        "embedded": true,
+        "fraction": 0.1,
+        "message_bytes": 2,
+        "output_sha256": "08b53fc71569e1bad67df6c073902d66e6ead5fc214b49033b13811616b10ce0",
+        "suspected": null
+      },
+      {
+        "chi_square_per_degree": [],
+        "cover": 2,
+        "embedded": true,
+        "fraction": 0.5,
+        "message_bytes": 10,
+        "output_sha256": "f565ce0b89624fdd7ee7194e2988c82d0b93d9f56996e50b9e0994a250f01ebe",
+        "suspected": null
+      },
+      {
+        "chi_square_per_degree": [],
+        "cover": 2,
+        "embedded": true,
+        "fraction": 0.9,
+        "message_bytes": 18,
+        "output_sha256": "71a155f16a98f6727850eed7d7da95e22a58a18e3637ab0207bfef91aa3ca9a0",
+        "suspected": null
+      }
+    ],
+    "counts": {
+      "clean": 3,
+      "embedded": 9,
+      "false_negatives": 3,
+      "false_positives": 1,
+      "inconclusive_clean": 1,
+      "inconclusive_embedded": 3,
+      "true_negatives": 1,
+      "true_positives": 3
+    },
+    "lsb_depth": 1,
+    "provenance": "Synthetic even-valued gradient, random noise, and undersized flat control; no natural-image detection claim.",
+    "rule": "Suspect if any usable channel has pair-of-values chi-square/df <= 1.5; otherwise negative; no usable channel = inconclusive.",
+    "scope": "Illustrative, uncalibrated rule. Clean covers can trigger it and embedded covers can evade it. This is not proof of tampering or a validated detector.",
+    "start_location": 0
+  },
+  "version": 1
+}

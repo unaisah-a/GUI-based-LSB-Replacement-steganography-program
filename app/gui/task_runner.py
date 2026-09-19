@@ -82,10 +82,13 @@ class TaskRunner(QObject):
             thread.deleteLater()
         self.finished.emit()
 
-    def shutdown(self, timeout_ms: int = 5000) -> None:
-        """Request cancellation and wait briefly during application shutdown."""
+    def shutdown(self, timeout_ms: int | None = 5000) -> None:
+        """Request cancellation; None waits until the owned thread has stopped."""
         thread = self._thread
         if thread is None:
             return
         self.cancel()
-        thread.wait(timeout_ms)
+        if timeout_ms is None:
+            thread.wait()
+        else:
+            thread.wait(timeout_ms)

@@ -1,0 +1,56 @@
+{
+  "all_passed": true,
+  "cases": [
+    {
+      "actual_verdict": "AUTHENTIC",
+      "expected_verdict": "AUTHENTIC",
+      "id": "image-short-positive",
+      "medium": "image",
+      "passed": true
+    },
+    {
+      "actual_verdict": "AUTHENTIC",
+      "expected_verdict": "AUTHENTIC",
+      "id": "audio-long-positive",
+      "medium": "audio",
+      "passed": true
+    },
+    {
+      "actual_verdict": "SIGNATURE_INVALID",
+      "expected_verdict": "SIGNATURE_INVALID",
+      "id": "image-message-corruption-negative",
+      "medium": "image",
+      "passed": true
+    }
+  ],
+  "contains_secret_values": false,
+  "format": "SMIV-DESKTOP-AUDIT",
+  "native_platform_required": true,
+  "qt_platform": "windows",
+  "screen_available_geometry": {
+    "height": 1440,
+    "width": 2560
+  },
+  "screenshots": [
+    {
+      "bytes": 68607,
+      "file": "r12-image-authentic.png",
+      "sha256": "83c5d87b259ecedb2f9ee5582da2f74a89d676a358a769fce843d74164475bd3"
+    },
+    {
+      "bytes": 48294,
+      "file": "r12-audio-authentic.png",
+      "sha256": "aa142b2ac32a7be92740a1c18734e948792ebadaa071f58c4fb69153ba8995f9"
+    },
+    {
+      "bytes": 70629,
+      "file": "r12-image-rejected.png",
+      "sha256": "6ea56596dea48a98e074c55cee4718f6cd97a6e3d47348016988b4f0b9353382"
+    }
+  ],
+  "version": 1,
+  "window": {
+    "height": 900,
+    "width": 1180
+  }
+}

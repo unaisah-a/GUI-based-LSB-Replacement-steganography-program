@@ -1,0 +1,30 @@
+﻿R12 clean-environment dependency validation
+Install command: python -m pip install --requirement requirements.txt
+Install result: exit code 0
+Python: Python 3.14.3
+requirements.txt SHA-256: bb6c69a56b81961fbf67a24bf30b2f8f4ed4624586e595df5eb90376f3b10ed7
+
+pip check:
+No broken requirements found.
+
+Installed packages:
+cffi==2.1.1
+colorama==0.4.6
+cryptography==50.0.1
+hypothesis==6.168.0
+iniconfig==2.3.0
+numpy==2.5.3
+packaging==26.3
+pillow==12.3.0
+pluggy==1.6.0
+pycparser==3.0
+Pygments==2.21.0
+PySide6_Addons==6.11.2
+PySide6_Essentials==6.11.2
+PySide6==6.11.2
+pytest==9.1.1
+scipy==1.18.1
+shiboken6==6.11.2
+sortedcontainers==2.4.0
+soundfile==0.14.0
+typing_extensions==4.16.0

@@ -1,0 +1,68 @@
+{
+  "all_passed": true,
+  "artifacts": [
+    {
+      "bytes": 4155,
+      "path": "results/r12-release-audit.json",
+      "sha256": "63941b774150b41dd5f783e03f278afb0c2f052bb0cd7eb58eee10435411d002"
+    },
+    {
+      "bytes": 1363,
+      "path": "results/r12-desktop-audit.json",
+      "sha256": "ff646cd822ae99adc954ea0dc723e2140d9703e19d54701ca669198dbf93afa9"
+    },
+    {
+      "bytes": 762,
+      "path": "logs/r12-full-suite.txt",
+      "sha256": "4773d86135903e24d5d42e2acf0a4746a8611a825ec9086b966379d1db6b3094"
+    },
+    {
+      "bytes": 707,
+      "path": "logs/r12-clean-install.txt",
+      "sha256": "8d91618753fbdc5ad16478521e6343f65aff594ed09a6d4ee4bde87359811cdd"
+    },
+    {
+      "bytes": 41,
+      "path": "logs/r12-main-smoke.txt",
+      "sha256": "cca80e6829b004d598c159c027ed6b956d35bd3956c02cdf81fbad4bc5ed538f"
+    },
+    {
+      "bytes": 68607,
+      "path": "screenshots/r12-image-authentic.png",
+      "sha256": "83c5d87b259ecedb2f9ee5582da2f74a89d676a358a769fce843d74164475bd3"
+    },
+    {
+      "bytes": 48294,
+      "path": "screenshots/r12-audio-authentic.png",
+      "sha256": "aa142b2ac32a7be92740a1c18734e948792ebadaa071f58c4fb69153ba8995f9"
+    },
+    {
+      "bytes": 70629,
+      "path": "screenshots/r12-image-rejected.png",
+      "sha256": "6ea56596dea48a98e074c55cee4718f6cd97a6e3d47348016988b4f0b9353382"
+    }
+  ],
+  "clean_environment": {
+    "main_startup_passed": true,
+    "pip_check_passed": true,
+    "python": "3.14.3",
+    "requirements_sha256": "bb6c69a56b81961fbf67a24bf30b2f8f4ed4624586e595df5eb90376f3b10ed7"
+  },
+  "contains_private_key_material": false,
+  "contains_secret_values": false,
+  "desktop": {
+    "all_passed": true,
+    "cases": 3,
+    "qt_platform": "windows",
+    "screenshots_visually_reviewed": true
+  },
+  "format": "SMIV-RELEASE-VALIDATION",
+  "optional_tool_absence_passed": true,
+  "receiver_all_passed": true,
+  "receiver_cases": 10,
+  "test_suite": {
+    "duration_seconds": 100.02,
+    "passed": 578
+  },
+  "version": 1
+}

@@ -1,0 +1,134 @@
+{
+  "contains_private_signing_key": false,
+  "contains_secret_values": false,
+  "dependencies": {
+    "Pillow": "12.3.0",
+    "PySide6": "6.11.2",
+    "cryptography": "50.0.1",
+    "hypothesis": "6.168.0",
+    "numpy": "2.5.3",
+    "pytest": "9.1.1",
+    "scipy": "1.18.1",
+    "soundfile": "0.14.0"
+  },
+  "environment": {
+    "implementation": "CPython",
+    "machine": "AMD64",
+    "operating_system": "Windows",
+    "operating_system_release": "11",
+    "python": "3.14.3"
+  },
+  "format": "SMIV-RELEASE-AUDIT",
+  "optional_tool_absence": {
+    "audio_without_ffmpeg": "audio",
+    "image_without_ffmpeg": "image",
+    "passed": true,
+    "video_error": "ffprobe is required for video support but was not found on PATH"
+  },
+  "receiver_bundle": {
+    "all_passed": true,
+    "capacity_case_passed": true,
+    "case_index_sha256": "159d64947a441c12e40c6d8ac0cb67ae47a158048da682d04db42c7537bfb7f0",
+    "cases": [
+      {
+        "actual_verdict": "AUTHENTIC",
+        "expected_verdict": "AUTHENTIC",
+        "id": "image-short-positive",
+        "medium": "image",
+        "message_matches": true,
+        "passed": true
+      },
+      {
+        "actual_verdict": "SIGNATURE_INVALID",
+        "expected_verdict": "SIGNATURE_INVALID",
+        "id": "image-message-corruption-negative",
+        "medium": "image",
+        "message_matches": null,
+        "passed": true
+      },
+      {
+        "actual_verdict": "AUTHENTIC",
+        "expected_verdict": "AUTHENTIC",
+        "id": "audio-long-positive",
+        "medium": "audio",
+        "message_matches": true,
+        "passed": true
+      },
+      {
+        "actual_verdict": "SIGNATURE_INVALID",
+        "expected_verdict": "SIGNATURE_INVALID",
+        "id": "audio-signature-corruption-negative",
+        "medium": "audio",
+        "message_matches": null,
+        "passed": true
+      },
+      {
+        "actual_verdict": "AUTHENTIC",
+        "expected_verdict": "AUTHENTIC",
+        "id": "image-confidential-positive",
+        "medium": "image",
+        "message_matches": true,
+        "passed": true
+      },
+      {
+        "actual_verdict": "AUTHENTIC",
+        "expected_verdict": "AUTHENTIC",
+        "id": "audio-robust-stereo-positive",
+        "medium": "audio",
+        "message_matches": true,
+        "passed": true
+      },
+      {
+        "actual_verdict": "AUTHENTIC",
+        "expected_verdict": "AUTHENTIC",
+        "id": "audio-robust-one-copy-corrected",
+        "medium": "audio",
+        "message_matches": true,
+        "passed": true
+      },
+      {
+        "actual_verdict": "SIGNATURE_INVALID",
+        "expected_verdict": "SIGNATURE_INVALID",
+        "id": "audio-robust-two-copy-negative",
+        "medium": "audio",
+        "message_matches": null,
+        "passed": true
+      },
+      {
+        "actual_verdict": "AUTHENTIC",
+        "expected_verdict": "AUTHENTIC",
+        "id": "video-short-positive",
+        "medium": "video",
+        "message_matches": true,
+        "passed": true
+      },
+      {
+        "actual_verdict": "CANNOT_VERIFY",
+        "expected_verdict": "CANNOT_VERIFY",
+        "id": "video-h264-lossy-negative",
+        "medium": "video",
+        "message_matches": null,
+        "passed": true
+      }
+    ],
+    "public_key_fingerprint": "652e4c3e4c43da8eeb4758655ff9923debfd911a2928f4fdac33a6b7e8037b00"
+  },
+  "requirements_sha256": "bb6c69a56b81961fbf67a24bf30b2f8f4ed4624586e595df5eb90376f3b10ed7",
+  "scope": [
+    "Verification authenticates the hidden signed message record, not every cover byte.",
+    "Replay prevention requires an external freshness policy.",
+    "Lossy-video results apply only to the recorded file, codec, and settings.",
+    "Demonstration AES/start values are evidence-only and are not production secrets."
+  ],
+  "tools": {
+    "ffmpeg": {
+      "available": true,
+      "version": "ffmpeg version 2026-02-26-git-6695528af6-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers"
+    },
+    "ffprobe": {
+      "available": true,
+      "version": "ffprobe version 2026-02-26-git-6695528af6-full_build-www.gyan.dev Copyright (c) 2007-2026 the FFmpeg developers"
+    }
+  },
+  "version": 1
+}

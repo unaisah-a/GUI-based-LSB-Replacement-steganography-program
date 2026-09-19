@@ -1,19 +1,35 @@
 # Implementation plan and interrupted-build handoff
 
+## Review follow-up R14: completed 2026-09-19
+
+The latest user request authorises resuming the interrupted implementation of the review recommendations and associated documentation. This section supersedes the earlier R13-only resumption scope below; earlier acceptance counts and evidence remain historical.
+
+**Completed:** capacity previews debounce edits for 250 ms and perform key loading, file reads, and estimation in a background worker. Revision checks discard stale successes/errors; shutdown waits safely. The GUI and README explain numeric sample locations, lowest-1-to-8-bit replacement, unchanged original files versus changed output bytes, conditional exact file size, and optional private-key password protection. Signature failures now acknowledge alteration or a mismatched public key. Existing drag-and-drop and output-location selection remain available.
+
+The demo reserves 22 minutes for content and three for contingencies, includes all five speakers, and uses image/audio for all three mandatory negative cases. Video remains additional. The reproducible extension evaluation records false alarms, misses, inconclusive cases, and independent-bit-noise recovery at five rates. Its synthetic covers and low-level payload experiments do not establish natural-image detection accuracy or end-to-end noisy signed-carrier recovery. See [evaluation and measured limits](extension_evaluation.md).
+
+The local release packager includes untracked deliverables and a per-file SHA-256 inventory, excludes environments/Git metadata, and rejects unexpected sample PEMs and private-key markers in non-source artifacts. It refuses overwrite and performs no commit or upload. The checkpoint does not replace a reviewed Git commit or the team's submission review.
+
+**Validation:** the complete suite passed **584 tests in 98.34 seconds**. After a final missing-input fingerprint-label correction, all **eight focused GUI/evaluation/packaging tests passed in 4.02 seconds**. Tests cover responsiveness, stale results, coalescing, errors, closure, evaluation determinism/accounting, unchanged cover inputs, recovery limits, and archive reproducibility/inventory/overwrite/private-key checks. Compilation and whitespace checks pass. The updated controls were visually checked on native Windows; see `evidence/screenshots/review-protect-controls.png`. Measured results are in `evidence/results/review-extension-evaluation.json`. R12 clean-install evidence is historical, not a fresh-install claim for R14.
+
+**Next:** H01 below remains the next human operational task, now depending on R01 through R14. Conduct the real A-to-B transfer and timed rehearsal, then record actual observations and complete team declarations. No transfer, listening observation, signature, or submission has been fabricated.
+
 ## 1. Review baseline and instructions for resuming
 
-This document reconciles the agreed whole-project plan in the conversation with the repository as inspected and resumed through 2026-09-18. It is a continuation plan, not a request to replace the existing implementation.
+This document reconciles the agreed whole-project plan in the conversation with the repository as inspected and resumed through 2026-09-19. It is a continuation plan, not a request to replace the existing implementation.
 
-- Current HEAD: `a3765f1` — `Enhance documentation and tests for audio and image protection features`. R01, R02, and the interrupted portion of R03 are committed there; the completed R03–R11 work remains in the current working tree.
+- Current HEAD: `5f2041e` — `Add comprehensive tests for media protection, recovery, and size preservation`. The completed R03–R13 work remains in the current working tree.
+- R13 acceptance review on 2026-09-19: the focused release-check run was **5 passed in 11.14 seconds** and the repository run was **578 passed in 98.25 seconds** with no failures. All 10 receiver cases and capacity rejection reproduce, the R12 finalizer passes, all 11 Markdown files have valid local links, the original planning README is preserved byte-for-byte, all five members have timed demo roles, required mappings/deadlines are present, personal paths are removed, and human declarations remain explicitly incomplete. Compilation and `git diff --check` also pass.
+- R12 acceptance review on 2026-09-19: the focused release-check run was **5 passed in 10.97 seconds**. The repository run was **578 passed in 98.85 seconds** with no failures. A clean Python 3.14 installation, dependency check, startup smoke test, 10-case receiver audit, optional-tool-absence path, native Windows Qt workflows, screenshot review, artifact hashes, and secret exclusions all pass. Compilation and `git diff --check` also pass.
 - R11 acceptance review on 2026-09-18: the focused reproducible-bundle run was **6 passed in 20.99 seconds**. The repository run was **573 passed in 85.59 seconds** with no failures. All 10 receiver cases and the separate capacity-rejection case reproduce their expected outcomes; compilation and `git diff --check` also pass.
 - R10 acceptance review on 2026-09-18: the focused video, GUI, verification, transaction, and security-boundary run was **84 passed in 47.67 seconds**. The repository run was **567 passed in 63.51 seconds** with no failures. Compilation and `git diff --check` also pass.
 - R09 acceptance review on 2026-09-18: the focused image/audio analysis, GUI and operation-control run was **105 passed in 1.96 seconds**. The repository run was **561 passed in 16.78 seconds** with no failures. Compilation and `git diff --check` also pass.
 - R04 acceptance review, reconfirmed on 2026-09-18: the focused GUI/workflow/service run was **78 passed in 6.09 seconds** and the threading-heavy GUI subset passed three consecutive runs. The repository run was **501 passed, 1 failed in 16.36 seconds**; the sole failure remains the unchanged R09 RGB-versus-alpha metric inconsistency. A native Windows desktop run completed real encrypted image/audio file-payload workflows, advanced WAV playback without a media error, opened and cancelled the platform file picker, switched tabs during a running operation, cancelled cleanly, and produced visually reviewed Protect/Verify screens.
 - R03 acceptance review on 2026-09-18: the focused carrier/capacity/audio/verification/transaction/GUI run was **122 passed in 5.04 seconds**. The repository run was **496 passed, 1 failed in 12.72 seconds**. The sole failure remains the unchanged R09 RGB-versus-alpha metric inconsistency recorded below.
 - R02 acceptance review on 2026-09-17: the focused transaction/recovery/GUI/verification run was **34 passed in 2.22 seconds**. The repository run was **451 passed, 1 failed in 14.44 seconds**. The remaining failure is the pre-existing RGB-versus-alpha metric inconsistency recorded under R09 below, exposed by Hypothesis with an alpha-only difference.
-- The local audit environment uses Python 3.14-compatible package versions. Installing the exact requirements file attempted to build `numpy==2.1.3` from source because that pin has no Python 3.14 wheel; clean installation of the pinned set therefore remains an R12/R13 concern.
+- The release requirements are pinned to Python 3.14-compatible versions and were installed from binary wheels in a fresh environment. `pip check`, application startup, focused release checks, and the complete suite pass in that environment.
 - The suite includes subprocess-based offscreen GUI workflow tests. R04 also received a native Windows desktop acceptance run; later optional-feature and release-machine checks remain scoped to their own tasks.
-- `ffmpeg` and `ffprobe` are discoverable on PATH and are exercised by generated-video R10 tests. Fresh-machine installation and version evidence remain part of R12.
+- `ffmpeg` and `ffprobe` are discoverable on PATH, their versions are recorded in release evidence, and generated-video tests exercise them. The release audit separately confirms that mandatory image/audio inspection remains usable when those optional executables are absent.
 - No applicable `AGENTS.md` was found in the repository search.
 - R01 hardens the security boundaries. R02 adds staged bundle publication and rollback. R03 supplies exact carrier integration and compatibility boundaries. R04 completes responsive image/audio GUI protection and verification workflows, trusted recovered-payload handling, and deliberate secret export.
 
@@ -21,9 +37,9 @@ Preserve the existing image layer, audio layer, security primitives, services, w
 
 ### Source precedence and agreed scope
 
-1. User instructions in this conversation define authorised work. The latest request authorises R11 acceptance testing and documentation only; R12–R13 implementation remain pending.
-2. The assignment brief defines assessed requirements: `INF2005-ACW1-spec_v5-f2f.pdf`, previously read in full from `C:\Users\ginli\OneDrive\SIT\Year 2 Tri 1\Cyber Security Fundamentals\Project\`.
-3. [The repository README](../README.md) supplies team context and proposed engineering choices. It explicitly remains a planning reference, not the submission README.
+1. User instructions in this conversation define authorised work. The latest request authorises R13 acceptance testing and this plan update only; the human handoff task identified below has not started.
+2. The assignment brief defines assessed requirements: `INF2005-ACW1-spec_v5-f2f.pdf`, previously read in full from the team-provided course-material location outside this repository.
+3. [The preserved planning README](planning_reference.md) supplies team context and proposed engineering choices. [The repository README](../README.md) is now the tested setup, use, reproduction, and evidence guide.
 4. The user selected the **full README roadmap**, implemented by the assistant, rather than a team work schedule. Extensions remain in the agreed build scope even though they are individually optional for assessment.
 
 The accepted verification boundary remains hidden-message and signed-record authenticity relative to a separately trusted public key. Whole-cover authentication and automatic replay rejection are not part of this implementation. Demonstrate these limits honestly. Document instructions, including the brief's email request, are not authorisation to send messages or submit work.
@@ -108,7 +124,7 @@ Preserve distinct envelope length (`payload_length`) and redundancy-expanded car
 
 ### Remaining architecture work
 
-Introduce worker execution with cancellation/progress and expose reusable compare/attack orchestration. Optional size/recovery processing now belongs to the protection service's staged transaction. Keep existing analysis functions; do not duplicate them merely to fill scaffold files. UI success must continue to say **“Message and signed record verified.”** Treat uncertain extraction failures as `CANNOT_VERIFY`, not a proven wrong-start cause.
+The implemented architecture is feature-complete for the agreed build scope and is documented in `docs/architecture.md`, with compatibility and claim boundaries in the adjacent documentation. UI success must continue to say **“Message and signed record verified.”** Treat uncertain extraction failures as `CANNOT_VERIFY`, not a proven wrong-start cause.
 
 ## 4. Completed work to preserve
 
@@ -116,7 +132,7 @@ Introduce worker execution with cancellation/progress and expose reusable compar
 
 | Completed slice | Implementation and evidence |
 | --- | --- |
-| Baseline environment | Local `.venv` and working pytest invocation. Original baselines were 357 and then 380 passing tests; the post-R01 suite is 430 passing tests. Exact pinned installation on Python 3.14 remains unresolved under R12/R13. |
+| Baseline environment | Local `.venv` and working pytest invocation. Original baselines were 357 and then 380 passing tests; the post-R12 suite is 578 passing tests. Exact pinned installation, dependency consistency and startup are validated on Python 3.14. |
 | Image carrier | Substantial PNG/BMP I/O, capacity, bit utilities, LSB embedding/extraction, alpha handling, atomic image writes, and extensive property/example tests. |
 | Image analysis backend | Quality metrics, bit planes, difference images, histograms, and multiple statistical indicators already implemented and tested. |
 | Audio carrier baseline | PCM-16 WAV read/write, depths 1–8, embedding/extraction, non-zero starts, common API wrappers, and atomic single-file output. |
@@ -140,16 +156,16 @@ Introduce worker execution with cancellation/progress and expose reusable compar
 | R09 analysis and comparison evidence | Analysis presents image bit-plane, amplified-difference and per-channel histogram views, every existing statistical indicator, audio waveform/difference views, media properties and SHA-256 hashes. Atomic JSON reports and deterministic depth-1–8 experiments record message/encoded sizes, density and quality metrics with explicit interpretation limits and human listening observations. Focused tests: 105 passed; full suite: 561 passed. |
 | R10 lossless video extension | Bounded FFmpeg/ffprobe integration embeds the framed signed payload into one authenticated frame of a short video, writes FFV1 Matroska, remuxes compatible audio, and verifies the complete decoded RGB frame set plus timing, resolution, frame rate/count and audio-stream properties before publication. Protection, verification, preview and an actual H.264 verification-failure experiment are integrated through the GUI and services. Focused tests: 84 passed; full suite: 567 passed. |
 | R11 reproducible sample and receiver bundles | One atomic generator creates deterministic image, mono/stereo PCM and FFV1 covers plus brief-derived short/long and fictional confidential messages while using fresh RSA/AES keys, start secrets and payload nonces. The standalone receiver bundle contains 10 indexed positive/negative/robustness/video cases, capacity-rejection evidence, portable paths, expected bytes, a public key and explicitly labelled demonstration secrets, but no signing private key. Focused tests: 6 passed; full suite: 573 passed. |
+| R12 release integration and evidence | Python 3.14-compatible direct dependencies install from binary wheels in a clean environment, `pip check` passes, and `main.py --smoke-test` proves application startup. Automated release audits reproduce all 10 receiver cases, exercise optional FFmpeg absence, run three native Windows Qt image/audio verification workflows, capture visually reviewed screenshots, validate hashes, and reject private-key or secret leakage. Focused tests: 5 passed; full suite: 578 passed. |
+| R13 documentation and submission preparation | The original planning README is preserved byte-for-byte and the root README now supplies tested setup, operation, reproduction, evidence, and key-handling instructions. Architecture, wire format, limitations, compatibility, requirement/rubric mapping, ten receiver cases, a 25-minute five-member demo, contribution/originality templates, AI-use disclosure, deadlines, evidence index, and packaging checks are documented. Personal paths were removed and all human-specific claims remain placeholders. Focused tests: 5 passed; full suite: 578 passed. |
 
-## 5. Partially completed work and specific inconsistencies
+## 5. Remaining human completion items
 
-These are the remaining observed gaps after completing R01 through R11. Not every issue can be attributed solely to the interruption; some predate it.
+No implementation or documentation slice remains after R01 through R13. The following external facts and actions cannot be completed truthfully from the repository alone.
 
 | Files / area | Observed incomplete or inconsistent behaviour | Follow-up |
 | --- | --- | --- |
-| `README.md`, `docs/architecture.md`, `docs/limitations.md` | README remains planning context; architecture remains audio-only, while limitations now adds the R01 plaintext-hash/confidentiality boundary but is not yet a complete system document. | R13 |
-| `requirements.txt` | Direct dependencies are pinned, but comments still instruct members to pin already-pinned packages. On Python 3.14, `numpy==2.1.3` has no compatible wheel and falls back to a source build. Fresh pinned installation and video setup have not been validated for release. | R12, R13 |
-| Release evidence | The signed R11 sample matrix, receiver bundle, public demo key and extension evidence are complete. Clean-environment logs, native desktop screenshots and final release-machine evidence are still pending. | R12 |
+| Human handoff | Team identifiers, actual contributions, acknowledgements, transfer/rehearsal observations, official declaration wording, and signatures require truthful completion by the team. | H01 |
 
 ### Empty scaffold inventory
 
@@ -157,7 +173,6 @@ These are the remaining observed gaps after completing R01 through R11. Not ever
 - Analysis placeholders: `app/analysis/quality_metrics.py`, `steganalysis.py`. Working image/audio analysis already exists in the media-specific modules.
 - Comparison placeholder: `app/verification/media_compare.py`.
 - Utility placeholders: `app/utils/constants.py`, `file_utils.py`, `logging_utils.py`, `media_utils.py`.
-- Submission document placeholders: `docs/demo_plan.md`, `docs/test_cases.md`, `docs/contribution_statement.md`.
 - Empty package `__init__.py` files and `.gitkeep` files are normal scaffolding, not broken implementations.
 - `app/robustness/error_correction.py` is a re-export of the implemented repetition helpers, not a separate error-correction algorithm. Do not infer Hamming/Reed-Solomon support from its filename.
 
@@ -165,7 +180,7 @@ Do not fill placeholders just to make every file non-empty. Extend existing owne
 
 ## 6. Remaining tasks, dependencies, and acceptance criteria
 
-R01 through R11 are complete. R12–R13 remain pending, including completion of partial features. IDs provide a stable order for future turns. Add regression tests alongside each correction; do not defer correctness testing to the final milestone.
+R01 through R13 are complete. No further implementation task is planned. H01 is the next operational task and requires the real team, devices, course details, observations, and signatures.
 
 ### R01 — Harden envelope, manifest, and verification boundaries — COMPLETE
 
@@ -337,7 +352,7 @@ Generate deterministic image, mono/stereo PCM audio and short video covers with 
 
 **Acceptance review:** complete. The checked-in bundle has 63 files, with all 62 non-index files matching the size and SHA-256 inventory in `bundle-index.json`. All 10 receiver cases match their recorded verdicts and recovered bytes, and the independent capacity case confirms no output was created. The matrix supplies positive and negative cases for both mandatory media, four actual verification-negative cases overall, deterministic original/protected/tampered artifacts, mono/stereo audio, confidentiality, robustness and video extensions. Regeneration tests prove cover/message bytes remain deterministic while RSA fingerprints, AES keys, start secrets and payload nonces change. JSON contains no absolute workspace path, no PEM private-key marker exists, and the public-key ignore exception is limited to the named receiver key. The focused R11 suite passes all 6 tests; the complete repository suite passes all 573 tests. Compilation and `git diff --check` pass, and no R11 acceptance item remains incomplete.
 
-### R12 — Complete integration, release and evidence checks
+### R12 — Complete integration, release and evidence checks — COMPLETE
 
 **Objective:** validate a release candidate from a clean supported environment and native desktop, close only integration defects exposed by that audit, and capture reproducible evidence for every implemented claim without including secrets.
 
@@ -349,7 +364,15 @@ Run the expanded suite and clean-environment installation, exercise real desktop
 
 **Acceptance:** all preserved and new tests pass; fresh setup launches `main.py`; receiver image/audio verification works solely from the documented bundle and separately supplied keys. Optional tool absence is handled. Evidence supports every claim, including limits, and contains no secrets. Record actual test counts/results rather than treating today's 380 passes as release sign-off.
 
-### R13 — Finish documentation and submission preparation
+**Completion evidence:** direct dependencies are pinned to Python 3.14-compatible releases. A fresh virtual environment installed `requirements.txt` from binary wheels, passed `pip check`, launched `main.py --smoke-test`, and completed the full suite. `scripts/collect_release_evidence.py` records dependency/tool versions, verifies the 10-case receiver matrix using only its bundle inputs, and confirms mandatory media inspection with FFmpeg unavailable. `scripts/run_desktop_release_check.py` completes authentic image/audio and rejected-image workflows on the native Windows Qt platform and captures three screenshots. `scripts/finalize_release_evidence.py` parses the real logs, verifies report and screenshot hashes, and rejects private key material or indexed secret values.
+
+**Acceptance review:** complete. The focused release checks pass all 5 tests and the complete repository suite passes all 578 tests. The independently rerun finalizer reports 578 tests, 10 passing receiver cases, three passing native desktop cases on Qt `windows`, visually reviewed screenshots, and successful optional-tool absence handling. Clean-environment startup and dependency checks pass; compilation and `git diff --check` pass. The evidence summary contains hashes for eight release artifacts and reports no private key material or secret values. No R12 acceptance item remains incomplete.
+
+### R13 — Finish documentation and submission preparation — COMPLETE
+
+**Objective:** turn the verified release candidate into a submission-ready, reproducible documentation set that accurately maps every requirement and claim to the implemented system, checked samples, and R12 evidence while reserving team-specific declarations and real transfer/rehearsal results for truthful human completion.
+
+**Likely files:** `README.md`; a preserved planning reference under `docs/`; `docs/architecture.md`, `docs/limitations.md`, `docs/test_cases.md`, `docs/demo_plan.md`, and `docs/contribution_statement.md`; any originality/AI-use or evidence-index document required by the brief.
 
 **Depends on:** R01–R12 for final claims; draft progressively as features settle.
 
@@ -357,14 +380,27 @@ Preserve the current planning README under project documentation and replace the
 
 **Acceptance:** every FR and rubric criterion maps to an implemented feature and evidence or an explicit limitation. Demo script fits 25 minutes and allocates all five members speaking time. Required package contents and deadlines are listed. Team ID/names, contribution percentages, acknowledgements, actual transfer/rehearsal and signatures remain truthful human-completed fields. No messages, uploads, signatures or submissions are fabricated or sent automatically.
 
+**Completion evidence:** the original planning README is preserved at `docs/planning_reference.md`, while the root README provides tested setup, GUI use, receiver reproduction, evidence, and security/key instructions. `docs/architecture.md` specifies the actual layers, flows, version-1 envelope/manifest, carrier framing, start derivation, optional mechanisms, and trust model. `docs/limitations.md` records authentication, replay, confidentiality, steganography, format, size, recovery, metadata, GUI, analysis, and evidence limits. `docs/test_cases.md` maps every functional requirement and rubric criterion to implementation and evidence. `docs/demo_plan.md` schedules all five members within exactly 25 minutes. Contribution, originality/AI-use, submission, deadline, evidence-index, packaging, and human-completion materials are present. Legacy personal absolute paths were removed.
+
+**Acceptance review:** complete. The full suite passes all 578 tests and focused release checks pass all 5 tests. The standalone receiver reproduces all 10 indexed outcomes and capacity rejection, and the release finalizer validates the recorded environment, native desktop cases, hashes, and secret exclusions. All 11 Markdown documents have resolving local links; the preserved planning README has the same Git blob hash as the original; five distinct member roles, nine functional-requirement rows, and four deadline entries are present. Privacy, compilation, and whitespace checks pass. Fifty-nine explicit placeholders or instructions keep identifiers, contributions, acknowledgements, actual transfer/rehearsal, official declarations, and signatures for truthful human completion. No R13 acceptance item remains incomplete.
+
+### H01 — Conduct and record the real A-to-B transfer and timed rehearsal
+
+**Objective:** have the five-person team perform the documented transfer and complete 25-minute rehearsal on the intended equipment, then record only actual observations needed for the final human submission review.
+
+**Likely files:** `docs/demo_plan.md`, `docs/test_cases.md`, and `docs/submission_checklist.md`; the team may also retain separate course-approved rehearsal notes or transfer evidence.
+
+**Depends on:** completed R01–R13; confirmed team members and roles; the real Party A/Party B devices or separate folders/accounts; current course dates and submission instructions; the team's chosen transfer and separate key/secret channels.
+
+**Acceptance:** Party B independently verifies the transferred image and audio cases without Party A's private key or process state; the trusted public-key fingerprint and any required secret channel are checked; actual image/audio observations and problems are recorded; all five members perform their allocated segments; the complete rehearsal lasts no more than 25 minutes; no private signing key enters receiver or submission evidence. This task does not authorize fabricated observations, signatures, uploads, or messages.
+
 ## 7. Recommended resumption order and final handoff
 
-1. **Protect existing work:** retain the reviewed baseline and completed R01–R11 slices. Do not restart scaffolding or rewrite tested media modules.
-2. **Validate the release candidate:** complete R12 clean-install, native-workflow and evidence checks, correcting only defects those checks expose.
-3. **Finish the handoff:** complete R13 documentation from the verified release evidence.
+1. **Protect existing work:** retain the reviewed baseline and completed R01–R13 slices. Do not alter verified behavior for submission-only edits.
+2. **Perform the real handoff:** complete H01 with the team and record the actual transfer and rehearsal results.
 
-The next single implementation action should be **R12: complete integration, release and evidence checks**. Its objective, dependencies, likely files, and acceptance criteria are recorded above. Do not begin R13 or unrelated submission-document work during the R12 slice.
+The next single logical task is **H01: conduct and record the real A-to-B transfer and timed rehearsal**. Its objective, dependencies, likely files, and acceptance criteria are recorded above. It is a human operational task, not another implementation slice.
 
 No user-supplied cover media or payload is needed to resume: synthetic covers and required messages can be prepared by the implementer. The team must eventually supply identifiers, actual contributions/signatures, the demo date, and participants/devices for the real A-to-B demonstration. These external inputs do not block code completion.
 
-Definition of done: all agreed core and extension workflows are implemented and verified within documented limits; the application is usable from a fresh documented setup; evidence and submission documents are ready for the team's review and genuine acknowledgements. The present repository is a working foundation with incomplete integration and extensions, not a completed submission.
+Definition of done for repository work is met: all agreed core and extension workflows are implemented and verified within documented limits; the application is usable from a fresh documented setup; evidence and submission documents are ready for team completion. Remaining work is H01 and the team's truthful identifiers, contributions, acknowledgements, declarations, signatures, packaging approval, and submission.

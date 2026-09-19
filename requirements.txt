@@ -1,53 +1,41 @@
 # INF2005 ACW1 dependencies.
 #
-# This file is the merge of two versions: the pinned image-layer dependencies
-# and the package list from origin/main. The origin/main version used prose
-# ("PySide6 - Qt bindings for Python"), which pip cannot parse, so those entries
-# have been rewritten as real requirement specifiers and the descriptions moved
-# into comments.
-#
 # Install with:
 #   python -m venv .venv
 #   .venv/Scripts/python -m pip install -r requirements.txt   (Windows)
 #   .venv/bin/python -m pip install -r requirements.txt       (macOS/Linux)
 #
-# Keep this file merge-friendly: add entries under your own section rather than
-# editing someone else's, and leave the section headers in place.
+# Pins below were installed from a clean Python 3.14 environment during R12.
 
 # --- Shared numerics --------------------------------------------------------
 # Used by the image layer (vectorised bit and metric arithmetic; Requirement
 # 13.8 sets a 36-million-element budget that rules out Python loops) and by the
 # audio layer for sample handling.
-numpy==2.1.3
+numpy==2.5.3
 
 # --- Image steganography and image steganalysis (Member 2) ------------------
 # Pillow is used for PNG only. BMP is encoded and decoded directly in
 # app/stego/image_io.py, because Pillow's BMP writer discards the alpha channel
 # and stores grayscale as an 8-bit palette.
-Pillow==11.0.0
+Pillow==12.3.0
 
 # --- Audio steganography and robust embedding (Member 3) --------------------
 # soundfile: read and write WAV/PCM audio.
 # scipy: scientific computing helpers for audio analysis.
-# TODO(Member 3): replace the open ranges with exact pins, e.g. soundfile==0.12.1,
-# once you confirm the versions in your environment. Everything else here is
-# pinned so the demo machine resolves identical builds.
 soundfile==0.14.0
 scipy==1.18.1
 
 # --- Cryptography and payload security (Member 1) ---------------------------
 # cryptography: RSA key handling, signatures and hashing primitives. Imported by
 # app/crypto/signatures.py, key_manager.py, hashing.py and payload.py.
-# TODO(Member 1): pin this, e.g. cryptography==43.0.1.
 cryptography==50.0.1
 
 # --- GUI and system integration (Member 4) ----------------------------------
 # PySide6: Qt bindings for the desktop GUI.
-# TODO(Member 4): pin this, e.g. PySide6==6.8.0.
 # Note: the image analysis layer must not import PySide6 (Requirement 12.2).
 PySide6==6.11.2
 
 # --- Testing (shared) -------------------------------------------------------
 # hypothesis drives the property-based tests required by Requirement 15.
-pytest==8.3.3
-hypothesis==6.115.5
+pytest==9.1.1
+hypothesis==6.168.0

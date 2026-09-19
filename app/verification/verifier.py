@@ -254,7 +254,8 @@ def verify_media(
     if not signature_valid:
         return result.result(
             Verdict.SIGNATURE_INVALID,
-            "The payload was not signed by the supplied trusted key.",
+            "Signature verification failed: the payload may have been altered, "
+            "or the supplied public key may not match the signer.",
             record=envelope.record,
             start_location=start,
         )
