@@ -13,7 +13,7 @@ Six layers, each depending only on the ones below it.
 ```text
 ┌──────────────────────────────────────────────────────────────┐
 │  app/gui/            Protect · Verify · Attack Lab ·         │
-│                      Steganalysis · Video                    │
+│                      Video                                  │
 ├──────────────────────────────────────────────────────────────┤
 │  app/verification/   protect · verifier · verdicts ·         │
 │                      media_compare                           │
@@ -389,42 +389,21 @@ that decoded the code, damaged the envelope and re-encoded would put the damage
 
 ---
 
-## 10. Steganalysis
+## 10. Quality comparison
 
-Descriptive statistics, not detectors. There is no verdict, no confidence percentage
-and no "probably contains data" anywhere in the module or the tab.
+Protect and Verify retain numerical MSE/PSNR, sample-difference and media-property
+comparisons. Statistical detection and analysis visualisations were removed in S01.
 
-| Indicator | Image | Audio |
-|---|---|---|
-| LSB distribution | ✓ | ✓ |
-| Bit-0 uniformity χ² | ✓ | ✓ |
-| Pair-of-values χ² | ✓ | reported as insufficient sample |
-| Pair-of-values neighbour | ✓ | ✓ |
-| Bit planes | ✓ | — |
-
-The pair-of-values χ² test is *not* computed for 16-bit audio. With 65 536 possible
-values most pair counts fall below the level at which the chi-square approximation
-holds, so it is reported as an insufficient sample rather than as a precise-looking
-number that means nothing.
-
-Video is not analysed here, and that is a scope decision rather than an oversight: a
-clip is hundreds of separate images of which a handful carry anything, so a clip-wide
-statistic would be dominated by the untouched frames and a per-frame one would be
-hundreds of numbers with no meaningful summary. The Video tab shows clip playback and the manifest-claimed payload frame range.
-It does not expose arbitrary-frame or reference-difference exploration.
-
----
 
 ## 11. The interface
 
-Five tabs, all real.
+Four tabs, all real.
 
 | Tab | Does |
 |---|---|
 | Protect | Collects settings, runs `protect_media`, shows capacity live and quality after |
 | Verify | Runs `verify_media`, renders the verdict, its reasons and its caveats |
 | Attack Lab | Runs focused payload/signature corruption or outside-payload edits and shows before/after verdicts; further challenge actions are T05 |
-| Steganalysis | Renders indicators, bit planes and, with a reference, the difference image |
 | Video | Clip properties, playback and the manifest-claimed payload frame range; video-only output disclosure |
 
 Every backend call runs on a `QThreadPool` worker. Qt repaints only from the main
@@ -538,5 +517,5 @@ inputs change. Recovered plaintext preview/save requires the final AUTHENTIC ver
 Sender and receiver inputs show the canonical public-key SHA-256 fingerprint with
 an independent-trust reminder. The separate key-location menu, bulk attack runner,
 extra GUI attack variants, arbitrary video-frame explorer, separate video capacity
-table and steganalysis scaling checkbox have been removed. Backend catalogues and
+table have been removed. Steganalysis was subsequently removed completely in S01. Backend catalogues and
 experiments remain available for tests and T05 evaluation.

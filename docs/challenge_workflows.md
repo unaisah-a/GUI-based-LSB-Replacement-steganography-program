@@ -9,7 +9,7 @@ Run from the repository root with Python 3.11 and the pinned dependencies:
 
 Use a new output directory each run. The script refuses to overwrite a directory.
 It creates synthetic PNG, PCM-16 WAV and ten-frame FFV1/MKV inputs, protected files,
-attack outputs, analysis pairs, a public key and results.json. Private keys remain
+attack outputs, a public key and results.json. Private keys remain
 in memory. RSA signatures, timestamps and nonces change each run; fixed generators,
 damage positions and evaluation rules reproduce the experiment, not identical bytes.
 This is a development experiment, not the T07 sender/receiver sample bundle.
@@ -67,21 +67,6 @@ indices and checks that they lie within that span. Output is video-only FFV1/MKV
 source audio is omitted. This synthetic source has no audio track. Codec/property
 measurements belong to T06; native playback validation belongs to T08.
 
-## 5. Steganalysis
 
-Open analysis_noise_0_stego.png in Steganalysis with analysis_noise_0.png as its
-reference. Inspect bit plane 0, amplified reference difference and distortion
-metrics. The evaluation script writes the reproducible report; there is no
-Steganalysis GUI export button. Repeat with an even-valued or gradient case.
-
-The evaluation has three synthetic families (uniform random bytes, even-valued
-random bytes and an even-valued gradient), three seed entries and paired
-cover/stego labels: 9 covers and 9 stegos. Gradient seeds intentionally produce
-the same cover; these are fixtures, not independent population samples.
-The fixed rule flags channel-0 bit-0 uniformity p >= 0.05. Other reported indicators
-are not combined into a classifier. Counts of false positives and misses are
-recorded along with every case and its indicators/quality metrics in results.json.
-A p-value is not a probability that steganography is present. These small,
-synthetic fixtures do not estimate natural-media detection accuracy.
-
-Recorded execution and limitations: [T05 evidence](../evidence/t05/README.md).
+Current scope: four retained challenges. Historical T05 results are in
+[T05 evidence](../evidence/t05/README.md); S01 removed the detection experiment.

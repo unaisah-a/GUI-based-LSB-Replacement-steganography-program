@@ -54,7 +54,7 @@ def build(output):
     output.mkdir(parents=True, exist_ok=False)
     sender, receiver = output / "party-a", output / "party-b"
     for folder in (sender / "original", sender / "protected", sender / "tampered",
-                   sender / "messages", sender / "analysis", receiver):
+                   sender / "messages", receiver):
         folder.mkdir(parents=True)
     private, public = key_manager.generate_key_pair(constants.RSA_KEY_SIZE_DEFAULT)
     _, wrong_public = key_manager.generate_key_pair(constants.RSA_MIN_KEY_SIZE)
@@ -86,7 +86,7 @@ def build(output):
     payload_audio = sender / "messages" / "payload.wav"
     sf.write(payload_audio, tones[:2205, 0], 22050, subtype="PCM_16")
 
-    cases, sender_rows, analysis_pairs, capacities = [], [], [], []
+    cases, sender_rows, capacities = [], [], []
     originals = {p: sha256(p.read_bytes()) for p in (sender / "original").iterdir()}
 
     def transfer(path):
@@ -204,20 +204,6 @@ def build(output):
     add_case("image-wrong-passphrase", encrypted, custom, passphrase="wrong_passphrase",
              expected=("CANNOT_VERIFY",), purpose="Signature can verify but decryption fails")
 
-    # Fixed rule and generators from T05; regenerate, never copy historical results.
-    for family in ("noise", "even", "gradient"):
-        for seed in range(3):
-            pixels = np.random.default_rng(seed).integers(0, 256, (128, 128, 3), dtype=np.uint8)
-            if family == "even":
-                pixels &= 254
-            elif family == "gradient":
-                pixels = np.tile(np.arange(128, dtype=np.uint8)[None, :, None] * 2, (128, 1, 3))
-            cover = sender / "analysis" / f"{family}-{seed}.png"
-            Image.fromarray(pixels).save(cover)
-            result = protect(f"analysis-{family}-{seed}", cover, short, depth=1)
-            analysis_pairs.append(dict(family=family, seed=seed, cover=transfer(cover),
-                                       stego=transfer(result.stego_path)))
-
     for cover in (image, audio):
         maximum = media.measure(cover, 1, 37).report.max_payload_length
         message = b"X" * (maximum + 1)
@@ -238,8 +224,8 @@ def build(output):
         if sha256(path.read_bytes()) != original_hash:
             raise RuntimeError("Original cover modified")
     write_json(receiver / "demo-only-secrets.json", DEMO)
-    write_json(receiver / "case-index.json", dict(schema="t07-v1", cases=cases,
-                                                   analysis_pairs=analysis_pairs, capacity_cases=capacities))
+    write_json(receiver / "case-index.json", dict(schema="t07-v2", cases=cases,
+                                                   capacity_cases=capacities))
     write_json(sender / "generation-report.json", dict(cases=sender_rows, attacks=attacks,
                                                         capacity=capacities, video=video_evidence,
                                                         private_keys_saved=0))

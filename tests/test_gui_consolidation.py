@@ -9,7 +9,6 @@ from PySide6.QtWidgets import QFileDialog
 from app.crypto import key_manager
 from app.gui.attack_tab import AttackTab
 from app.gui.protect_tab import ProtectTab
-from app.gui.steganalysis_tab import SteganalysisTab
 from app.gui.verify_tab import VerifyTab
 from app.gui.widgets.drop_zone import DropZone
 from app.stego import image_io
@@ -130,7 +129,7 @@ def test_capacity_worker_ignores_superseded_result(qtbot, cover, monkeypatch):
 
 
 @pytest.mark.parametrize("cls,attr", [(ProtectTab, "_cover_path"), (VerifyTab, "_stego_path"),
-                                     (AttackTab, "_stego_path"), (SteganalysisTab, "_path")])
+                                     (AttackTab, "_stego_path")])
 def test_clear_forgets_tab_input(qtbot, cover, cls, attr):
     tab = widget(qtbot, cls)
     tab.drop_zone.accept_path(cover)
@@ -173,7 +172,5 @@ def test_sender_receiver_fingerprints_match(qtbot, tmp_path):
 
 def test_cut_controls_are_absent(qtbot):
     attack = widget(qtbot, AttackTab)
-    analysis = widget(qtbot, SteganalysisTab)
     for name in ("run_all_button", "bit_error_spin", "manifest_field_combo"):
         assert not hasattr(attack, name)
-    assert not hasattr(analysis, "scaled_check")

@@ -38,8 +38,7 @@ covert. See [`limitations.md`](limitations.md) §9.
 
 **The Attack Lab is dual-use.** The same attacks that show where verification stops
 also show an adversary how to damage or strip a payload: which edits go unnoticed,
-which destroy it, and that re-signing requires a key. The same applies to the
-steganalysis views, which detect this tool's own embedding. They are included because
+which destroy it, and that re-signing requires a key. These experiments are included because
 an integrity claim that has not been attacked is not worth much, and every attack here
 is standard, published technique. Use them on media you own or are authorised to test.
 
@@ -66,14 +65,12 @@ stylesheet under `assets/`, and the documents under `docs/`. That covers:
 - the manifest and its cross-check against the signed record
 - the verdict rules
 - the attack catalogue
-- the steganalysis indicators, including the implementation of the chi-square attack
 - the file-size experiment
 - the GUI
 
 **Published techniques, implemented here.**
 
 - LSB replacement.
-- The pairs-of-values chi-square attack (Westfeld and Pfitzmann, 2000).
 - Repetition coding with majority-vote decoding.
 - HMAC-based derivation.
 
@@ -88,7 +85,7 @@ SHA-256. The other libraries used:
 - `Pillow`: PNG and BMP encode and decode.
 - `soundfile`: WAV input and output.
 - `opencv-python`: video decode and encode, including its bundled FFV1 codec.
-- `scipy`: the chi-square distribution used for p-values.
+- `scipy`: photographic fixture for preservation evaluation.
 - `PySide6`: the interface and media playback.
 - `pytest`, `hypothesis`, `pytest-qt`, `coverage` and `ruff`: testing and linting.
 

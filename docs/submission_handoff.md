@@ -35,16 +35,16 @@ From the repository root with Python 3.11 and pinned requirements installed:
 
 ```powershell
 .venv/Scripts/python.exe -m scripts.verify_sample_bundle samples/t07/party-b --report tmp/receiver-final.json --recovered tmp/receiver-final-files
-.venv/Scripts/python.exe -m scripts.package_submission --output dist/INF2005_ACW1_T09.zip
-.venv/Scripts/python.exe evidence/t08/check_package.py --archive dist/INF2005_ACW1_T09.zip --extract tmp/t09-final --report dist/T09-final-package-report.json
+.venv/Scripts/python.exe -m scripts.package_submission --output dist/INF2005_ACW1_S01.zip
+.venv/Scripts/python.exe evidence/t08/check_package.py --archive dist/INF2005_ACW1_S01.zip --extract tmp/s01-package-audit --report dist/S01-audit-package-report.json
 ```
 
 Use fresh report/recovered/extraction paths on repeat. The validation machine uses
-`.venv-t08` instead of `.venv`. Expected receiver result: 27 cases and two capacity
-checks pass, with 20 exact authenticated exports. The archive check compares every
+`.venv-t08` instead of `.venv`. Expected receiver result: 18 cases and two capacity
+checks pass, with 11 exact authenticated exports. The archive check compares every
 member to source, rejects private keys, extracts to a fresh folder and runs isolated
 receiver plus original-format/startup checks. Its report records archive/member
-hashes outside the ZIP. See [executed T09 evidence](../evidence/t09/README.md).
+hashes outside the ZIP. See [current S01 evidence](../evidence/s01/README.md).
 
 Included: source, pinned requirements, tests, docs, evidence, public keys and
 original/protected/tampered samples. Excluded: private demo keys, environments,

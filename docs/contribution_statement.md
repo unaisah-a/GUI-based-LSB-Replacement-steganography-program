@@ -43,7 +43,7 @@ completion are described in [ethics_and_ai_use.md](ethics_and_ai_use.md).
 | Member 2 | 02–07 | Image workflow and receiver transfer | TO COMPLETE |
 | Member 3 | 07–12 and shared 15–19 | Audio, starts and robustness | TO COMPLETE |
 | Member 4 | 12–15 | Encryption and file recovery | TO COMPLETE |
-| Member 5 | 19–22 | Video, steganalysis and evidence | TO COMPLETE |
+| Member 5 | 19–22 | Video and evidence | TO COMPLETE |
 
 Follow the [script](demo_plan.md); every member explains their actual contribution.
 Record measured airtime and full rehearsal in the [handoff](submission_handoff.md).

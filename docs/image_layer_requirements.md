@@ -1,3 +1,7 @@
+> **Historical design reference, superseded by S01.** Detection statistics, bit-plane
+> views and difference-image visualisation described here are no longer implemented.
+> Current scope is in [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md).
+
 # Requirements Document
 
 ## Introduction

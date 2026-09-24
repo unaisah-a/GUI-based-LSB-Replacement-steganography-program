@@ -2,7 +2,7 @@
 
 Every operation the tabs trigger can take long enough to freeze the window if it
 runs inline. Embedding into a large PNG, deriving a key with scrypt at the
-production cost, computing bit planes over millions of samples, and anything to do
+production cost, comparing millions of image samples, and anything to do
 with video are all in that category. Qt repaints only from the main thread, so a
 long call there produces a window that stops responding, which during a live
 demonstration looks like a crash.

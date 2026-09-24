@@ -1,4 +1,5 @@
-# T07 sender/receiver sample bundle
+# Current sender/receiver sample bundle (S01)
+
 
 This is a local demonstration bundle, not a submitted release. Party A and Party B
 are separate folders. No private signing key is saved in either folder. The signing
@@ -47,7 +48,7 @@ it is not evidence of an email transfer or a second person's demonstration.
   `unrelated-public.pem` is deliberately wrong.
 - `party-b/demo-only-secrets.json`: public demonstration start/passphrase values,
   including intentionally wrong values. **These protect no real information.**
-- `party-b/original/` and `analysis/`: optional reference media for comparison.
+- `party-b/original/`: optional reference media for comparison.
   Positive verification itself needs only media, manifest, public key and any
   relevant demo secret.
 
@@ -68,7 +69,8 @@ and signatures are fresh, so regenerated protected files differ byte-for-byte.
 In **Verify**, select the indexed file under Party B, its listed companion manifest
 and public key. Enter the relevant start value/passphrase. Select the corresponding
 original as the optional comparison. Damaged files deliberately reuse the original
-manifest: select that path explicitly. Use **Save as evidence...** for results.
+manifest: select that path explicitly. Use **Save recovered payload...** for authenticated bytes. Attack Lab supplies
+**Save as evidence...** for attack results; receiver scripts produce JSON reports.
 
 | Demonstration | Case / action | Expected observation |
 | --- | --- | --- |
@@ -87,22 +89,15 @@ manifest: select that path explicitly. Use **Save as evidence...** for results.
 | Wrong passphrase | `image-wrong-passphrase` | CANNOT_VERIFY; signature may verify but plaintext is withheld |
 | Outside-payload attack | `image-outside-payload` | AUTHENTIC despite changed cover samples; signature covers the payload |
 | Video challenge | `video-positive`, then Video tab | AUTHENTIC; preview cover/stego and locate the manifest-claimed affected frames |
-| Steganalysis | `analysis-noise-0`, `analysis-even-0`, `analysis-gradient-0` and their cover references | Inspect bit plane 0, amplified difference and metrics; export the analysis |
 
 Robustness flips the last signature bit in one stored copy, then in two copies of
 the repetition-3 envelope. Coded and uncoded cases use the same cover, message,
 depth and manual start. This is matched logical damage, not an equal bit-error rate
 or resistance to lossy compression. Repetition consumes about three times the space.
 
-The receiver reruns a fixed steganalysis rule (channel-0 bit-0 uniformity p >= 0.05)
-on 18 labelled fixtures: noise/even/gradient families, three seed entries, each
-with a cover/stego pair. It reports false positives and misses. Gradient seeds
-produce the same cover; these are not independent population samples or measured
-natural-media detection accuracy. A p-value is not the probability of hidden data.
-
 Video output is **video-only FFV1/MKV**: source audio is omitted. This bundle's
 synthetic source has no audio track. Timing uses constant-rate frames; native
-playback and source-audio omission with an audio-bearing input remain T08 checks.
+playback and source-audio omission were checked in [T08](../evidence/t08/README.md).
 The Video tab's frame span is untrusted until verification succeeds.
 
 ## Sender actions and retained extras
@@ -115,8 +110,8 @@ Keep locally generated private keys out of the shared bundle.
 
 Use an image drop and an audio picker selection to demonstrate both input routes.
 Select manual start 37 for the image and HMAC start for audio. Show the depth slider
-offers 1-8 and the capacity display responds to depth/start/message changes. These
-instructions are demo preparation, not a claim of native drag/drop acceptance.
+offers 1-8 and the capacity display responds to depth/start/message changes. T08 subsequently confirmed native picker/drop behaviour; these are live demo
+preparation instructions, not evidence of a team rehearsal.
 
 For capacity rejection, load the indexed original image or audio, depth 1, manual
 start 37, and enter the indexed `message_bytes` count of `X` characters. The builder
@@ -138,9 +133,14 @@ Wrong-key/start actions change verifier inputs and do not create a tampered file
 
 Use recovered text/hex views and save only AUTHENTIC payloads. For file cases the
 verifier's optional recovered directory supplies exact-hash evidence; native GUI
-preview/playback is still a T08 acceptance task. T09 owns the timed team demo,
-names/contributions/signatures, actual transfer and rehearsal records.
+preview/playback passed T08. T09 supplies the [timed script](demo_plan.md) and
+[human completion records](submission_handoff.md).
 
 AUTHENTIC concerns the signed payload and settings, not every cover byte. Timestamp
 and nonce alone do not reject replay. No email, submission or real transfer is made
 by these commands.
+
+S01 pruned the nine analysis-only cases without re-signing retained fixtures.
+The v2 index has 18 verification cases, two capacity checks and 11 authenticated
+exports. The verifier accepts v1 indexes for payload verification only; retired
+analysis fields are ignored and v2 reports contain no statistical analysis.

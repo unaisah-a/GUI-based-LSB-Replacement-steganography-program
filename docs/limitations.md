@@ -197,33 +197,11 @@ cover.
 
 ---
 
-## 8. Steganalysis indicators are not detectors
+## 8. Quality comparisons require a reference
 
-None of the indicators establishes that a file does or does not contain embedded data.
-The module returns no verdict and no confidence, and the tab shows none.
+MSE, PSNR and changed-sample counts compare the selected original and protected
+media. They measure distortion, not hidden-data detection or authenticity.
 
-- The two chi-square indicators report a goodness-of-fit **p-value** (Westfeld and
-  Pfitzmann's pair-of-values attack). Replacement pushes it toward 1, so a threshold
-  flags values at or above it. The p-value is the probability of counts this uneven
-  *if* the pairs were even; it is **not** the probability that the file holds data.
-  The synthetic cover in `samples/` already scores about 0.997 in its green channel
-  with nothing embedded.
-- Each figure is computed over the whole image. A small payload at a secret offset
-  changes too few samples to move it: the committed sample stego image carries an
-  814-byte payload and its p-values barely differ from the cover's.
-- Natural media routinely produces values that look suspicious. A photograph's low
-  bits are close to random already.
-- A short or low-entropy payload routinely produces values that look ordinary.
-- Where there was not enough data for a number to mean anything, `insufficient_sample`
-  is set and the tab prints "insufficient sample" rather than a precise-looking figure
-  computed from nothing.
-- A threshold comparison, when a caller asks for one, records the comparison the
-  caller requested. It is not a detection.
-
-Video is not analysed at all; see [`architecture.md`](architecture.md) §10 for why,
-and use the Video tab's per-frame difference instead.
-
----
 
 ## 9. Limits of the manifest
 

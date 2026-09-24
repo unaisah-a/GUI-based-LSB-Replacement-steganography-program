@@ -1,14 +1,12 @@
-"""Tests for the Attack Lab and Steganalysis tabs.
+"""Tests for the Attack Lab tab.
 
-Both tabs are presentation over layers that are already tested, so these tests focus
+The tab presents backend layers that are already tested, so these tests focus
 on the wiring and on the honesty properties that only exist in the interface:
 
 * the attack list is filtered to the loaded medium
 * the observed verdict is shown alongside the verdict the attack declared to expect,
   including the attack that is *supposed* to leave the verdict at AUTHENTIC
 * an attack that cannot run on the loaded file is reported as skipped, with a reason
-* every indicator row is rendered, and an insufficient sample renders as words rather
-  than a number
 """
 
 from __future__ import annotations
@@ -25,7 +23,6 @@ from app.attacks.base import AttackError
 from app.crypto import key_manager
 from app.crypto.encryption import MIN_SCRYPT_N
 from app.gui.attack_tab import AttackTab
-from app.gui.steganalysis_tab import SteganalysisTab, array_to_pixmap
 from app.stego import image_io
 from app.utils import constants
 from app.verification import verdicts
@@ -95,12 +92,6 @@ def attack_tab(qtbot, monkeypatch):
     return tab
 
 
-@pytest.fixture()
-def analysis_tab(qtbot, monkeypatch):
-    monkeypatch.setattr(QMessageBox, "warning", lambda *args, **kwargs: None)
-    tab = SteganalysisTab()
-    qtbot.addWidget(tab)
-    return tab
 
 
 def load(tab: AttackTab, protected) -> None:
@@ -333,173 +324,12 @@ class TestAttackTabRunning:
 
 
 # --------------------------------------------------------------------------- #
-# Steganalysis tab
+# Additional attack regressions
 # --------------------------------------------------------------------------- #
 
 
-class TestArrayToPixmap:
-    def test_a_grayscale_plane(self):
-        import numpy as np
-
-        pixmap = array_to_pixmap(np.zeros((8, 12), dtype=np.uint8))
-        assert pixmap.width() == 12
-        assert pixmap.height() == 8
-
-    def test_an_rgb_image(self):
-        import numpy as np
-
-        pixmap = array_to_pixmap(np.zeros((8, 12, 3), dtype=np.uint8))
-        assert pixmap.width() == 12
-
-    def test_an_rgba_image(self):
-        import numpy as np
-
-        pixmap = array_to_pixmap(np.zeros((8, 12, 4), dtype=np.uint8))
-        assert pixmap.width() == 12
-
-    def test_a_single_channel_three_dimensional_array(self):
-        import numpy as np
-
-        pixmap = array_to_pixmap(np.zeros((8, 12, 1), dtype=np.uint8))
-        assert pixmap.width() == 12
-
-    def test_an_unsupported_shape_is_refused(self):
-        import numpy as np
-
-        with pytest.raises(ValueError, match="shape"):
-            array_to_pixmap(np.zeros((8, 12, 5), dtype=np.uint8))
 
 
-class TestSteganalysisTab:
-    def test_it_constructs(self, analysis_tab):
-        assert analysis_tab.TITLE == "Steganalysis"
-
-    def test_the_disclaimer_is_always_displayed(self, analysis_tab):
-        from app.analysis import image_analysis
-
-        assert analysis_tab.disclaimer_label.text() == (
-            image_analysis.INDICATOR_DISCLAIMER
-        )
-
-    def test_no_file_is_refused(self, analysis_tab):
-        assert "file to analyse" in analysis_tab.validation_error()
-
-    def test_a_missing_reference_is_refused(self, analysis_tab, protected_png, tmp_path):
-        result, _, _ = protected_png
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab.reference_edit.setText(str(tmp_path / "absent.png"))
-
-        assert "does not exist" in analysis_tab.validation_error()
-
-    def test_it_proposes_the_likely_original(self, analysis_tab, protected_png):
-        """A file named cover_stego.png usually sits beside cover.png."""
-        result, _, cover = protected_png
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-
-        assert analysis_tab.reference_edit.text() == cover
-
-    def test_it_analyses_an_image_without_a_reference(
-        self, analysis_tab, protected_png
-    ):
-        result, _, _ = protected_png
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab.reference_edit.setText("")
-
-        report = analysis_tab._run_analysis(analysis_tab._collect_inputs())
-        analysis_tab._on_analysed(report)
-
-        assert analysis_tab.report is report
-        assert analysis_tab.indicator_table.rowCount() == len(report.indicators)
-        assert "Select the original" in analysis_tab.quality_panel._notice_label.text()
-
-    def test_it_analyses_an_image_with_a_reference(self, analysis_tab, protected_png):
-        result, _, cover = protected_png
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab.reference_edit.setText(cover)
-
-        report = analysis_tab._run_analysis(analysis_tab._collect_inputs())
-        analysis_tab._on_analysed(report)
-
-        assert analysis_tab.quality_panel.value_for("MSE") is not None
-        assert analysis_tab.quality_panel.value_for("PSNR") is not None
-        assert "amplified" in analysis_tab.difference_caption.text()
-
-    def test_bit_planes_are_rendered_for_the_selected_channel(
-        self, analysis_tab, protected_png
-    ):
-        result, _, _ = protected_png
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
-
-        assert analysis_tab.plane_channel_combo.count() == 3
-        # Eight bit positions for the selected channel.
-        assert analysis_tab._plane_grid.count() == 8
-
-    def test_changing_the_channel_re_renders(self, analysis_tab, protected_png):
-        result, _, _ = protected_png
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
-
-        analysis_tab.plane_channel_combo.setCurrentIndex(1)
-        assert analysis_tab._plane_grid.count() == 8
-
-    def test_an_insufficient_sample_renders_as_words(self, analysis_tab, tmp_path):
-        """Not a precise-looking number computed from nothing."""
-        tiny = write_cover(str(tmp_path), make_cover(4, 4, 3), image_io.PNG, "tiny")
-        analysis_tab.drop_zone.accept_path(tiny)
-        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
-
-        texts = [
-            analysis_tab.indicator_table.item(row, 2).text()
-            for row in range(analysis_tab.indicator_table.rowCount())
-        ]
-        assert "insufficient sample" in texts
-
-    def test_every_row_explains_what_it_measures(self, analysis_tab, protected_png):
-        result, _, _ = protected_png
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
-
-        for row in range(analysis_tab.indicator_table.rowCount()):
-            assert analysis_tab.indicator_table.item(row, 4).text()
-
-    def test_every_row_carries_the_disclaimer_as_a_tooltip(
-        self, analysis_tab, protected_png
-    ):
-        from app.analysis import image_analysis
-
-        result, _, _ = protected_png
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
-
-        for row in range(analysis_tab.indicator_table.rowCount()):
-            assert (
-                analysis_tab.indicator_table.item(row, 0).toolTip()
-                == image_analysis.INDICATOR_DISCLAIMER
-            )
-
-    def test_it_analyses_audio(self, analysis_tab, protected_wav):
-        result, _, cover = protected_wav
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab.reference_edit.setText(cover)
-
-        report = analysis_tab._run_analysis(analysis_tab._collect_inputs())
-        analysis_tab._on_analysed(report)
-
-        assert report.media_type == constants.MEDIA_AUDIO
-        assert analysis_tab.quality_panel.value_for("SNR") is not None
-        assert "samples changed" in analysis_tab.difference_caption.text().lower()
-
-    def test_audio_shows_no_bit_plane_grid(self, analysis_tab, protected_wav):
-        result, _, _ = protected_wav
-        analysis_tab.drop_zone.accept_path(result.stego_path)
-        analysis_tab._on_analysed(analysis_tab._run_analysis(analysis_tab._collect_inputs()))
-
-        assert analysis_tab._plane_grid.count() == 0
-        assert "image media only" in analysis_tab.views_box.title()
-
-    def test_a_failure_is_reported_without_raising(self, analysis_tab):
-        analysis_tab._on_analysis_failed("could not decode the file", "traceback")
         # No exception is the assertion.
 
 

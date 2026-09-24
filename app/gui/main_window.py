@@ -1,8 +1,8 @@
-"""The application window: five tabs, a status bar, and demo key management.
+"""The application window: four tabs, a status bar, and demo key management.
 
 Structure follows the layout in the project plan::
 
-    Protect | Verify | Attack Lab | Steganalysis | Video
+    Protect | Verify | Attack Lab | Video
 
 The window itself holds no steganography or cryptography logic. It builds the tabs,
 offers the shared key-management actions they all depend on, and makes sure nothing
@@ -35,7 +35,6 @@ from PySide6.QtWidgets import (
 from app.crypto import key_manager
 from app.gui.attack_tab import AttackTab
 from app.gui.protect_tab import ProtectTab
-from app.gui.steganalysis_tab import SteganalysisTab
 from app.gui.verify_tab import VerifyTab
 from app.gui.video_tab import VideoTab
 from app.gui.workers import BackgroundRunner
@@ -67,14 +66,12 @@ class MainWindow(QMainWindow):
         self.protect_tab = ProtectTab(self)
         self.verify_tab = VerifyTab(self)
         self.attack_tab = AttackTab(self)
-        self.steganalysis_tab = SteganalysisTab(self)
         self.video_tab = VideoTab(self)
 
         for tab in (
             self.protect_tab,
             self.verify_tab,
             self.attack_tab,
-            self.steganalysis_tab,
             self.video_tab,
         ):
             # Loaded manifests/results need more height than an empty tab.
@@ -220,7 +217,7 @@ class MainWindow(QMainWindow):
         use, so the window waits rather than dropping the work.
         """
         for tab in (self.protect_tab, self.verify_tab, self.attack_tab,
-                    self.steganalysis_tab, self.video_tab):
+                    self.video_tab):
             if hasattr(tab, "shutdown"):
                 tab.shutdown()
             else:

@@ -15,7 +15,6 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.analysis.steganalysis import analyse
 from app.crypto import key_manager
 from app.stego import media
 from app.utils import constants, payload_files
@@ -36,7 +35,7 @@ def local_file(root, name):
 def verify_bundle(root, recovered=None):
     root = Path(root).resolve()
     index = json.loads(local_file(root, "case-index.json").read_text(encoding="utf-8"))
-    if index["schema"] != "t07-v1" or not index["cases"]:
+    if index["schema"] not in {"t07-v1", "t07-v2"} or not index["cases"]:
         raise ValueError("Unsupported or empty case index")
     # Check only the transferred tree. No original workspace or sender path is used.
     for path in root.rglob("*"):
@@ -87,17 +86,6 @@ def verify_bundle(root, recovered=None):
         results.append(dict(id=identifier, passed=bool(good), expected=case["expected_verdicts"],
                             actual=result.as_dict(), message_sha256=actual_hash, saved=saved))
 
-    analysis = []
-    for pair in index["analysis_pairs"]:
-        for label, name in (("cover", pair["cover"]), ("stego", pair["stego"])):
-            report = analyse(local_file(root, name), threshold=0.05,
-                             reference=local_file(root, pair["cover"]) if label == "stego" else None)
-            indicator = next(i for i in report.indicators
-                             if i.name == "bit0_uniformity_chi_square" and i.channel_index == 0)
-            if indicator.value is None:
-                raise ValueError("Steganalysis fixture has insufficient data")
-            analysis.append(dict(family=pair["family"], seed=pair["seed"], label=label,
-                                 flagged=bool(indicator.value >= 0.05), report=report.as_dict()))
     capacities = []
     for case in index["capacity_cases"]:
         result = media.measure(local_file(root, case["cover"]), case["depth"],
@@ -106,16 +94,11 @@ def verify_bundle(root, recovered=None):
                                requested_message_bytes=case["message_bytes"],
                                maximum_raw_payload_bytes=result.report.max_payload_length))
     public = key_manager.load_public_key(str(local_file(root, "sender-public.pem")))
-    return dict(schema="t07-receiver-report-v1", python=platform.python_version(),
+    return dict(schema="t07-receiver-report-v2", python=platform.python_version(),
                 platform=platform.platform(), private_key_files=0,
                 sender_fingerprint=key_manager.public_key_fingerprint(public),
                 passed=all(c["passed"] for c in results + capacities), cases=results,
-                capacity_checks=capacities,
-                steganalysis=dict(rule="channel-0 bit0 uniformity p >= 0.05",
-                                 false_positives=sum(c["flagged"] for c in analysis if c["label"] == "cover"),
-                                 misses=sum(not c["flagged"] for c in analysis if c["label"] == "stego"),
-                                 caveat="18 synthetic fixtures; not natural-media detection accuracy",
-                                 cases=analysis))
+                capacity_checks=capacities)
 
 
 def main():

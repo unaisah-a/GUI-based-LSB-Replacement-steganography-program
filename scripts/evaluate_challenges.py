@@ -15,7 +15,6 @@ import numpy as np
 import soundfile as sf
 from PIL import Image
 
-from app.analysis.steganalysis import analyse
 from app.attacks import registry
 from app.crypto import key_manager
 from app.crypto.envelope import ErrorCorrectionParameters
@@ -119,32 +118,8 @@ def evaluate(output: Path) -> dict:
                                        bits_corrected=corrected, file=target.name,
                                        manifest=Path(result.manifest_path).name))
 
-    cases = []
-    # Fixed before evaluation: flag channel-0 bit-0 uniformity p >= 0.05.
-    # Three synthetic families, three seeds, paired cover/stego = 18 cases.
-    for family in ("noise", "even", "gradient"):
-        for seed in range(3):
-            pixels = np.random.default_rng(seed).integers(0, 256, (128, 128, 3), dtype=np.uint8)
-            if family == "even":
-                pixels &= 254
-            elif family == "gradient":
-                pixels = np.tile(np.arange(128, dtype=np.uint8)[None, :, None] * 2, (128, 1, 3))
-            cover = output / f"analysis_{family}_{seed}.png"
-            Image.fromarray(pixels).save(cover)
-            result = protect(cover, f"analysis_{family}_{seed}_stego")
-            for label, path in (("cover", cover), ("stego", result.stego_path)):
-                report = analyse(path, reference=cover if label == "stego" else None, threshold=0.05)
-                indicator = next(i for i in report.indicators
-                                 if i.name == "bit0_uniformity_chi_square" and i.channel_index == 0)
-                assert indicator.value is not None
-                cases.append(dict(family=family, seed=seed, label=label,
-                                  flagged=bool(indicator.value >= 0.05), report=report.as_dict()))
-    fp = sum(c["flagged"] for c in cases if c["label"] == "cover")
-    fn = sum(not c["flagged"] for c in cases if c["label"] == "stego")
-    summary = dict(python=platform.python_version(), provenance="Synthetic generators; not natural-media accuracy",
-                   workflows=results, robustness=robustness,
-                   steganalysis=dict(rule="channel-0 bit0 uniformity p >= 0.05", covers=9, stegos=9,
-                                    false_positives=fp, misses=fn, cases=cases))
+    summary = dict(python=platform.python_version(), provenance="Synthetic generators",
+                   workflows=results, robustness=robustness)
     (output / "results.json").write_text(json.dumps(summary, indent=2, allow_nan=False), encoding="utf-8")
     return summary
 
@@ -154,5 +129,5 @@ if __name__ == "__main__":
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     summary = evaluate(args.output)
-    print(json.dumps({"output": str(args.output), "false_positives": summary["steganalysis"]["false_positives"],
-                      "misses": summary["steganalysis"]["misses"]}))
+    print(json.dumps({"output": str(args.output), "workflows": len(summary["workflows"]),
+                      "robustness_cases": len(summary["robustness"])}))

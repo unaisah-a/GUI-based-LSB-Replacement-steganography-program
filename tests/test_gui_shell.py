@@ -101,7 +101,7 @@ class TestMainWindow:
         qtbot.addWidget(window)
         assert window.windowTitle()
 
-    def test_it_has_the_five_tabs_from_the_plan(self, qtbot):
+    def test_it_has_the_four_tabs_from_the_plan(self, qtbot):
         window = MainWindow()
         qtbot.addWidget(window)
 
@@ -110,7 +110,6 @@ class TestMainWindow:
             "Protect",
             "Verify",
             "Attack Lab",
-            "Steganalysis",
             "Video",
         ]
 
@@ -221,7 +220,7 @@ class TestTabs:
 
     @pytest.mark.parametrize(
         "attribute",
-        ["protect_tab", "verify_tab", "attack_tab", "steganalysis_tab", "video_tab"],
+        ["protect_tab", "verify_tab", "attack_tab", "video_tab"],
     )
     def test_each_tab_declares_a_title(self, qtbot, attribute):
         window = MainWindow()
@@ -230,7 +229,7 @@ class TestTabs:
 
     @pytest.mark.parametrize(
         "attribute",
-        ["protect_tab", "verify_tab", "attack_tab", "steganalysis_tab", "video_tab"],
+        ["protect_tab", "verify_tab", "attack_tab", "video_tab"],
     )
     def test_each_tab_reports_progress_to_the_status_bar(self, qtbot, attribute):
         """A tab with no statusMessage signal was a placeholder; none are left."""

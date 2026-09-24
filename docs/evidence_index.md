@@ -1,3 +1,6 @@
+> Current scope: S01 removed steganalysis. [Current validation](../evidence/s01/README.md)
+> supersedes historical suite totals and bundle counts below.
+
 # Consolidated evidence index
 
 Application/test baseline: T08 commit `2aa68adf83f0e57cefa8cff10b4a78f3ac4c4f41`.
@@ -10,12 +13,11 @@ recorded revisions, not separate current-suite totals. A live demo is still requ
 | FR3–FR4 record/signature, FR9 hash, FR10 verdicts | [T03 safeguards](../evidence/t03/README.md), [T08 suite](../evidence/t08/stable-full.txt) | 00–02, receiver/attacks | Payload scope and external key trust |
 | FR5–FR8 embedding, starts, extraction, depths/capacity | [T07 isolation](../evidence/t07/README.md), [cases](../samples/t07/CASE_INDEX.md), T08 suite | 02–12 | Envelope overhead; HMAC is not encryption |
 | FR11 positive/negative cases | T07 image-short, audio-long, image-payload-corruption, audio-signature-corruption, audio-repetition3-damage2 | 02–12, 15–19 | Capacity rejection/video do not replace mandatory-media negatives |
-| FR12 reproducibility | [Bundle guide](sample_bundle.md), [T09 package](../evidence/t09/README.md) | Transfer, 21–22 | Local isolation is not actual human transfer |
-| FR13/all five challenges | [T05](../evidence/t05/README.md), T07, [challenge guide](challenge_workflows.md) | 07–12, 15–22 | No universal robustness/detection claim |
+| FR12 reproducibility | [Bundle guide](sample_bundle.md), [Current package](../evidence/s01/README.md) | Transfer, 21–22 | Local isolation is not actual human transfer |
+| FR13/four retained challenges | [T05](../evidence/t05/README.md), T07, [challenge guide](challenge_workflows.md) | 07–12, 15–22 | No universal robustness/detection claim |
 | AES, trusted file preview/save | T03/T04 tests, T07 confidential/file cases, T08 native exact saves | 12–15 | Wrong passphrase withholds recovery |
 | Size/properties | [T06 measurements](../evidence/t06/README.md) | 02–12, 19–20 | 66 cases; PNG matching 6/9; headers/codecs matter |
 | Repetition recovery/failure | T07 audio repetition1/3 damage cases | 17–19 | Controlled logical damage; approximately triple storage |
-| Steganalysis | T07 evaluation: 18 fixtures, 2/9 false positives, 8/9 misses | 20–21 | Synthetic, not natural-media accuracy; T05 miss count is historical |
 | Video properties/playback/audio omission | T06/T07 and [T08 audio-bearing source](../evidence/t08/video-audio.txt)/native checks | 19–20 | Video-only FFV1; source audio omitted |
 | Integrated validation | [1830 full tests](../evidence/t08/stable-full.txt), [932 repeated GUI tests](../evidence/t08/no-log-diagnostic.txt) | 21–22 | Supported --no-qt-log mitigation; native defect not proven |
 | Human completion | [Records](submission_handoff.md), [contributions](contribution_statement.md), [AI use](ethics_and_ai_use.md) | Every member | Unfilled records are not evidence |

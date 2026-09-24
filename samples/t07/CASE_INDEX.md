@@ -1,6 +1,6 @@
-# T07 case index
+# Current sender/receiver case index
 
-Paths are relative to party-b. Explicitly select each listed manifest.
+Paths are relative to party-b. Select each listed manifest explicitly.
 
 | Case | Media | Manifest | Expected |
 | --- | --- | --- | --- |
@@ -22,12 +22,3 @@ Paths are relative to party-b. Explicitly select each listed manifest.
 | audio-wrong-key | protected/audio-long.wav | protected/audio-long.wav.manifest.json | SIGNATURE_INVALID |
 | audio-wrong-start | protected/audio-long.wav | protected/audio-long.wav.manifest.json | PAYLOAD_MISSING, CANNOT_VERIFY, SIGNATURE_INVALID |
 | image-wrong-passphrase | protected/image-confidential.png | protected/image-confidential.png.manifest.json | CANNOT_VERIFY |
-| analysis-noise-0 | protected/analysis-noise-0.png | protected/analysis-noise-0.png.manifest.json | AUTHENTIC |
-| analysis-noise-1 | protected/analysis-noise-1.png | protected/analysis-noise-1.png.manifest.json | AUTHENTIC |
-| analysis-noise-2 | protected/analysis-noise-2.png | protected/analysis-noise-2.png.manifest.json | AUTHENTIC |
-| analysis-even-0 | protected/analysis-even-0.png | protected/analysis-even-0.png.manifest.json | AUTHENTIC |
-| analysis-even-1 | protected/analysis-even-1.png | protected/analysis-even-1.png.manifest.json | AUTHENTIC |
-| analysis-even-2 | protected/analysis-even-2.png | protected/analysis-even-2.png.manifest.json | AUTHENTIC |
-| analysis-gradient-0 | protected/analysis-gradient-0.png | protected/analysis-gradient-0.png.manifest.json | AUTHENTIC |
-| analysis-gradient-1 | protected/analysis-gradient-1.png | protected/analysis-gradient-1.png.manifest.json | AUTHENTIC |
-| analysis-gradient-2 | protected/analysis-gradient-2.png | protected/analysis-gradient-2.png.manifest.json | AUTHENTIC |

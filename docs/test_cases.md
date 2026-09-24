@@ -1,3 +1,6 @@
+> Current test inventory and counts: [S01 evidence](../evidence/s01/README.md).
+> Counts below are historical; retired feature rows have been removed.
+
 # Test Cases
 
 The assignment requires at least **two positive** and **three negative**
@@ -143,7 +146,7 @@ Asserted:
 | `test_image_stego.py` | 133 | Image embed/extract, all depths, all patterns, property-based round trips |
 | `test_envelope.py` | 120 | Envelope framing, canonical JSON, record validation, malformed input |
 | `test_manifest.py` | 105 | Manifest schema, cross-check, tamper detection per field |
-| `test_image_analysis.py` | 89 | Indicators, bit planes, difference images, histograms |
+| `test_image_analysis.py` | 89 | Retained quality comparisons |
 | `test_gui_shell.py` | 86 | Window, tabs, widgets, workers, error surfacing |
 | `test_audio_stego.py` | 84 | Audio embed/extract, signed-sample handling, all depths |
 | `test_utils.py` | 83 | Content sniffing, atomic writes, constants agreeing with their sources |
@@ -159,11 +162,10 @@ Asserted:
 | `test_media_facade.py` | 50 | Dispatch by content, unified result shapes |
 | `test_capacity.py` | 49 | Capacity arithmetic, the three distinct quantities |
 | `test_image_io.py` | 48 | Container sniffing, decode, encode, rejection of lossy input |
-| `test_gui_lab_tabs.py` | 48 | Attack Lab and Steganalysis tabs |
+| `test_gui_lab_tabs.py` | 48 | Attack Lab tab |
 | `test_size_preservation.py` | 44 | The file-size experiment and its wiring into protect |
 | `test_e2e.py` | 40 | The cases in §1 |
 | `test_bit_utils.py` | 39 | Bit packing, masking, depth and width validation |
-| `test_steganalysis.py` | 30 | The analysis facade and the audio indicators |
 | `test_audio_quality.py` | 17 | MSE, PSNR, SNR, distortion bounds |
 | `test_crypto.py` | 16 | Hashing and payload preparation |
 
@@ -184,7 +186,6 @@ quietly started claiming more than it can establish.
 | `test_size_preservation.py::test_an_impossible_case_is_reported_rather_than_forced` | PNG size matching cannot always succeed |
 | `test_size_preservation.py::test_a_coincidental_size_match_is_not_counted` | Two FFV1 encodings landing on the same length is not preservation |
 | `test_verification.py` — missing-secret mapping | A missing secret is `CANNOT_VERIFY`, not `WRONG_START_LOCATION` |
-| `test_steganalysis.py` — insufficient sample | Indicators report "insufficient sample" rather than a fabricated number |
 | `test_video_stego.py::test_a_lossy_encoder_would_be_caught_rather_than_trusted` | A codec that does not preserve pixels is caught at embed time, not at verification |
 
 ---

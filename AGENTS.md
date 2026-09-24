@@ -2,7 +2,7 @@
 
 Before making changes, read [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md). It records the agreed scope, current authorization, task dependencies, acceptance criteria and handoff state.
 
-- Respect the user's latest authorised task scope. T01-T09 deliverables are complete; human delivery actions remain open. Do not send messages, submit work or invent human declarations/rehearsal evidence.
+- Respect the user's latest authorised task scope. S01 full steganalysis removal is complete. Preserve quality comparisons and video; optional video removal is not authorised. Do not send messages, submit work or invent human declarations/rehearsal evidence.
 - Maintain the task ledger after completed tasks and before handoff. Use TODO, IN_PROGRESS, BLOCKED and DONE; record actual changes, evidence and remaining work.
 - Mark DONE only when acceptance criteria are met. For BLOCKED, record the specific blocker and what would resolve it.
 - Record commands, environment and tested revision/working-tree state. Distinguish historical branch evidence from current results, and planned checks from executed checks.

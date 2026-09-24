@@ -35,8 +35,10 @@ def test_receiver_in_fresh_process_without_sender(bundle, tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     report = json.loads((isolated / "result.json").read_text())
     assert report["passed"] and report["private_key_files"] == 0
-    assert len(report["cases"]) == 27
-    assert len(report["steganalysis"]["cases"]) == 18
+    assert len(report["cases"]) == 18
+    assert "steganalysis" not in report
+    assert report["schema"] == "t07-receiver-report-v2"
+    assert len(list((isolated / "recovered").iterdir())) == 11
     assert all(c["passed"] for c in report["capacity_checks"])
     assert not (isolated / "party-a").exists()
     rows = {r["id"]: r for r in report["cases"]}
@@ -99,3 +101,21 @@ def test_bundle_paths_cannot_escape(tmp_path):
     (tmp_path / "outside.txt").write_text("outside")
     with pytest.raises(ValueError, match="escapes"):
         local_file(root, "../outside.txt")
+
+
+def test_legacy_index_verifies_payloads_without_retired_analysis(bundle, tmp_path):
+    receiver = tmp_path / "legacy"
+    shutil.copytree(bundle / "party-b", receiver)
+    path = receiver / "case-index.json"
+    index = json.loads(path.read_text())
+    index["schema"] = "t07-v1"
+    index["analysis_pairs"] = [{"cover": "absent.png", "stego": "absent-stego.png"}]
+    path.write_text(json.dumps(index), encoding="utf-8")
+    inventory_path = receiver / "checksums.json"
+    inventory = json.loads(inventory_path.read_text())
+    inventory["case-index.json"] = sha256(path.read_bytes())
+    inventory_path.write_text(json.dumps(inventory), encoding="utf-8")
+    report = verify_bundle(receiver)
+    assert report["passed"]
+    assert len(report["cases"]) == 18
+    assert "steganalysis" not in report

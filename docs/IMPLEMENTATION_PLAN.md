@@ -4,7 +4,7 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorised execution scope: **T09 only**, following the user's instruction to execute the next task. Prepare the handoff; do not submit or send messages.
+- Latest authorised execution scope: **S01: full steganalysis removal only**, following the user's instruction to execute the next task. Prepare the handoff; do not submit or send messages.
 - Integration branch: `integration/acw1-consolidated`.
 - Current integration workspace: `A:/Code/GUI-based-LSB-Replacement-steganography-program` (historical setup used `C:/Code/INF2005-ACW1-consolidated`).
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
@@ -14,9 +14,17 @@ This is the living source of truth for the agreed consolidation scope and implem
 - T01-T09: DONE. Native checks and final full suite pass with the documented pytest-qt logging-capture mitigation.
 - T01/T02 established the workspace and clean baseline. T03 added backend safeguards; T04 updated the GUI and regressions. Dependency pins and existing demo samples remain unchanged; T07 adds a separate samples/t07 bundle.
 
+## S01 scope reduction (current)
+
+DONE: removed steganalysis code, feature-only tests, current feature claims and nine analysis-only sample cases. Quality/size comparisons and video remain. Full suite: 1713 passed in 47.30s; retained fixture hashes unchanged. See [S01 evidence](../evidence/s01/README.md) for native observations and final package report. Historical records below describe their original scope.
+
+Follow-up audit (DONE): removed unused region-selection helpers and the unused image-input alias, plus stale worker/test/dependency comments. Re-ran the full suite (1713 passed), lint and fixture checks on the uncommitted S01 working tree. Historical references and absence/legacy-index regressions remain intentionally.
+
+Optional stage S02 (TODO, not authorised): remove video from GUI, media dispatch, preview, attacks, samples, tests and dependencies; retain image/audio formats and playback. Expected bundle then has 17 cases/two capacity checks/10 exports. Reassign Member 5 airtime to receiver evidence and limitations. Apply only after a separate user decision.
+
 ## 1. Objective and decisions
 
-Build one polished INF2005 ACW1 desktop app from Tristan, selectively adapting Gin's safeguards and evaluation methods. Demonstrate all functional requirements, all five optional challenges and every retained user-facing extra. Plan 22 minutes of content plus 3 minutes of contingency within the 25-minute maximum.
+Build one polished INF2005 ACW1 desktop app from Tristan, selectively adapting Gin's safeguards and evaluation methods. Demonstrate all functional requirements, the four retained optional challenges and every retained user-facing extra. Plan 22 minutes of content plus 3 minutes of contingency within the 25-minute maximum.
 
 Tristan is the base for its consistent media architecture, integrated GUI workflows and attack framework. Gin supplies ideas and regression cases for transactional publication, receiver bundles and measured challenge evaluation. Do not blindly merge either branch into the other.
 
@@ -32,7 +40,7 @@ Use the full assignment brief as the source of requirements. The group compariso
 ### Confirmed defaults
 
 - Keep drag-and-drop, normal file pickers and file-size preservation.
-- Keep all five optional challenges. Integrate overlapping demonstrations to save time.
+- Keep the four retained optional challenges. Integrate overlapping demonstrations to save time.
 - Focused GUI polish, not a full redesign.
 - Fresh samples using Tristan's envelope/manifest format; no Gin-format compatibility reader.
 - Python 3.11 remains the documented baseline; T02 verified clean installation on Python 3.11.16 with every existing direct dependency pin unchanged.
@@ -60,7 +68,6 @@ Hashing/signing alone does not provide confidentiality. The payload hash authent
 | Attack simulation | Payload corruption, signature corruption, wrong-key verification, wrong-start extraction, outside-payload edits | Report actual verdicts; failure causes may be ambiguous |
 | Robust embedding | Repetition-3, correction reporting, matched coded/uncoded damage, unrecoverable damage | Independent bit recovery does not establish resistance to arbitrary lossy transforms |
 | Video | One short FFV1 clip protected/verified, preview and affected-frame indication | Video-only output; codec size/property limits |
-| Steganalysis | One bit-plane view, reference difference, distortion/statistical indicators, evaluated false alarms and misses | Experimental indicators, not proof of hidden content |
 
 ### Deliberate cuts
 
@@ -68,9 +75,8 @@ Hashing/signing alone does not provide confidentiality. The payload hash authent
 - Do not add password-protected private-key generation.
 - Remove the GUI's bulk attack runner and attack variants outside the focused set above.
 - Remove arbitrary video-frame exploration and the separate video capacity-by-depth table.
-- Replace steganalysis display-scaling controls with sensible defaults.
 - Remove the separate key-location menu; display paths in generation results and existing inputs.
-- Keep bulk robustness/steganalysis experiments in development scripts, not extra app workflows.
+- Keep bulk robustness experiments in development scripts, not extra app workflows.
 - Keep useful backend regression tests/helpers. Update obsolete GUI tests/docs when controls are removed.
 - Hiding a retained feature under Advanced does not exempt it from the demo.
 
@@ -86,7 +92,7 @@ Avoid a second crypto/media implementation. Keep public API changes additive and
 
 ### GUI and input handling
 
-Retain Protect, Verify, Attack Lab, Steganalysis and Video tabs. Use one validation route for picker/drop selections. Reject nonexistent paths, directories, unsupported inputs, remote URLs and inappropriate multiple-file drops, including mixed local/remote drops.
+Retain Protect, Verify, Attack Lab and Video tabs. Use one validation route for picker/drop selections. Reject nonexistent paths, directories, unsupported inputs, remote URLs and inappropriate multiple-file drops, including mixed local/remote drops.
 
 Preserve responsive workers, playback controls and rejection of stale results. Preview/save recovered payloads only after successful verification. Clearly label video-only output before protection and in results.
 
@@ -159,7 +165,7 @@ T09 maps these retained features to the executable [timed script](demo_plan.md).
 | FR10 Verdicts | Per-check results, truthful failure explanations | Receiver steps and 15-19 / Members 1-3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | FR11 Positive/negative cases | Image/audio positives, three mandatory negatives | 2-12 and 15-19 / Members 1-3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | FR12 Reproducibility | A-to-B folder transfer, receiver index, evidence export | 2-7 and 19-22 / Members 2, 5 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
-| FR13 Innovation | Advanced starts and all five challenges with limits | Throughout | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR13 Innovation | Four retained challenges with limits | Throughout | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | LSB depths 1-8 | Show selector and bit/capacity tradeoff; all depths tested | 2-7 / Member 2 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | Capacity check | Full overhead and start accounted for, overflow rejected | 2-7 / Member 2 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | Cover/stego comparison | Image display and audio playback before/after | 2-12 / Members 2, 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
@@ -172,7 +178,6 @@ T09 maps these retained features to the executable [timed script](demo_plan.md).
 | Attack challenge | Focused five controls, including outside-region limitation | 15-19 / Members 1, 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | Robustness challenge | Matched damage, recovery, unrecoverable third negative | 15-19 / Members 1, 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | Video challenge | Protect/verify short clip, preview, affected frames, audio omission | 19-22 / Member 5 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
-| Steganalysis challenge | Bit plane/difference, metrics, indicators, false alarms/misses | 19-22 / Member 5 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | Evidence export | Export the demonstrated results | 19-22 / Member 5 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | Limitations/AI/contributions | Brief explanations integrated into each member's segment | Throughout / All | Human completion required |
 
@@ -186,7 +191,7 @@ T09 maps these retained features to the executable [timed script](demo_plan.md).
 - Qt event tests plus native Windows drag/drop, picker, playback and preview checks. Leave acceptance open when native checks cannot run.
 - Size/property measurements on flat/photographic PNG, BMP, mono/stereo WAV and short video. No invented universal growth threshold.
 - Repetition recovery and failure under controlled damage, with matched uncoded comparison.
-- Labelled cover/stego evaluation recording false positives, misses and provenance. Synthetic results must not be represented as natural-media detection accuracy.
+- Retired detection experiments remain historical evidence only; S01 validates numerical quality comparisons.
 - Fresh receiver process and extracted submission archive verification without private keys.
 
 ### Historical branch inspection (not integration certification)
@@ -319,14 +324,14 @@ Every retained user-facing feature must map to a live action. Prepare files/keys
 | 7-12 | Member 3 | Audio picker, long payload, derived start, playback, sizes and receiver verification |
 | 12-15 | Member 4 | Encrypted custom/file payload, trusted recovery/save, applicable image/audio payload previews |
 | 15-19 | Members 1 and 3 | Focused attacks and negatives, outside-region limit, repetition recovery/failure |
-| 19-22 | Member 5 | Video protect/verify, steganalysis, evidence export and remaining limitations |
+| 19-22 | Member 5 | Video protect/verify, evidence export and remaining limitations |
 | 22-25 | All | Contingency and questions |
 
 Integrate contribution explanations and AI-use reflection into members' segments. Include the third negative in robustness. A real rehearsal must establish feasibility; reduce setup/narration/duplicate actions if needed without dropping agreed capabilities. Never invent rehearsal timing.
 
 Deliver README, architecture/limitations, this living guide, requirement/demo matrix, fresh samples, current test evidence, submission archive and timed script. Human-only items remain names, agreed contribution percentages, signatures, actual transfer/rehearsal records, required AI-use notifications and submission by the brief's deadlines.
 
-## 8. Decision log
+## 8. Decision log (earlier scope decisions are historical)
 
 | Decision | Reason |
 | --- | --- |
@@ -346,7 +351,7 @@ Deliver README, architecture/limitations, this living guide, requirement/demo ma
 | Execute T08 only | Subsequently authorised integrated validation, including resumed native checks; completed with documented mitigation |
 | Execute T09 only | Subsequently authorised the next task after T08 push; prepare handoff without performing human declarations, messages or submission |
 
-## 9. Handoff
+## 9. Historical T09 handoff (superseded by S01 above)
 
 - Current branch/workspace: `integration/acw1-consolidated` at `A:/Code/GUI-based-LSB-Replacement-steganography-program`.
 - Current state: T01-T09 DONE. Latest authorised scope: T09 handoff only. Human delivery actions remain open in [submission_handoff.md](submission_handoff.md).

@@ -3,7 +3,7 @@
 > Consolidation work: read the [implementation plan and task tracker](docs/IMPLEMENTATION_PLAN.md) for agreed scope, task status, verification evidence and handoff notes.
 
 The [T07 sender/receiver bundle guide](docs/sample_bundle.md) covers fresh required
-messages, positive/negative cases, all five challenges and independent verification.
+messages, positive/negative cases, the four retained challenges and independent verification.
 
 INF2005 Assignment 1 — a desktop application that hides a **signed** message inside an
 image, audio or video file using LSB replacement, and lets a receiver prove whether that
@@ -14,7 +14,7 @@ message is authentic.
 - **LSB depth:** 1 to 8 bits per sample.
 - **Security:** RSA-PSS signatures, SHA-256 message digests, optional AES-256-GCM
   encryption with a scrypt-derived key, and an HMAC-derived secret start location.
-- **Extras:** repetition error correction, an attack simulator, steganalysis views, and
+- **Extras:** repetition error correction, an attack simulator and
   a file-size preservation experiment.
 
 Design and limits are documented in [`docs/`](docs/): start with
@@ -49,7 +49,7 @@ Every dependency is a wheel, including the FFV1 video codec bundled inside
 .venv/bin/python main.py            # macOS / Linux
 ```
 
-The window has five tabs: **Protect**, **Verify**, **Attack Lab**, **Steganalysis** and
+The window has four tabs: **Protect**, **Verify**, **Attack Lab** and
 **Video**. Log output goes to the terminal and to `evidence/logs/application.log`.
 
 ## Test
@@ -127,9 +127,7 @@ Regenerate the samples with `python scripts/generate_samples.py`.
    runner and extra GUI attack variants have been removed; backend experiments remain.
    Dedicated wrong-key and wrong-start actions reverify the unchanged file with a substituted receiver input. Wrong-start requires HMAC-derived protection.
 
-5. **Inspect it.** **Steganalysis** shows bit planes with fixed display scaling,
-   a reference difference, distortion figures and experimental statistical indicators.
-   **Video** provides playback, clip properties and the claimed payload frame range
+5. **Inspect video.** **Video** provides playback, clip properties and the claimed payload frame range
    from the manifest. Use **Verify** to authenticate those claims. Video protection
    creates video-only FFV1/MKV output: source audio is omitted. Capacity is measured
    in **Protect**, including the selected manual start, on a background worker.
@@ -144,7 +142,7 @@ app/
   verification/   the protect (sender) and verify (receiver) workflows
   robustness/     repetition error correction
   attacks/        the attack catalogue used by the Attack Lab
-  analysis/       quality metrics, steganalysis, file-size experiment
+  analysis/       quality metrics and file-size experiment
   gui/            the PySide6 interface; nothing below this layer imports Qt
   utils/          constants, file helpers, logging
 assets/styles/    the Qt stylesheet

@@ -93,24 +93,18 @@ select it explicitly. Read observed outcomes alongside expectations.
 | 17:30–18:40 | Show Protect's repetition-3 checkbox. Verify indexed `audio-repetition1-damage1`, `audio-repetition3-damage1`, `audio-repetition3-damage2` | Uncoded failure; coded AUTHENTIC with correction report; coded SIGNATURE_INVALID. Last is the third mandatory negative: unrecoverable audio damage |
 | 18:40–19:00 | Attack Lab **Save as evidence...** | Save actual before/after outcomes. Explain approximately triple storage and controlled one-copy/two-copy damage, not arbitrary lossy-transform resistance |
 
-## 19:00–22:00 — Member 5: video, steganalysis and evidence
+## 19:00–22:00 — Member 5: video and evidence
 
-- 19:00–20:15: Protect A's short `original/video.mkv` with `short.txt`. Point to
+- 19:00–21:00: Protect A's short `original/video.mkv` with `short.txt`. Point to
   the warning before protection: source audio is omitted. Verify the fresh output;
-  open it in Video, play and **Locate the payload frames** using its manifest and
-  start inputs. The span is a manifest claim until verified. Explain FFV1/MKV and
+  open it in Video, play and **Locate the payload frames** with its manifest/start
+  inputs. The span is a manifest claim until verified. Explain FFV1/MKV output and
   codec-driven size changes. Prepared `video-positive` is the labelled fallback:
   30 frames, 15 fps, two seconds.
-- 20:15–21:15: In Steganalysis select B's `protected/analysis-even-0.png` and
-  reference `analysis/even-0.png`, then Analyse. Show channel selection, bit plane 0,
-  reference difference, distortion and indicators. Scaling is fixed. T07's 18
-  synthetic fixtures gave 2/9 false positives and 8/9 misses; these are not
-  natural-media accuracy estimates. A p-value is not a hidden-data probability.
-- 21:15–22:00: Open the evidence index and actual exported attack log. Point to
-  receiver and preservation reports. Steganalysis has no GUI export button; its
-  reproducible reports come from evaluation/receiver scripts. State the member's
-  actual contribution and explain AI assistance and checking truthfully. Recap
-  key trust, replay, payload scope, fragile LSBs, omitted audio and detection limits.
+- 21:00–22:00: Show the actual exported attack log and the current receiver report
+  (18 cases, two capacity checks, 11 recovered files). Explain preservation metrics,
+  actual contribution and AI checking. Recap key trust, replay, payload scope,
+  fragile LSBs and omitted source audio. Member 5 retains their three-minute slot.
 
 ## 22:00–25:00 — contingency and questions
 

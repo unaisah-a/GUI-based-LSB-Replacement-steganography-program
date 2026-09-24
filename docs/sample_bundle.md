@@ -1,4 +1,5 @@
-# T07 sender/receiver sample bundle
+# Current sender/receiver sample bundle (S01)
+
 
 This is a local demonstration bundle, not a submitted release. Party A and Party B
 are separate folders. No private signing key is saved in either folder. The signing
@@ -47,7 +48,7 @@ it is not evidence of an email transfer or a second person's demonstration.
   `unrelated-public.pem` is deliberately wrong.
 - `party-b/demo-only-secrets.json`: public demonstration start/passphrase values,
   including intentionally wrong values. **These protect no real information.**
-- `party-b/original/` and `analysis/`: optional reference media for comparison.
+- `party-b/original/`: optional reference media for comparison.
   Positive verification itself needs only media, manifest, public key and any
   relevant demo secret.
 
@@ -88,18 +89,11 @@ manifest: select that path explicitly. Use **Save recovered payload...** for aut
 | Wrong passphrase | `image-wrong-passphrase` | CANNOT_VERIFY; signature may verify but plaintext is withheld |
 | Outside-payload attack | `image-outside-payload` | AUTHENTIC despite changed cover samples; signature covers the payload |
 | Video challenge | `video-positive`, then Video tab | AUTHENTIC; preview cover/stego and locate the manifest-claimed affected frames |
-| Steganalysis | `analysis-noise-0`, `analysis-even-0`, `analysis-gradient-0` and their cover references | Inspect bit plane 0, amplified difference and metrics; export the analysis |
 
 Robustness flips the last signature bit in one stored copy, then in two copies of
 the repetition-3 envelope. Coded and uncoded cases use the same cover, message,
 depth and manual start. This is matched logical damage, not an equal bit-error rate
 or resistance to lossy compression. Repetition consumes about three times the space.
-
-The receiver reruns a fixed steganalysis rule (channel-0 bit-0 uniformity p >= 0.05)
-on 18 labelled fixtures: noise/even/gradient families, three seed entries, each
-with a cover/stego pair. It reports false positives and misses. Gradient seeds
-produce the same cover; these are not independent population samples or measured
-natural-media detection accuracy. A p-value is not the probability of hidden data.
 
 Video output is **video-only FFV1/MKV**: source audio is omitted. This bundle's
 synthetic source has no audio track. Timing uses constant-rate frames; native
@@ -145,3 +139,8 @@ preview/playback passed T08. T09 supplies the [timed script](demo_plan.md) and
 AUTHENTIC concerns the signed payload and settings, not every cover byte. Timestamp
 and nonce alone do not reject replay. No email, submission or real transfer is made
 by these commands.
+
+S01 pruned the nine analysis-only cases without re-signing retained fixtures.
+The v2 index has 18 verification cases, two capacity checks and 11 authenticated
+exports. The verifier accepts v1 indexes for payload verification only; retired
+analysis fields are ignored and v2 reports contain no statistical analysis.
