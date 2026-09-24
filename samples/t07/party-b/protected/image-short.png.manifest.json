@@ -1,0 +1,19 @@
+{
+  "container_format": "PNG",
+  "created": "2026-09-24T12:48:28+00:00",
+  "ecc": null,
+  "encrypted": false,
+  "encryption": null,
+  "envelope_length": 927,
+  "format_version": 1,
+  "lsb_depth": 2,
+  "media_id": "image-short",
+  "media_type": "image",
+  "message_length": 105,
+  "nonce": "56f3fcabbbcac8d85bc9610e508452fa",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": 37,
+  "start_method": "manual",
+  "stego_file": "image-short.png",
+  "stego_sha256": "72c0f641cc38b6e12d17b220d056035d5e28c1893bb7a04a80527f696d27bee2"
+}

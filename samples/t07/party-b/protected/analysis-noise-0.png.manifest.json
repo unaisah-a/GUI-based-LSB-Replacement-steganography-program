@@ -1,0 +1,19 @@
+{
+  "container_format": "PNG",
+  "created": "2026-09-24T12:48:29+00:00",
+  "ecc": null,
+  "encrypted": false,
+  "encryption": null,
+  "envelope_length": 936,
+  "format_version": 1,
+  "lsb_depth": 1,
+  "media_id": "analysis-noise-0",
+  "media_type": "image",
+  "message_length": 105,
+  "nonce": "23ffc4f4c269e18c8d436bed9bc35486",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": null,
+  "start_method": "hmac_prf",
+  "stego_file": "analysis-noise-0.png",
+  "stego_sha256": "9c0ec49f7299fd7559a988b4776587cf471947513b210b1c0b8314ab37bc4e71"
+}

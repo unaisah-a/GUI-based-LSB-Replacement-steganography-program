@@ -1,0 +1,4 @@
+........................................................................ [ 87%]
+..........                                                               [100%]
+- generated xml file: A:\Code\GUI-based-LSB-Replacement-steganography-program\evidence\t07\pytest.xml -
+82 passed in 7.41s

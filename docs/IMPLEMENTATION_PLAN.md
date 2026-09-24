@@ -4,15 +4,15 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorised execution scope: **T06 only**, following the user's instruction to execute the next task. Do not start T07-T09 without further authorisation.
+- Latest authorised execution scope: **T07 only**, following the user's instruction to execute the next task. Do not start T08-T09 without further authorisation.
 - Integration branch: `integration/acw1-consolidated`.
 - Current integration workspace: `A:/Code/GUI-based-LSB-Replacement-steganography-program` (historical setup used `C:/Code/INF2005-ACW1-consolidated`).
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
 - Base: `Tristan`, commit `6167e72203e3a3045cdc4fa8ae36f4080689df34`.
 - Selective source: `gin`, commit `f3c267e10a47fa8bba7ace1078a7dce0e6d68f8e`.
 - T01 status: DONE. Documentation, branch/base and worktree-preservation checks passed.
-- T01-T06: DONE. T07-T09: TODO. T06 size/property measurements and safeguards are complete; combined-process Qt test instability is recorded for T08.
-- T01/T02 established the workspace and clean baseline. T03 added backend safeguards; T04 updated the GUI and regressions. Dependency pins and demo samples remain unchanged.
+- T01-T07: DONE. T08-T09: TODO. Fresh T07 sender/receiver samples verify independently; combined-process Qt test instability remains recorded for T08.
+- T01/T02 established the workspace and clean baseline. T03 added backend safeguards; T04 updated the GUI and regressions. Dependency pins and existing demo samples remain unchanged; T07 adds a separate samples/t07 bundle.
 
 ## 1. Objective and decisions
 
@@ -116,7 +116,7 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 | T04 | GUI simplification and input handling | T03 | DONE | Agreed cuts completed; retained inputs/previews/workers validated; no orphan controls or stale docs |
 | T05 | Five challenge workflows | T03, T04 | DONE | Each retained capability has reproducible demo, tests/evaluation and stated limitations |
 | T06 | Size/property preservation | T03, T05 | DONE | Representative size/property measurements recorded; unexpected growth investigated |
-| T07 | Sender/receiver sample bundle | T04, T05, T06 | TODO | Required messages, positives, negatives and challenges reproduce independently without private keys |
+| T07 | Sender/receiver sample bundle | T04, T05, T06 | DONE | Required messages, positives, negatives and challenges reproduce independently without private keys |
 | T08 | Integrated release validation | T07 | TODO | Full suite, lint, clean setup, native desktop checks and extracted-package verification complete |
 | T09 | Demo/submission handoff | T08 | TODO | Feature-complete timed script, evidence index and human-task checklist delivered; actual rehearsal tracked honestly |
 
@@ -137,7 +137,7 @@ For each task below, replace the placeholder when work is authorized. Record cha
 | T04 | Agreed control cuts, shared picker/drop validation and clear handling, background offset-aware capacity, stale-result rejection, AUTHENTIC-only preview/save, fingerprints and video-only notices | [T04 report](../evidence/t04/README.md): 1799 full tests passed; lint, sample compatibility and startup passed | None for T04; native desktop validation remains T08; new challenge actions/evaluation remain T05 |
 | T05 | Wrong-key/wrong-start actions; reproducible five-challenge evaluation and demo guide | [T05 evidence](../evidence/t05/README.md): 1809 tests passed; pinned Python 3.11.16; lint, compatibility/startup and challenge evaluation passed | None for T05; native checks T08, sample bundle T07 |
 | T06 | 66 saved-file measurements; codec baselines; metadata-aware size reporting; video timing/count safeguards | [T06 evidence](../evidence/t06/README.md): all 66 authentic, properties preserved; 1820 tests pass across five processes; lint and startup/compatibility pass | None for T06; combined-process Qt access violation requires T08 investigation |
-| T07 | Not started | None | All acceptance criteria |
+| T07 | Fresh samples/t07, builder, receiver verifier, case index and guide; required PDF message wording checked | [T07 evidence](../evidence/t07/README.md): 27 cases and two capacity checks pass in isolated receiver process; 20 authenticated exports; 82 focused tests and lint pass | None for T07; native/release validation T08, real transfer/rehearsal T09 |
 | T08 | Not started | T06 records combined-process Qt access violations; individual GUI modules pass | All acceptance criteria, including investigation of Qt test/process instability |
 | T09 | Not started | None | All acceptance criteria |
 
@@ -263,6 +263,15 @@ For future tasks, append command, environment, tested revision/working-tree stat
 - Combined-process caveat: initial 1819-test run passed; after one additional cleanup regression, two full runs stopped with native Qt access violations around GUI teardown/construction. Logs retained; root cause unresolved, assigned to T08. Do not call the final combined-process suite clean.
 - [T06 evidence](../evidence/t06/README.md) records exact commands, measurements, source hashes and limits. No native playback, source-audio-track test, release bundle or rehearsal was performed. T07-T09 not started.
 
+### T07 verification log
+
+- Authorised scope: T07 only. Base HEAD `b59c4a11fb42b7f0154e8ad507431407c03f174c` plus T07 working-tree changes; Windows, Python 3.11.16, unchanged dependencies. Application code unchanged.
+- `python -m scripts.build_sample_bundle --output samples/t07`: 27 cases, including required messages, encrypted custom payload, PNG/WAV file payloads, mandatory image/audio negatives, repetition recovery/failure, wrong inputs, outside-payload limitation, video and steganalysis fixtures. Separate actual image/audio capacity rejections publish no output.
+- `python evidence/t07/check_isolated_receiver.py --output tmp/t07-isolated`: copies only receiver data and runtime code, runs fresh Python with `-I`; all 27 cases and two capacity checks pass, 20 exact authenticated payloads exported, no private keys or sender folder.
+- Focused `test_sample_bundle.py`, `test_e2e.py`, `test_payload_files.py`, `test_challenge_evaluation.py`: **82 passed in 7.41s**, no failures/errors/skips. Ruff and diff checks pass. Full-suite/native validation is T08; no clean combined-process claim.
+- Fresh analysis: 2/9 false positives, 8/9 misses on 18 labelled synthetic fixtures. Video: 30 frames at 15 fps, 2 seconds, changed frame 9 inside claimed span. These are current bundle results, not reused T05 measurements.
+- Exact commands, source/bundle hashes, development corrections and limits: [T07 evidence](../evidence/t07/README.md). T08-T09 not started; real human transfer/rehearsal and submissions remain undone. Existing untracked samples/r11 untouched.
+
 ## 7. Demo and delivery
 
 Every retained user-facing feature must map to a live action. Prepare files/keys/folders ahead of time; reuse mandatory workflows to demonstrate advanced starts and attacks. Screenshots are fallback evidence, not a substitute for required working demonstrations.
@@ -297,14 +306,15 @@ Deliver README, architecture/limitations, this living guide, requirement/demo ma
 | Execute T04 only | GUI simplification/input handling completed under prior authorization |
 | Execute T05 only | Latest user instruction authorises the next task; five challenge workflows completed; T06-T09 remain TODO |
 | Execute T06 only | Subsequent user instruction authorises size/property evaluation; completed with evidence; T07-T09 remain TODO |
+| Execute T07 only | Subsequent user instruction authorises fresh sender/receiver bundle; completed with independent receiver evidence; T08-T09 remain TODO |
 
 ## 9. Handoff
 
 - Current branch/workspace: `integration/acw1-consolidated` at `A:/Code/GUI-based-LSB-Replacement-steganography-program`.
-- Current state: T01-T06 DONE; T07-T09 TODO. Latest authorised scope: T06 only.
-- T06 is based on `9b1d6d2824137dc0bfae422c677fae7e0d839f0d`; the evidence identifies the tested working-tree source hashes. The user subsequently authorised committing and pushing T06 on this integration branch. T07-T09 remain unauthorised.
-- T06 measurements and safeguards: [evidence](../evidence/t06/README.md). All 1820 tests pass in separate processes; repeated combined-process Qt access violations remain a T08 investigation item.
-- Next task when authorised: T07, sender/receiver sample bundle.
-- T07 prepares receiver bundles, T08 validates native GUI/playback/drop and packaging, T09 finalises demo/submission handoff.
+- Current state: T01-T07 DONE; T08-T09 TODO. Latest authorised scope: T07 only.
+- T07 is based on `b59c4a11fb42b7f0154e8ad507431407c03f174c`; the evidence identifies the tested source and bundle hashes. The user subsequently authorised committing and pushing T07 on this integration branch. T08-T09 remain unauthorised.
+- T07 bundle: [guide](sample_bundle.md), [case index](../samples/t07/CASE_INDEX.md), [evidence](../evidence/t07/README.md). 27 receiver cases, two capacity checks, 20 authenticated exports and 82 focused tests pass without private keys.
+- Next task when authorised: T08, integrated release validation, including investigation of repeated combined-process Qt access violations, native GUI/playback/drop, clean setup and extracted-package receiver verification.
+- T09 finalises demo/submission handoff, real transfer and rehearsal records.
 - Existing untracked samples/r11 remains untouched. Original branches remain untouched.
 - Human tasks: names/contributions/signatures, real transfer/rehearsal, notifications and submission remain open.

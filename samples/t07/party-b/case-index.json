@@ -1,0 +1,625 @@
+{
+  "schema": "t07-v1",
+  "cases": [
+    {
+      "id": "image-short",
+      "media": "protected/image-short.png",
+      "manifest": "protected/image-short.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": null,
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 2,
+      "start_method": "manual",
+      "sender_start_location": 37
+    },
+    {
+      "id": "audio-long",
+      "media": "protected/audio-long.wav",
+      "manifest": "protected/audio-long.wav.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+      "message_bytes": 673,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 2,
+      "start_method": "hmac_prf",
+      "sender_start_location": 3242
+    },
+    {
+      "id": "image-confidential",
+      "media": "protected/image-confidential.png",
+      "manifest": "protected/image-confidential.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": "passphrase",
+      "message_sha256": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+      "message_bytes": 325,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 2,
+      "start_method": "hmac_prf",
+      "sender_start_location": 94541
+    },
+    {
+      "id": "image-file",
+      "media": "protected/image-file.png",
+      "manifest": "protected/image-file.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "0f02cfabf22a629bb41c2973231db07cf5b68b1f537301827bd95166de8d73c0",
+      "message_bytes": 1644,
+      "payload_kind": "image",
+      "expected_filename": "payload.png",
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 4,
+      "start_method": "hmac_prf",
+      "sender_start_location": 219949
+    },
+    {
+      "id": "audio-file",
+      "media": "protected/audio-file.wav",
+      "manifest": "protected/audio-file.wav.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "44e05eb1cad5637ac44a0f0eeb8fbf8a170d3f10718d487589585a8296d32506",
+      "message_bytes": 4454,
+      "payload_kind": "audio",
+      "expected_filename": "payload.wav",
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 4,
+      "start_method": "hmac_prf",
+      "sender_start_location": 6385
+    },
+    {
+      "id": "bmp-manual",
+      "media": "protected/bmp-manual.bmp",
+      "manifest": "protected/bmp-manual.bmp.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": null,
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 8,
+      "start_method": "manual",
+      "sender_start_location": 37
+    },
+    {
+      "id": "video-positive",
+      "media": "protected/video-positive.mkv",
+      "manifest": "protected/video-positive.mkv.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 347692
+    },
+    {
+      "id": "audio-uncoded",
+      "media": "protected/audio-uncoded.wav",
+      "manifest": "protected/audio-uncoded.wav.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": null,
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "manual",
+      "sender_start_location": 37
+    },
+    {
+      "id": "audio-robust",
+      "media": "protected/audio-robust.wav",
+      "manifest": "protected/audio-robust.wav.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": null,
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "manual",
+      "sender_start_location": 37
+    },
+    {
+      "id": "image-payload-corruption",
+      "media": "tampered/image-payload-corruption.png",
+      "manifest": "protected/image-short.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "start_secret": null,
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Inverted byte 52 of the envelope's message section, which is covered by the signature.",
+      "depth": 2,
+      "start_method": "manual",
+      "sender_start_location": 37
+    },
+    {
+      "id": "audio-signature-corruption",
+      "media": "tampered/audio-signature-corruption.wav",
+      "manifest": "protected/audio-long.wav.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+      "message_bytes": 673,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Inverted byte 192 of the envelope's signature section, which is covered by the signature.",
+      "depth": 2,
+      "start_method": "hmac_prf",
+      "sender_start_location": 3242
+    },
+    {
+      "id": "image-outside-payload",
+      "media": "tampered/image-outside-payload.png",
+      "manifest": "protected/image-short.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": null,
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Inverted 64 samples starting at sample 3761, which is past the end of the payload region. Verification is expected to succeed: it authenticates the signed message, not the whole file.",
+      "depth": 2,
+      "start_method": "manual",
+      "sender_start_location": 37
+    },
+    {
+      "id": "audio-repetition1-damage1",
+      "media": "tampered/audio-repetition1-damage1.wav",
+      "manifest": "protected/audio-uncoded.wav.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "start_secret": null,
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Last signature bit flipped in 1 stored copy/copies; factor 1",
+      "depth": 1,
+      "start_method": "manual",
+      "sender_start_location": 37
+    },
+    {
+      "id": "audio-repetition3-damage1",
+      "media": "tampered/audio-repetition3-damage1.wav",
+      "manifest": "protected/audio-robust.wav.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": null,
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 1,
+      "purpose": "Last signature bit flipped in 1 stored copy/copies; factor 3",
+      "depth": 1,
+      "start_method": "manual",
+      "sender_start_location": 37
+    },
+    {
+      "id": "audio-repetition3-damage2",
+      "media": "tampered/audio-repetition3-damage2.wav",
+      "manifest": "protected/audio-robust.wav.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "start_secret": null,
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Last signature bit flipped in 2 stored copy/copies; factor 3",
+      "depth": 1,
+      "start_method": "manual",
+      "sender_start_location": 37
+    },
+    {
+      "id": "audio-wrong-key",
+      "media": "protected/audio-long.wav",
+      "manifest": "protected/audio-long.wav.manifest.json",
+      "public_key": "unrelated-public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+      "message_bytes": 673,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Unrelated public key; media unchanged",
+      "depth": 2,
+      "start_method": "hmac_prf",
+      "sender_start_location": 3242
+    },
+    {
+      "id": "audio-wrong-start",
+      "media": "protected/audio-long.wav",
+      "manifest": "protected/audio-long.wav.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "PAYLOAD_MISSING",
+        "CANNOT_VERIFY",
+        "SIGNATURE_INVALID"
+      ],
+      "start_secret": "wrong_start",
+      "passphrase": null,
+      "message_sha256": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+      "message_bytes": 673,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Different derived location; failure cause alone remains ambiguous",
+      "depth": 2,
+      "start_method": "hmac_prf",
+      "sender_start_location": 3242
+    },
+    {
+      "id": "image-wrong-passphrase",
+      "media": "protected/image-confidential.png",
+      "manifest": "protected/image-confidential.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "CANNOT_VERIFY"
+      ],
+      "start_secret": "start",
+      "passphrase": "wrong_passphrase",
+      "message_sha256": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+      "message_bytes": 325,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Signature can verify but decryption fails",
+      "depth": 2,
+      "start_method": "hmac_prf",
+      "sender_start_location": 94541
+    },
+    {
+      "id": "analysis-noise-0",
+      "media": "protected/analysis-noise-0.png",
+      "manifest": "protected/analysis-noise-0.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 40758
+    },
+    {
+      "id": "analysis-noise-1",
+      "media": "protected/analysis-noise-1.png",
+      "manifest": "protected/analysis-noise-1.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 6568
+    },
+    {
+      "id": "analysis-noise-2",
+      "media": "protected/analysis-noise-2.png",
+      "manifest": "protected/analysis-noise-2.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 24449
+    },
+    {
+      "id": "analysis-even-0",
+      "media": "protected/analysis-even-0.png",
+      "manifest": "protected/analysis-even-0.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 35145
+    },
+    {
+      "id": "analysis-even-1",
+      "media": "protected/analysis-even-1.png",
+      "manifest": "protected/analysis-even-1.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 22700
+    },
+    {
+      "id": "analysis-even-2",
+      "media": "protected/analysis-even-2.png",
+      "manifest": "protected/analysis-even-2.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 33849
+    },
+    {
+      "id": "analysis-gradient-0",
+      "media": "protected/analysis-gradient-0.png",
+      "manifest": "protected/analysis-gradient-0.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 35922
+    },
+    {
+      "id": "analysis-gradient-1",
+      "media": "protected/analysis-gradient-1.png",
+      "manifest": "protected/analysis-gradient-1.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 30292
+    },
+    {
+      "id": "analysis-gradient-2",
+      "media": "protected/analysis-gradient-2.png",
+      "manifest": "protected/analysis-gradient-2.png.manifest.json",
+      "public_key": "sender-public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "start_secret": "start",
+      "passphrase": null,
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "message_bytes": 105,
+      "payload_kind": "text",
+      "expected_filename": null,
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "depth": 1,
+      "start_method": "hmac_prf",
+      "sender_start_location": 25888
+    }
+  ],
+  "analysis_pairs": [
+    {
+      "family": "noise",
+      "seed": 0,
+      "cover": "analysis/noise-0.png",
+      "stego": "protected/analysis-noise-0.png"
+    },
+    {
+      "family": "noise",
+      "seed": 1,
+      "cover": "analysis/noise-1.png",
+      "stego": "protected/analysis-noise-1.png"
+    },
+    {
+      "family": "noise",
+      "seed": 2,
+      "cover": "analysis/noise-2.png",
+      "stego": "protected/analysis-noise-2.png"
+    },
+    {
+      "family": "even",
+      "seed": 0,
+      "cover": "analysis/even-0.png",
+      "stego": "protected/analysis-even-0.png"
+    },
+    {
+      "family": "even",
+      "seed": 1,
+      "cover": "analysis/even-1.png",
+      "stego": "protected/analysis-even-1.png"
+    },
+    {
+      "family": "even",
+      "seed": 2,
+      "cover": "analysis/even-2.png",
+      "stego": "protected/analysis-even-2.png"
+    },
+    {
+      "family": "gradient",
+      "seed": 0,
+      "cover": "analysis/gradient-0.png",
+      "stego": "protected/analysis-gradient-0.png"
+    },
+    {
+      "family": "gradient",
+      "seed": 1,
+      "cover": "analysis/gradient-1.png",
+      "stego": "protected/analysis-gradient-1.png"
+    },
+    {
+      "family": "gradient",
+      "seed": 2,
+      "cover": "analysis/gradient-2.png",
+      "stego": "protected/analysis-gradient-2.png"
+    }
+  ],
+  "capacity_cases": [
+    {
+      "id": "capacity-png",
+      "cover": "original/image.png",
+      "depth": 1,
+      "start": 37,
+      "message_bytes": 28792,
+      "sender_exception": "CapacityError",
+      "sender_reason": "the message does not fit: a 28792-byte message becomes a 29546-byte signed payload, but image.png holds at most 28791 bytes at depth 1 from start 37. The largest message that fits at this depth is about 28037 bytes; a greater depth or a larger cover would raise that",
+      "output_created": false
+    },
+    {
+      "id": "capacity-wav",
+      "cover": "original/audio-mono.wav",
+      "depth": 1,
+      "start": 37,
+      "message_bytes": 5504,
+      "sender_exception": "CapacityError",
+      "sender_reason": "the message does not fit: a 5504-byte message becomes a 6257-byte signed payload, but audio-mono.wav holds at most 5503 bytes at depth 1 from start 37. The largest message that fits at this depth is about 4750 bytes; a greater depth or a larger cover would raise that",
+      "output_created": false
+    }
+  ]
+}

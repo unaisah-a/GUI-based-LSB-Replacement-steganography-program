@@ -1,0 +1,22 @@
+{
+  "container_format": "WAV",
+  "created": "2026-09-24T12:48:29+00:00",
+  "ecc": {
+    "factor": 3,
+    "scheme": "repetition"
+  },
+  "encrypted": false,
+  "encryption": null,
+  "envelope_length": 958,
+  "format_version": 1,
+  "lsb_depth": 1,
+  "media_id": "audio-robust",
+  "media_type": "audio",
+  "message_length": 105,
+  "nonce": "0b33046ce8bb308a006ca907b3071861",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": 37,
+  "start_method": "manual",
+  "stego_file": "audio-robust.wav",
+  "stego_sha256": "4e84f037c587f86489882b0458a3eb99a7e1439f60c3472238dc16bce7592f11"
+}

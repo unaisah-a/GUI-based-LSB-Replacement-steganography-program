@@ -1,0 +1,2 @@
+# Preserve the exact bytes used by the sample bundle's transfer checksums.
+samples/t07/** -text whitespace=cr-at-eol

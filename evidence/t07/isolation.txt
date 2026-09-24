@@ -1,0 +1,22 @@
+{
+  "command": [
+    "A:\\Code\\GUI-based-LSB-Replacement-steganography-program\\.venv-t05\\Scripts\\python.exe",
+    "-I",
+    "A:\\Code\\GUI-based-LSB-Replacement-steganography-program\\tmp\\t07-isolated\\scripts\\verify_sample_bundle.py",
+    "A:\\Code\\GUI-based-LSB-Replacement-steganography-program\\tmp\\t07-isolated\\received",
+    "--report",
+    "A:\\Code\\GUI-based-LSB-Replacement-steganography-program\\tmp\\t07-isolated\\report.json",
+    "--recovered",
+    "A:\\Code\\GUI-based-LSB-Replacement-steganography-program\\tmp\\t07-isolated\\recovered"
+  ],
+  "cwd": "A:\\Code\\GUI-based-LSB-Replacement-steganography-program\\tmp\\t07-isolated",
+  "returncode": 0,
+  "stdout": "{\"passed\": true, \"cases\": 27, \"report\": \"A:\\\\Code\\\\GUI-based-LSB-Replacement-steganography-program\\\\tmp\\\\t07-isolated\\\\report.json\"}\n",
+  "stderr": "",
+  "sender_folder_present": false,
+  "private_key_files": 0,
+  "cases": 27,
+  "all_expectations_passed": true,
+  "recovered_files": 20,
+  "limitation": "Local file/process isolation; not OS denial of access or an actual human transfer"
+}

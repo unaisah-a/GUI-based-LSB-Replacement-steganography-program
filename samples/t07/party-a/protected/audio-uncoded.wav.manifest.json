@@ -1,0 +1,19 @@
+{
+  "container_format": "WAV",
+  "created": "2026-09-24T12:48:29+00:00",
+  "ecc": null,
+  "encrypted": false,
+  "encryption": null,
+  "envelope_length": 929,
+  "format_version": 1,
+  "lsb_depth": 1,
+  "media_id": "audio-uncoded",
+  "media_type": "audio",
+  "message_length": 105,
+  "nonce": "c2869e111e92ff1eda7f63218082b13f",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": 37,
+  "start_method": "manual",
+  "stego_file": "audio-uncoded.wav",
+  "stego_sha256": "2adc9600b3166ccc85a2e69d444f4d8ca83240497a4e3e12a630cc33b16a0cb5"
+}

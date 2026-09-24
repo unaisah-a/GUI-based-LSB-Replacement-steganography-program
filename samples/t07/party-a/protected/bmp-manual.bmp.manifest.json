@@ -1,0 +1,19 @@
+{
+  "container_format": "BMP",
+  "created": "2026-09-24T12:48:28+00:00",
+  "ecc": null,
+  "encrypted": false,
+  "encryption": null,
+  "envelope_length": 926,
+  "format_version": 1,
+  "lsb_depth": 8,
+  "media_id": "bmp-manual",
+  "media_type": "image",
+  "message_length": 105,
+  "nonce": "69231083961f794d9729839c1f77f2e8",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": 37,
+  "start_method": "manual",
+  "stego_file": "bmp-manual.bmp",
+  "stego_sha256": "d1606b7e02214f340c179205eceba0d861c7f5bdefe5c3b95dcd33ac42364ff0"
+}

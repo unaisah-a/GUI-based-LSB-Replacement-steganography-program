@@ -67,6 +67,8 @@ keys/demo_private/
 # the committed sample files are signed with it.
 !keys/public/
 !keys/public/*.pem
+!samples/t07/party-b/sender-public.pem
+!samples/t07/party-b/unrelated-public.pem
 keys/public/demo_public.pem
 
 # evidence/ is deliberately NOT ignored.

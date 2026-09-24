@@ -1,0 +1,19 @@
+{
+  "container_format": "PNG",
+  "created": "2026-09-24T12:48:29+00:00",
+  "ecc": null,
+  "encrypted": false,
+  "encryption": null,
+  "envelope_length": 939,
+  "format_version": 1,
+  "lsb_depth": 1,
+  "media_id": "analysis-gradient-2",
+  "media_type": "image",
+  "message_length": 105,
+  "nonce": "5c0a4f6744fb5166d5ddd5daa17a79f6",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": null,
+  "start_method": "hmac_prf",
+  "stego_file": "analysis-gradient-2.png",
+  "stego_sha256": "8f6b6a7e4a59655428d3b520fbed18df00b4951b932dfab79d108b1e683e7cca"
+}
