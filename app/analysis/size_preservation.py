@@ -10,10 +10,9 @@ Why the answer differs by container
 The distinction that matters is whether the container stores samples at a fixed
 position and width, or compresses them.
 
-``WAV`` and ``BMP`` store samples literally, so replacing low-order bits changes
-byte *values* and not byte *counts*. Size preservation is not something to achieve
-here; it is unavoidable, and the experiment's job is to confirm it rather than to
-work for it.
+``WAV`` and ``BMP`` store samples at fixed width, so replacing low-order bits
+does not change the sample byte count. Whole-file sizes can still change when
+re-encoding removes metadata, padding or non-canonical headers.
 
 ``PNG`` runs the pixel data through DEFLATE. Altering low bits makes the data more
 or less compressible, so the compressed stream changes length in a direction nobody
@@ -418,9 +417,8 @@ def size_outcome(
 ) -> SizeResult:
     """Report the size relationship for any medium, without attempting to change it.
 
-    For WAV and BMP this is the whole experiment: the sizes are expected to match
-    already, and a mismatch would mean something is wrong with the writer rather than
-    with the format. For PNG it is the *baseline* that
+    For WAV and BMP the sample storage is fixed-width, but metadata and headers
+    can change when re-encoded. For PNG it is the *baseline* that
     :func:`preserve_png_size` is measured against. For video it records that the
     question does not apply.
     """
@@ -434,15 +432,17 @@ def size_outcome(
     media_type = media.detect_media_type(stego)
     container = file_utils.describe_file(stego).container_format
 
-    inherent = container in (constants.CONTAINER_WAV, constants.CONTAINER_BMP)
+    fixed_width = container in (constants.CONTAINER_WAV, constants.CONTAINER_BMP)
+    inherent = fixed_width and stego_size == cover_size
     notes: list[str] = []
 
-    if inherent:
-        strategy = "none needed: samples are stored at fixed positions and widths"
+    if fixed_width:
+        strategy = ("none needed: fixed-width sample storage" if inherent else
+                    "not matched: container metadata or header layout changed")
         notes.append(
-            "Replacing low-order bits changes byte values, not byte counts, so the "
-            "size is preserved without doing anything. A mismatch here would point "
-            "at the writer, not at the format."
+            "Sample storage has fixed width. Re-encoding can remove metadata or "
+            "padding and normalise headers, so whole-file size is not guaranteed. "
+            "No size adjustment is attempted for WAV or BMP."
         )
     elif container == constants.CONTAINER_PNG:
         strategy = "baseline, before any attempt"
@@ -455,9 +455,9 @@ def size_outcome(
         strategy = "not applicable: the output is a full re-encode"
         notes.append(
             "A protected clip is re-encoded as FFV1 from the decoded frames, so its "
-            "size bears no relation to the cover's — the cover may not even have "
-            "been in a lossless codec. Comparing the two sizes measures the codec "
-            "change, not the embedding."
+            "size reflects both re-encoding and embedding. A lossy source codec "
+            "can produce substantially larger lossless output. Source audio is "
+            "omitted. Exact size matching is not supported for video."
         )
         if stego_size == cover_size:
             # Two independently encoded FFV1 streams can land on the same length. It

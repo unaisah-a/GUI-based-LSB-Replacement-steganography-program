@@ -1,0 +1,4 @@
+........................................................................ [ 96%]
+...                                                                      [100%]
+- generated xml file: A:\Code\GUI-based-LSB-Replacement-steganography-program\evidence\t06\test_gui_tabs.xml -
+75 passed in 5.34s

@@ -2,7 +2,7 @@
 
 Before making changes, read [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md). It records the agreed scope, current authorization, task dependencies, acceptance criteria and handoff state.
 
-- Respect the user's latest authorized task scope. The current handoff is T05 complete; do not start T06-T09 without a subsequent user instruction authorizing further work.
+- Respect the user's latest authorised task scope. The current handoff is T06 complete; do not start T07-T09 without a subsequent user instruction authorising further work.
 - Maintain the task ledger after completed tasks and before handoff. Use TODO, IN_PROGRESS, BLOCKED and DONE; record actual changes, evidence and remaining work.
 - Mark DONE only when acceptance criteria are met. For BLOCKED, record the specific blocker and what would resolve it.
 - Record commands, environment and tested revision/working-tree state. Distinguish historical branch evidence from current results, and planned checks from executed checks.

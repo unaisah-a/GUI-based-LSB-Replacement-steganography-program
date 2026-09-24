@@ -1,0 +1,13 @@
+{
+  "base_head": "9b1d6d2824137dc0bfae422c677fae7e0d839f0d",
+  "state": "uncommitted T06 source; final partitioned tests",
+  "sha256": {
+    "app/analysis/size_preservation.py": "8215f447cd3b6d86090b600fb73f03a477f768180b4af8a97594683c2236fcc8",
+    "app/gui/protect_tab.py": "3b0af20aa06f77133b7fabb0f3c5db4c503abe865c109e0b0824aab6f57406e8",
+    "app/stego/video_stego.py": "9588fd5264e27dea1d98207ddd1a969e5b431eabd4e59969a97765f3da9938c6",
+    "app/verification/protect.py": "954a79713564440612fa5d617a608e41c292bb7a002610e875d00e619dd59ade",
+    "scripts/evaluate_preservation.py": "e85437e8caf29bf633703818467aff8640a90f641298b8ba4d4f0ef727d4faef",
+    "tests/test_preservation_evaluation.py": "fdaafcb06ae5204c61e685ac5cf1da994c1b0cffcb9858cbe432a269d1b0887c",
+    "tests/test_size_preservation.py": "d1cb77a3a77d9e05b172769fef7e4af050b61c0fc382a7834cd4ec82c4b3de24"
+  }
+}

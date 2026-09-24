@@ -1,0 +1,3321 @@
+{
+  "python": "3.11.16",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "scipy": "1.14.1",
+  "opencv": "4.10.0",
+  "provenance": {
+    "source": "SciPy misc/face.dat: raccoon photograph from public-domain-image.com",
+    "source_sha256": "9d8b0b4d081313e2b485748c770472e5a95ed1738146883d84c7030493e82886",
+    "resize": [
+      256,
+      192
+    ],
+    "other_media": "Flat RGB, generated sine waves, photographic moving frames; no audio in video"
+  },
+  "cases": [
+    {
+      "case": "flat_png_d1_match0",
+      "cover": "flat.png",
+      "cover_sha256": "79d718d3ed5f5912d92abec072c84040feb92052412f88618be4491a611ef290",
+      "output_sha256": "9129687802bb3b00913c41bb534fa8b8253cf270fb4f1b54fdbea65a8d02bf02",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat.png",
+        "stego": "flat_png_d1_match0.png",
+        "cover_size": 590,
+        "stego_size": 2402,
+        "final_size": 2402,
+        "difference": 1812,
+        "growth_proportion": 3.071186440677966,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "baseline, before any attempt",
+        "content_unchanged": null,
+        "notes": [
+          "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 653,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 1812,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_png_d1_match1",
+      "cover": "flat.png",
+      "cover_sha256": "79d718d3ed5f5912d92abec072c84040feb92052412f88618be4491a611ef290",
+      "output_sha256": "df2f6848baecdde4539f46cc911afd8496ee95e2e5ab0429c772b9c159b3445c",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat.png",
+        "stego": "flat_png_d1_match1.png",
+        "cover_size": 590,
+        "stego_size": 2408,
+        "final_size": 2215,
+        "difference": 1625,
+        "growth_proportion": 2.7542372881355934,
+        "exact": false,
+        "attempted": true,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: every encoding is larger than the cover",
+        "content_unchanged": true,
+        "notes": [
+          "LSB replacement pushed the low-order bits toward random, and random data does not compress. The smallest of the ten encodings is still 1,625 bytes over. Bytes cannot be removed from a PNG without changing its pixels, so this file cannot be matched. This is the usual outcome at higher LSB depths."
+        ],
+        "details": {
+          "sizes_by_deflate_level": {
+            "0": 147760,
+            "1": 3573,
+            "2": 3385,
+            "3": 3340,
+            "4": 2478,
+            "5": 2429,
+            "6": 2408,
+            "7": 2387,
+            "8": 2215,
+            "9": 2215
+          },
+          "exact_level": null,
+          "smallest_level": 8,
+          "padded_bytes": 0,
+          "output": "flat_png_d1_match1.png"
+        }
+      },
+      "manifest_bytes": 653,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 1625,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_png_d4_match0",
+      "cover": "flat.png",
+      "cover_sha256": "79d718d3ed5f5912d92abec072c84040feb92052412f88618be4491a611ef290",
+      "output_sha256": "b9384ed1b438553e3b1261e3eba99d31c7f3a0efb7a16dfe8db161e15e859f9c",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat.png",
+        "stego": "flat_png_d4_match0.png",
+        "cover_size": 590,
+        "stego_size": 1879,
+        "final_size": 1879,
+        "difference": 1289,
+        "growth_proportion": 2.1847457627118643,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "baseline, before any attempt",
+        "content_unchanged": null,
+        "notes": [
+          "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 653,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 1289,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_png_d4_match1",
+      "cover": "flat.png",
+      "cover_sha256": "79d718d3ed5f5912d92abec072c84040feb92052412f88618be4491a611ef290",
+      "output_sha256": "3b2d171b6ede7b9d5997c47b60c3cd2552b0e28cde8e1a2a5e407ca8904afa7e",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat.png",
+        "stego": "flat_png_d4_match1.png",
+        "cover_size": 590,
+        "stego_size": 1885,
+        "final_size": 1692,
+        "difference": 1102,
+        "growth_proportion": 1.8677966101694916,
+        "exact": false,
+        "attempted": true,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: every encoding is larger than the cover",
+        "content_unchanged": true,
+        "notes": [
+          "LSB replacement pushed the low-order bits toward random, and random data does not compress. The smallest of the ten encodings is still 1,102 bytes over. Bytes cannot be removed from a PNG without changing its pixels, so this file cannot be matched. This is the usual outcome at higher LSB depths."
+        ],
+        "details": {
+          "sizes_by_deflate_level": {
+            "0": 147760,
+            "1": 2749,
+            "2": 2749,
+            "3": 2749,
+            "4": 1882,
+            "5": 1884,
+            "6": 1885,
+            "7": 1881,
+            "8": 1692,
+            "9": 1692
+          },
+          "exact_level": null,
+          "smallest_level": 8,
+          "padded_bytes": 0,
+          "output": "flat_png_d4_match1.png"
+        }
+      },
+      "manifest_bytes": 653,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 1102,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_png_d8_match0",
+      "cover": "flat.png",
+      "cover_sha256": "79d718d3ed5f5912d92abec072c84040feb92052412f88618be4491a611ef290",
+      "output_sha256": "6b18275bc77a6cc34e02dfe9e690ab11a75615df084c48678ca418734c3b6f44",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat.png",
+        "stego": "flat_png_d8_match0.png",
+        "cover_size": 590,
+        "stego_size": 1425,
+        "final_size": 1425,
+        "difference": 835,
+        "growth_proportion": 1.4152542372881356,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "baseline, before any attempt",
+        "content_unchanged": null,
+        "notes": [
+          "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 653,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 835,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 128,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_png_d8_match1",
+      "cover": "flat.png",
+      "cover_sha256": "79d718d3ed5f5912d92abec072c84040feb92052412f88618be4491a611ef290",
+      "output_sha256": "3054807e473c28dcdd6ba8fadab13d91244aff59852ee790d1aaa9c7c0c83816",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat.png",
+        "stego": "flat_png_d8_match1.png",
+        "cover_size": 590,
+        "stego_size": 1427,
+        "final_size": 1231,
+        "difference": 641,
+        "growth_proportion": 1.0864406779661018,
+        "exact": false,
+        "attempted": true,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: every encoding is larger than the cover",
+        "content_unchanged": true,
+        "notes": [
+          "LSB replacement pushed the low-order bits toward random, and random data does not compress. The smallest of the ten encodings is still 641 bytes over. Bytes cannot be removed from a PNG without changing its pixels, so this file cannot be matched. This is the usual outcome at higher LSB depths."
+        ],
+        "details": {
+          "sizes_by_deflate_level": {
+            "0": 147760,
+            "1": 2169,
+            "2": 2169,
+            "3": 1840,
+            "4": 1425,
+            "5": 1422,
+            "6": 1427,
+            "7": 1427,
+            "8": 1231,
+            "9": 1231
+          },
+          "exact_level": null,
+          "smallest_level": 8,
+          "padded_bytes": 0,
+          "output": "flat_png_d8_match1.png"
+        }
+      },
+      "manifest_bytes": 653,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 641,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 128,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_png_d1_match0",
+      "cover": "photo.png",
+      "cover_sha256": "4c98f41f0e9be37a57ff6e0b231f20bf5f78c5cc3f333f364059ad65dc5a2b03",
+      "output_sha256": "f1c04fd98ee861bd59dffbd6dc1132afd97f032eb32a181ef7bcb40d1f94bfc8",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "photo.png",
+        "stego": "photo_png_d1_match0.png",
+        "cover_size": 107976,
+        "stego_size": 107990,
+        "final_size": 107990,
+        "difference": 14,
+        "growth_proportion": 0.00012965844261687783,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "baseline, before any attempt",
+        "content_unchanged": null,
+        "notes": [
+          "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 107976,
+      "delta_from_baseline": 14,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_png_d1_match1",
+      "cover": "photo.png",
+      "cover_sha256": "4c98f41f0e9be37a57ff6e0b231f20bf5f78c5cc3f333f364059ad65dc5a2b03",
+      "output_sha256": "e020321a03acbc9d55246a2a23999740c2f64a0a353ea1571444baa2d9cff2cc",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "photo.png",
+        "stego": "photo_png_d1_match1.png",
+        "cover_size": 107976,
+        "stego_size": 107996,
+        "final_size": 107976,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": true,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "re-encoding at DEFLATE level 8",
+        "content_unchanged": true,
+        "notes": [
+          "No padding was needed: one of the ten DEFLATE levels happened to produce exactly the cover's length."
+        ],
+        "details": {
+          "sizes_by_deflate_level": {
+            "0": 147760,
+            "1": 107845,
+            "2": 107700,
+            "3": 107343,
+            "4": 108140,
+            "5": 108047,
+            "6": 107996,
+            "7": 107985,
+            "8": 107976,
+            "9": 107976
+          },
+          "exact_level": 8,
+          "smallest_level": 3,
+          "padded_bytes": 0,
+          "output": "photo_png_d1_match1.png"
+        }
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 107976,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_png_d4_match0",
+      "cover": "photo.png",
+      "cover_sha256": "4c98f41f0e9be37a57ff6e0b231f20bf5f78c5cc3f333f364059ad65dc5a2b03",
+      "output_sha256": "91993c262506428f29ca43f4403e3efcc0d25b5391c432a5398a63df85522eae",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "photo.png",
+        "stego": "photo_png_d4_match0.png",
+        "cover_size": 107976,
+        "stego_size": 108043,
+        "final_size": 108043,
+        "difference": 67,
+        "growth_proportion": 0.0006205082610950582,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "baseline, before any attempt",
+        "content_unchanged": null,
+        "notes": [
+          "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 107976,
+      "delta_from_baseline": 67,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_png_d4_match1",
+      "cover": "photo.png",
+      "cover_sha256": "4c98f41f0e9be37a57ff6e0b231f20bf5f78c5cc3f333f364059ad65dc5a2b03",
+      "output_sha256": "b185b9818e9661d2d897f3dd3bde3d3e63bef781d7e66a72f9273578ea496557",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "photo.png",
+        "stego": "photo_png_d4_match1.png",
+        "cover_size": 107976,
+        "stego_size": 108050,
+        "final_size": 107976,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": true,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "DEFLATE level 3 plus a 526-byte stPd padding chunk",
+        "content_unchanged": true,
+        "notes": [
+          "The padding chunk is ancillary and private, so a conforming decoder skips it and the pixels are unchanged. It is also an unusual feature in an otherwise plain PNG, which makes the file arguably more conspicuous to an analyst than a size mismatch would."
+        ],
+        "details": {
+          "sizes_by_deflate_level": {
+            "0": 147760,
+            "1": 107936,
+            "2": 107791,
+            "3": 107450,
+            "4": 108198,
+            "5": 108108,
+            "6": 108050,
+            "7": 108039,
+            "8": 108029,
+            "9": 108029
+          },
+          "exact_level": null,
+          "smallest_level": 3,
+          "padded_bytes": 526,
+          "output": "photo_png_d4_match1.png"
+        }
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 107976,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_png_d8_match0",
+      "cover": "photo.png",
+      "cover_sha256": "4c98f41f0e9be37a57ff6e0b231f20bf5f78c5cc3f333f364059ad65dc5a2b03",
+      "output_sha256": "9df3778127db54d7b4a3377bfad684a06cab04d52553254abd0be0a1d9115ad3",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "photo.png",
+        "stego": "photo_png_d8_match0.png",
+        "cover_size": 107976,
+        "stego_size": 108025,
+        "final_size": 108025,
+        "difference": 49,
+        "growth_proportion": 0.00045380454915907236,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "baseline, before any attempt",
+        "content_unchanged": null,
+        "notes": [
+          "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 107976,
+      "delta_from_baseline": 49,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 183,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_png_d8_match1",
+      "cover": "photo.png",
+      "cover_sha256": "4c98f41f0e9be37a57ff6e0b231f20bf5f78c5cc3f333f364059ad65dc5a2b03",
+      "output_sha256": "9fde4efc9da7de2af400f5ed441f233b1c7d739799da6379343ea6384afa9524",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "photo.png",
+        "stego": "photo_png_d8_match1.png",
+        "cover_size": 107976,
+        "stego_size": 108034,
+        "final_size": 107976,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": true,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "DEFLATE level 3 plus a 746-byte stPd padding chunk",
+        "content_unchanged": true,
+        "notes": [
+          "The padding chunk is ancillary and private, so a conforming decoder skips it and the pixels are unchanged. It is also an unusual feature in an otherwise plain PNG, which makes the file arguably more conspicuous to an analyst than a size mismatch would."
+        ],
+        "details": {
+          "sizes_by_deflate_level": {
+            "0": 147760,
+            "1": 107741,
+            "2": 107596,
+            "3": 107230,
+            "4": 108190,
+            "5": 108100,
+            "6": 108034,
+            "7": 108022,
+            "8": 108012,
+            "9": 108012
+          },
+          "exact_level": null,
+          "smallest_level": 3,
+          "padded_bytes": 746,
+          "output": "photo_png_d8_match1.png"
+        }
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 107976,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 210,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_uncompressed_png_d1_match0",
+      "cover": "flat_uncompressed.png",
+      "cover_sha256": "45fea75f049030980616534a16c75ae6d16fa0ffe273f8f4f248aa128fa4e7a0",
+      "output_sha256": "c05167a0d14d37d58d69eb2f4d131455364b744d8ed95ae55282713a7a548492",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat_uncompressed.png",
+        "stego": "flat_uncompressed_png_d1_match0.png",
+        "cover_size": 147760,
+        "stego_size": 2409,
+        "final_size": 2409,
+        "difference": -145351,
+        "growth_proportion": -0.9836965349214943,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "baseline, before any attempt",
+        "content_unchanged": null,
+        "notes": [
+          "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 1819,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_uncompressed_png_d1_match1",
+      "cover": "flat_uncompressed.png",
+      "cover_sha256": "45fea75f049030980616534a16c75ae6d16fa0ffe273f8f4f248aa128fa4e7a0",
+      "output_sha256": "f4579eeae03a44d482afe81a7a39d0d84277758c4adbad0f126768a8b777a392",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat_uncompressed.png",
+        "stego": "flat_uncompressed_png_d1_match1.png",
+        "cover_size": 147760,
+        "stego_size": 2405,
+        "final_size": 147760,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": true,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "re-encoding at DEFLATE level 0",
+        "content_unchanged": true,
+        "notes": [
+          "No padding was needed: one of the ten DEFLATE levels happened to produce exactly the cover's length."
+        ],
+        "details": {
+          "sizes_by_deflate_level": {
+            "0": 147760,
+            "1": 3614,
+            "2": 3455,
+            "3": 3348,
+            "4": 2482,
+            "5": 2443,
+            "6": 2405,
+            "7": 2405,
+            "8": 2236,
+            "9": 2239
+          },
+          "exact_level": 0,
+          "smallest_level": 8,
+          "padded_bytes": 0,
+          "output": "flat_uncompressed_png_d1_match1.png"
+        }
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 147170,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_uncompressed_png_d4_match0",
+      "cover": "flat_uncompressed.png",
+      "cover_sha256": "45fea75f049030980616534a16c75ae6d16fa0ffe273f8f4f248aa128fa4e7a0",
+      "output_sha256": "e82fd3f67ce1fec72bfe8e1e065b9b1c2ce9d1e0e0521f38f5e3ac0e6d83e2f2",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat_uncompressed.png",
+        "stego": "flat_uncompressed_png_d4_match0.png",
+        "cover_size": 147760,
+        "stego_size": 1899,
+        "final_size": 1899,
+        "difference": -145861,
+        "growth_proportion": -0.9871480779642664,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "baseline, before any attempt",
+        "content_unchanged": null,
+        "notes": [
+          "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 1309,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_uncompressed_png_d4_match1",
+      "cover": "flat_uncompressed.png",
+      "cover_sha256": "45fea75f049030980616534a16c75ae6d16fa0ffe273f8f4f248aa128fa4e7a0",
+      "output_sha256": "f2d02ea075b65d4ebb5f40ddecf2b0602c49f4f4e29d8730a073e930a8ffb123",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat_uncompressed.png",
+        "stego": "flat_uncompressed_png_d4_match1.png",
+        "cover_size": 147760,
+        "stego_size": 1894,
+        "final_size": 147760,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": true,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "re-encoding at DEFLATE level 0",
+        "content_unchanged": true,
+        "notes": [
+          "No padding was needed: one of the ten DEFLATE levels happened to produce exactly the cover's length."
+        ],
+        "details": {
+          "sizes_by_deflate_level": {
+            "0": 147760,
+            "1": 2752,
+            "2": 2754,
+            "3": 2754,
+            "4": 1893,
+            "5": 1895,
+            "6": 1894,
+            "7": 1892,
+            "8": 1704,
+            "9": 1704
+          },
+          "exact_level": 0,
+          "smallest_level": 8,
+          "padded_bytes": 0,
+          "output": "flat_uncompressed_png_d4_match1.png"
+        }
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 147170,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_uncompressed_png_d8_match0",
+      "cover": "flat_uncompressed.png",
+      "cover_sha256": "45fea75f049030980616534a16c75ae6d16fa0ffe273f8f4f248aa128fa4e7a0",
+      "output_sha256": "89cda7502cf71a11f7d74a895448e98965aab98db77d7f3076882f19adaa0020",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat_uncompressed.png",
+        "stego": "flat_uncompressed_png_d8_match0.png",
+        "cover_size": 147760,
+        "stego_size": 1440,
+        "final_size": 1440,
+        "difference": -146320,
+        "growth_proportion": -0.9902544667027612,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "baseline, before any attempt",
+        "content_unchanged": null,
+        "notes": [
+          "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 850,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 128,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "flat_uncompressed_png_d8_match1",
+      "cover": "flat_uncompressed.png",
+      "cover_sha256": "45fea75f049030980616534a16c75ae6d16fa0ffe273f8f4f248aa128fa4e7a0",
+      "output_sha256": "382a1d7f107301cc588ee738c25517c0efce315058da7bfb40a6253032e8cfa2",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "PNG",
+        "cover": "flat_uncompressed.png",
+        "stego": "flat_uncompressed_png_d8_match1.png",
+        "cover_size": 147760,
+        "stego_size": 1438,
+        "final_size": 147760,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": true,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "re-encoding at DEFLATE level 0",
+        "content_unchanged": true,
+        "notes": [
+          "No padding was needed: one of the ten DEFLATE levels happened to produce exactly the cover's length."
+        ],
+        "details": {
+          "sizes_by_deflate_level": {
+            "0": 147760,
+            "1": 2149,
+            "2": 2121,
+            "3": 1855,
+            "4": 1438,
+            "5": 1435,
+            "6": 1438,
+            "7": 1438,
+            "8": 1246,
+            "9": 1246
+          },
+          "exact_level": 0,
+          "smallest_level": 8,
+          "padded_bytes": 0,
+          "output": "flat_uncompressed_png_d8_match1.png"
+        }
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 590,
+      "delta_from_baseline": 147170,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 128,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_bmp_d1_match0",
+      "cover": "photo.bmp",
+      "cover_sha256": "8f2e9de51a756a25cb1e7aabed5746f94a055b17cb53a4f155ac1009af85a492",
+      "output_sha256": "bdb3fb18dadcd0bdc290eaa20e6cb6f2e73e0b387191d19d2496ff378c656823",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo.bmp",
+        "stego": "photo_bmp_d1_match0.bmp",
+        "cover_size": 147510,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_bmp_d1_match1",
+      "cover": "photo.bmp",
+      "cover_sha256": "8f2e9de51a756a25cb1e7aabed5746f94a055b17cb53a4f155ac1009af85a492",
+      "output_sha256": "29b75a76e80564f825546e3fe4b0377a385284f4779ab364489bdbcde2b513bb",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo.bmp",
+        "stego": "photo_bmp_d1_match1.bmp",
+        "cover_size": 147510,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_bmp_d4_match0",
+      "cover": "photo.bmp",
+      "cover_sha256": "8f2e9de51a756a25cb1e7aabed5746f94a055b17cb53a4f155ac1009af85a492",
+      "output_sha256": "bd48e813b8834d219c57d375cc17984fba31b12db7486d9a6905285f2391111e",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo.bmp",
+        "stego": "photo_bmp_d4_match0.bmp",
+        "cover_size": 147510,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_bmp_d4_match1",
+      "cover": "photo.bmp",
+      "cover_sha256": "8f2e9de51a756a25cb1e7aabed5746f94a055b17cb53a4f155ac1009af85a492",
+      "output_sha256": "09158f0be6d5c3e8c7d055af546f00dda78fcc2523acadc43a301fd305eb9d83",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo.bmp",
+        "stego": "photo_bmp_d4_match1.bmp",
+        "cover_size": 147510,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_bmp_d8_match0",
+      "cover": "photo.bmp",
+      "cover_sha256": "8f2e9de51a756a25cb1e7aabed5746f94a055b17cb53a4f155ac1009af85a492",
+      "output_sha256": "31b04db3c485f0b9ba00420906fc215a5faa22faf87587c470ea9ce6c17cbd52",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo.bmp",
+        "stego": "photo_bmp_d8_match0.bmp",
+        "cover_size": 147510,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 188,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_bmp_d8_match1",
+      "cover": "photo.bmp",
+      "cover_sha256": "8f2e9de51a756a25cb1e7aabed5746f94a055b17cb53a4f155ac1009af85a492",
+      "output_sha256": "b5031e1c7bd812612d496b434069d3553c180b2c6dd47727549b83d6b4b73210",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo.bmp",
+        "stego": "photo_bmp_d8_match1.bmp",
+        "cover_size": 147510,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 655,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 186,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_gap_bmp_d1_match0",
+      "cover": "photo_gap.bmp",
+      "cover_sha256": "19e736b3e409f762a963eb7060de6ce308ad2271dcb0a14dba2bdb1e72d891fc",
+      "output_sha256": "8716cc3d7e9209fd86e04f72e25d53fcf88d5238aee8982c645e240e94910cde",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo_gap.bmp",
+        "stego": "photo_gap_bmp_d1_match0.bmp",
+        "cover_size": 147638,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": -128,
+        "growth_proportion": -0.0008669854644468226,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 663,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_gap_bmp_d1_match1",
+      "cover": "photo_gap.bmp",
+      "cover_sha256": "19e736b3e409f762a963eb7060de6ce308ad2271dcb0a14dba2bdb1e72d891fc",
+      "output_sha256": "02af174a1bb60a2fba9a16070645c328831564a01f6f745c6bc310e688710407",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo_gap.bmp",
+        "stego": "photo_gap_bmp_d1_match1.bmp",
+        "cover_size": 147638,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": -128,
+        "growth_proportion": -0.0008669854644468226,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 663,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_gap_bmp_d4_match0",
+      "cover": "photo_gap.bmp",
+      "cover_sha256": "19e736b3e409f762a963eb7060de6ce308ad2271dcb0a14dba2bdb1e72d891fc",
+      "output_sha256": "e2eec1ad1425d9720109b391cee26a03a0ff84a2f64b3554e4af596ebccba721",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo_gap.bmp",
+        "stego": "photo_gap_bmp_d4_match0.bmp",
+        "cover_size": 147638,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": -128,
+        "growth_proportion": -0.0008669854644468226,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 663,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_gap_bmp_d4_match1",
+      "cover": "photo_gap.bmp",
+      "cover_sha256": "19e736b3e409f762a963eb7060de6ce308ad2271dcb0a14dba2bdb1e72d891fc",
+      "output_sha256": "29b7a4b14f9aeee00cd3bc6adefdb8075803141522e92442b1c2b9f55a745c8e",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo_gap.bmp",
+        "stego": "photo_gap_bmp_d4_match1.bmp",
+        "cover_size": 147638,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": -128,
+        "growth_proportion": -0.0008669854644468226,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 663,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_gap_bmp_d8_match0",
+      "cover": "photo_gap.bmp",
+      "cover_sha256": "19e736b3e409f762a963eb7060de6ce308ad2271dcb0a14dba2bdb1e72d891fc",
+      "output_sha256": "92b6f750732dd4be9e325ea7ecd7ed5749e0f5f80a49e484f41ddb9c38eb9c8c",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo_gap.bmp",
+        "stego": "photo_gap_bmp_d8_match0.bmp",
+        "cover_size": 147638,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": -128,
+        "growth_proportion": -0.0008669854644468226,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 663,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 201,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "photo_gap_bmp_d8_match1",
+      "cover": "photo_gap.bmp",
+      "cover_sha256": "19e736b3e409f762a963eb7060de6ce308ad2271dcb0a14dba2bdb1e72d891fc",
+      "output_sha256": "75d6881f129bccfc59e9ef9b95ebaddd79c49d1d426fe28ee8d46c7bcf34c421",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "image",
+        "container": "BMP",
+        "cover": "photo_gap.bmp",
+        "stego": "photo_gap_bmp_d8_match1.bmp",
+        "cover_size": 147638,
+        "stego_size": 147510,
+        "final_size": 147510,
+        "difference": -128,
+        "growth_proportion": -0.0008669854644468226,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 663,
+      "baseline_bytes": 147510,
+      "delta_from_baseline": 0,
+      "before": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "after": {
+        "height": 192,
+        "width": 256,
+        "channels": 3
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 170,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_1ch_wav_d1_match0",
+      "cover": "tone_1ch.wav",
+      "cover_sha256": "0fe8f3ce71c035991d2f6412bda13a0bf7396b2b95aed0161345ce411421a7f2",
+      "output_sha256": "0c7641cbc31a9a85526f899b35035fe4d12f832147a4702829c3a35e725310eb",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_1ch.wav",
+        "stego": "tone_1ch_wav_d1_match0.wav",
+        "cover_size": 88244,
+        "stego_size": 88244,
+        "final_size": 88244,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 88244,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_1ch_wav_d1_match1",
+      "cover": "tone_1ch.wav",
+      "cover_sha256": "0fe8f3ce71c035991d2f6412bda13a0bf7396b2b95aed0161345ce411421a7f2",
+      "output_sha256": "153707dd65306ba36bcc6c3716b0476e6ecd409f93fef826f39d4d64806af63b",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_1ch.wav",
+        "stego": "tone_1ch_wav_d1_match1.wav",
+        "cover_size": 88244,
+        "stego_size": 88244,
+        "final_size": 88244,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 88244,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_1ch_wav_d4_match0",
+      "cover": "tone_1ch.wav",
+      "cover_sha256": "0fe8f3ce71c035991d2f6412bda13a0bf7396b2b95aed0161345ce411421a7f2",
+      "output_sha256": "f827235219ac58ca2488a475489b4dbfbf37f73ac1cff638bdf4f18142614a90",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_1ch.wav",
+        "stego": "tone_1ch_wav_d4_match0.wav",
+        "cover_size": 88244,
+        "stego_size": 88244,
+        "final_size": 88244,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 88244,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_1ch_wav_d4_match1",
+      "cover": "tone_1ch.wav",
+      "cover_sha256": "0fe8f3ce71c035991d2f6412bda13a0bf7396b2b95aed0161345ce411421a7f2",
+      "output_sha256": "e7a7b538a05dbe8ec6fb5cbf39cc23e06f8f2d7c8d3f09e29a540554c8975186",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_1ch.wav",
+        "stego": "tone_1ch_wav_d4_match1.wav",
+        "cover_size": 88244,
+        "stego_size": 88244,
+        "final_size": 88244,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 88244,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_1ch_wav_d8_match0",
+      "cover": "tone_1ch.wav",
+      "cover_sha256": "0fe8f3ce71c035991d2f6412bda13a0bf7396b2b95aed0161345ce411421a7f2",
+      "output_sha256": "9ed8289d43bb5d0c47bb6cb3ce6ee87009e47c135a72211a16e35adeb18498bc",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_1ch.wav",
+        "stego": "tone_1ch_wav_d8_match0.wav",
+        "cover_size": 88244,
+        "stego_size": 88244,
+        "final_size": 88244,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 88244,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 252,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_1ch_wav_d8_match1",
+      "cover": "tone_1ch.wav",
+      "cover_sha256": "0fe8f3ce71c035991d2f6412bda13a0bf7396b2b95aed0161345ce411421a7f2",
+      "output_sha256": "068e977430840ded3b387328fc3ff11b68e1d190f768f25b0a1664f4fda30104",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_1ch.wav",
+        "stego": "tone_1ch_wav_d8_match1.wav",
+        "cover_size": 88244,
+        "stego_size": 88244,
+        "final_size": 88244,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 88244,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 44100,
+        "channels": 1,
+        "sample_rate": 22050,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 252,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_2ch_wav_d1_match0",
+      "cover": "tone_2ch.wav",
+      "cover_sha256": "7fd480cce5a5fd2566a00c5ac816ba620a1100a88189472689cd477959d15ea4",
+      "output_sha256": "29007ddefb3b74bffe0172f5ff2f1e01705adfc48a705d6534c43a688bd9a12a",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_2ch.wav",
+        "stego": "tone_2ch_wav_d1_match0.wav",
+        "cover_size": 352844,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_2ch_wav_d1_match1",
+      "cover": "tone_2ch.wav",
+      "cover_sha256": "7fd480cce5a5fd2566a00c5ac816ba620a1100a88189472689cd477959d15ea4",
+      "output_sha256": "7134f526504136965c0b8972ff4329297cbfa9550f4a3bd98ba7aba98a586b84",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_2ch.wav",
+        "stego": "tone_2ch_wav_d1_match1.wav",
+        "cover_size": 352844,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_2ch_wav_d4_match0",
+      "cover": "tone_2ch.wav",
+      "cover_sha256": "7fd480cce5a5fd2566a00c5ac816ba620a1100a88189472689cd477959d15ea4",
+      "output_sha256": "0bc6478ce9a891b47fb6649629dce8cd0efc96b2291121da0781ad3e19d7701f",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_2ch.wav",
+        "stego": "tone_2ch_wav_d4_match0.wav",
+        "cover_size": 352844,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_2ch_wav_d4_match1",
+      "cover": "tone_2ch.wav",
+      "cover_sha256": "7fd480cce5a5fd2566a00c5ac816ba620a1100a88189472689cd477959d15ea4",
+      "output_sha256": "68dabeb4307260d81b01b2c29a227a55d08cee7ddf7f4686dc13d97797cce5ba",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_2ch.wav",
+        "stego": "tone_2ch_wav_d4_match1.wav",
+        "cover_size": 352844,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_2ch_wav_d8_match0",
+      "cover": "tone_2ch.wav",
+      "cover_sha256": "7fd480cce5a5fd2566a00c5ac816ba620a1100a88189472689cd477959d15ea4",
+      "output_sha256": "198a777d718ad2d54f501c6b52dd2fe107339b9cf4ffc5659a86f5e42864eb5f",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_2ch.wav",
+        "stego": "tone_2ch_wav_d8_match0.wav",
+        "cover_size": 352844,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 244,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_2ch_wav_d8_match1",
+      "cover": "tone_2ch.wav",
+      "cover_sha256": "7fd480cce5a5fd2566a00c5ac816ba620a1100a88189472689cd477959d15ea4",
+      "output_sha256": "fbd630af0710b4124ef812346b003e851985e46fc36075de6e87de7a1214f89d",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_2ch.wav",
+        "stego": "tone_2ch_wav_d8_match1.wav",
+        "cover_size": 352844,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": 0,
+        "growth_proportion": 0.0,
+        "exact": true,
+        "attempted": false,
+        "inherent": true,
+        "applicable": true,
+        "strategy": "none needed: fixed-width sample storage",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 661,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 246,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_metadata_wav_d1_match0",
+      "cover": "tone_metadata.wav",
+      "cover_sha256": "7d62a19e81102bf01e8459e78f629f69fe92954292565bb00f3153ec5fa5635d",
+      "output_sha256": "cf8ac5e03cc9950ed55dd5f655e01c41337dd3990350f04072a48155c6432ad9",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_metadata.wav",
+        "stego": "tone_metadata_wav_d1_match0.wav",
+        "cover_size": 352980,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": -136,
+        "growth_proportion": -0.00038529095132868715,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 671,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_metadata_wav_d1_match1",
+      "cover": "tone_metadata.wav",
+      "cover_sha256": "7d62a19e81102bf01e8459e78f629f69fe92954292565bb00f3153ec5fa5635d",
+      "output_sha256": "f22bbb4d72423b6ecf4b0a0bb39ac9e045d7143a1e78839840a69e354bf12142",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_metadata.wav",
+        "stego": "tone_metadata_wav_d1_match1.wav",
+        "cover_size": 352980,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": -136,
+        "growth_proportion": -0.00038529095132868715,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 671,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_metadata_wav_d4_match0",
+      "cover": "tone_metadata.wav",
+      "cover_sha256": "7d62a19e81102bf01e8459e78f629f69fe92954292565bb00f3153ec5fa5635d",
+      "output_sha256": "d59caa3a14e2469511815ae38fea9d3aa2e2275e06b172b4941cd0f1da459354",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_metadata.wav",
+        "stego": "tone_metadata_wav_d4_match0.wav",
+        "cover_size": 352980,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": -136,
+        "growth_proportion": -0.00038529095132868715,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 671,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_metadata_wav_d4_match1",
+      "cover": "tone_metadata.wav",
+      "cover_sha256": "7d62a19e81102bf01e8459e78f629f69fe92954292565bb00f3153ec5fa5635d",
+      "output_sha256": "00eeb04b06123d0dac28f60f8224bfd07d70bc1b4c8eb240b2bc12e18809feb8",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_metadata.wav",
+        "stego": "tone_metadata_wav_d4_match1.wav",
+        "cover_size": 352980,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": -136,
+        "growth_proportion": -0.00038529095132868715,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 671,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_metadata_wav_d8_match0",
+      "cover": "tone_metadata.wav",
+      "cover_sha256": "7d62a19e81102bf01e8459e78f629f69fe92954292565bb00f3153ec5fa5635d",
+      "output_sha256": "5019ff21d161bd6b6ad4b17664a005d80425daf333d7bc424829d427beb38111",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_metadata.wav",
+        "stego": "tone_metadata_wav_d8_match0.wav",
+        "cover_size": 352980,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": -136,
+        "growth_proportion": -0.00038529095132868715,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 671,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 238,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "tone_metadata_wav_d8_match1",
+      "cover": "tone_metadata.wav",
+      "cover_sha256": "7d62a19e81102bf01e8459e78f629f69fe92954292565bb00f3153ec5fa5635d",
+      "output_sha256": "23767035f4e105cf4299a23d11b2ed4a34a0382e86f4044fe2517f38dbdc5959",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "audio",
+        "container": "WAV",
+        "cover": "tone_metadata.wav",
+        "stego": "tone_metadata_wav_d8_match1.wav",
+        "cover_size": 352980,
+        "stego_size": 352844,
+        "final_size": 352844,
+        "difference": -136,
+        "growth_proportion": -0.00038529095132868715,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": true,
+        "strategy": "not matched: container metadata or header layout changed",
+        "content_unchanged": null,
+        "notes": [
+          "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 671,
+      "baseline_bytes": 352844,
+      "delta_from_baseline": 0,
+      "before": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "after": {
+        "frames": 88200,
+        "channels": 2,
+        "sample_rate": 44100,
+        "subtype": "PCM_16",
+        "duration_seconds": 2.0
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 243,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_10.000_mkv_d1_match0",
+      "cover": "video_FFV1_10.000.mkv",
+      "cover_sha256": "f2559ce2569ffd1b7349ff46b4d75966ec58e54491609fea85699970f01b4360",
+      "output_sha256": "cdbd3955361ff6c16a34bf7dc8afbd84bb23dbe6cec00b777cc2f6f9c74d5f9f",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_10.000.mkv",
+        "stego": "video_FFV1_10.000_mkv_d1_match0.mkv",
+        "cover_size": 901754,
+        "stego_size": 901990,
+        "final_size": 901990,
+        "difference": 236,
+        "growth_proportion": 0.0002617121742736933,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 236,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_10.000_mkv_d1_match1",
+      "cover": "video_FFV1_10.000.mkv",
+      "cover_sha256": "f2559ce2569ffd1b7349ff46b4d75966ec58e54491609fea85699970f01b4360",
+      "output_sha256": "82828e21806b4f3429e14621b81f8f2d384378a3c174d234357492911e24af5a",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_10.000.mkv",
+        "stego": "video_FFV1_10.000_mkv_d1_match1.mkv",
+        "cover_size": 901754,
+        "stego_size": 901993,
+        "final_size": 901993,
+        "difference": 239,
+        "growth_proportion": 0.00026503902394666394,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 239,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_10.000_mkv_d4_match0",
+      "cover": "video_FFV1_10.000.mkv",
+      "cover_sha256": "f2559ce2569ffd1b7349ff46b4d75966ec58e54491609fea85699970f01b4360",
+      "output_sha256": "a1dd2d0e6da321079c78653fcb4fc3752cf1ea9577ee27be2cfc1dccf7badf45",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_10.000.mkv",
+        "stego": "video_FFV1_10.000_mkv_d4_match0.mkv",
+        "cover_size": 901754,
+        "stego_size": 902677,
+        "final_size": 902677,
+        "difference": 923,
+        "growth_proportion": 0.0010235607493839782,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 923,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_10.000_mkv_d4_match1",
+      "cover": "video_FFV1_10.000.mkv",
+      "cover_sha256": "f2559ce2569ffd1b7349ff46b4d75966ec58e54491609fea85699970f01b4360",
+      "output_sha256": "23c1934ccc6731c32bf326adf5bc5dd9dae6cec94cbbe0e16dc404491a1454bf",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_10.000.mkv",
+        "stego": "video_FFV1_10.000_mkv_d4_match1.mkv",
+        "cover_size": 901754,
+        "stego_size": 902699,
+        "final_size": 902699,
+        "difference": 945,
+        "growth_proportion": 0.0010479576469857633,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 945,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_10.000_mkv_d8_match0",
+      "cover": "video_FFV1_10.000.mkv",
+      "cover_sha256": "f2559ce2569ffd1b7349ff46b4d75966ec58e54491609fea85699970f01b4360",
+      "output_sha256": "b755d8d996956ca97c7e2d69212362cab475166ea10b3a500a946c6a6d0ba90b",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_10.000.mkv",
+        "stego": "video_FFV1_10.000_mkv_d8_match0.mkv",
+        "cover_size": 901754,
+        "stego_size": 903186,
+        "final_size": 903186,
+        "difference": 1432,
+        "growth_proportion": 0.0015880162438980032,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 1432,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 188,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_10.000_mkv_d8_match1",
+      "cover": "video_FFV1_10.000.mkv",
+      "cover_sha256": "f2559ce2569ffd1b7349ff46b4d75966ec58e54491609fea85699970f01b4360",
+      "output_sha256": "38f8ec7dbb450662b1ec660a4826a86354e0d655b23ed0f5cf98190820846efe",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_10.000.mkv",
+        "stego": "video_FFV1_10.000_mkv_d8_match1.mkv",
+        "cover_size": 901754,
+        "stego_size": 903175,
+        "final_size": 903175,
+        "difference": 1421,
+        "growth_proportion": 0.0015758177950971107,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 1421,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 10.0,
+        "duration_seconds": 1.2
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 168,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_29.970_mkv_d1_match0",
+      "cover": "video_FFV1_29.970.mkv",
+      "cover_sha256": "d8e0926715d3fcdf968f2507119e26bd14282cf2819952f5df5a5dcf02141d33",
+      "output_sha256": "056d5869841466888a609dce5ccbc7a7610c420035439707835e728d0f3e2989",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_29.970.mkv",
+        "stego": "video_FFV1_29.970_mkv_d1_match0.mkv",
+        "cover_size": 901754,
+        "stego_size": 902004,
+        "final_size": 902004,
+        "difference": 250,
+        "growth_proportion": 0.00027723747274755644,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 250,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_29.970_mkv_d1_match1",
+      "cover": "video_FFV1_29.970.mkv",
+      "cover_sha256": "d8e0926715d3fcdf968f2507119e26bd14282cf2819952f5df5a5dcf02141d33",
+      "output_sha256": "c7e46dd43d467d4d4283aeece9fedae0e2609f0c527307436da1f6e2e323cf89",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_29.970.mkv",
+        "stego": "video_FFV1_29.970_mkv_d1_match1.mkv",
+        "cover_size": 901754,
+        "stego_size": 902026,
+        "final_size": 902026,
+        "difference": 272,
+        "growth_proportion": 0.00030163437034934137,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 272,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_29.970_mkv_d4_match0",
+      "cover": "video_FFV1_29.970.mkv",
+      "cover_sha256": "d8e0926715d3fcdf968f2507119e26bd14282cf2819952f5df5a5dcf02141d33",
+      "output_sha256": "e642b39d1046841f1092b6d7927b2af5c300f2b1514e55f5c2265e670f3cb126",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_29.970.mkv",
+        "stego": "video_FFV1_29.970_mkv_d4_match0.mkv",
+        "cover_size": 901754,
+        "stego_size": 902637,
+        "final_size": 902637,
+        "difference": 883,
+        "growth_proportion": 0.0009792027537443692,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 883,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_29.970_mkv_d4_match1",
+      "cover": "video_FFV1_29.970.mkv",
+      "cover_sha256": "d8e0926715d3fcdf968f2507119e26bd14282cf2819952f5df5a5dcf02141d33",
+      "output_sha256": "6af94d3f531767c629b822081438d397bc7835491a3edaa4554ebc3da14f848d",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_29.970.mkv",
+        "stego": "video_FFV1_29.970_mkv_d4_match1.mkv",
+        "cover_size": 901754,
+        "stego_size": 902709,
+        "final_size": 902709,
+        "difference": 955,
+        "growth_proportion": 0.0010590471458956656,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 955,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_29.970_mkv_d8_match0",
+      "cover": "video_FFV1_29.970.mkv",
+      "cover_sha256": "d8e0926715d3fcdf968f2507119e26bd14282cf2819952f5df5a5dcf02141d33",
+      "output_sha256": "d5f51ec2bb88eb0e262cb4a978831c97b367cb20f6a4df11b1084e4bc825c8ef",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_29.970.mkv",
+        "stego": "video_FFV1_29.970_mkv_d8_match0.mkv",
+        "cover_size": 901754,
+        "stego_size": 903169,
+        "final_size": 903169,
+        "difference": 1415,
+        "growth_proportion": 0.0015691640957511694,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 1415,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 185,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_FFV1_29.970_mkv_d8_match1",
+      "cover": "video_FFV1_29.970.mkv",
+      "cover_sha256": "d8e0926715d3fcdf968f2507119e26bd14282cf2819952f5df5a5dcf02141d33",
+      "output_sha256": "369be39c0d5c479d5ede8d71c6e2e2f6f76731155bbfbd3338f4d6fcade2b764",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_FFV1_29.970.mkv",
+        "stego": "video_FFV1_29.970_mkv_d8_match1.mkv",
+        "cover_size": 901754,
+        "stego_size": 903177,
+        "final_size": 903177,
+        "difference": 1423,
+        "growth_proportion": 0.001578035694879091,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 901754,
+      "delta_from_baseline": 1423,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 29.97,
+        "duration_seconds": 0.4004004004004004
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 182,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_MJPG_25.000_avi_d1_match0",
+      "cover": "video_MJPG_25.000.avi",
+      "cover_sha256": "5227c8c8d1476b4b6048d69aab6ac78c7d934859369201c8e7ddf29cd4609388",
+      "output_sha256": "0fb8287d5565f423c8a6426353d413cdfead7e208b96e1c46cf4197172c1f2da",
+      "depth": 1,
+      "matching_requested": false,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_MJPG_25.000.avi",
+        "stego": "video_MJPG_25.000_avi_d1_match0.mkv",
+        "cover_size": 210950,
+        "stego_size": 593017,
+        "final_size": 593017,
+        "difference": 382067,
+        "growth_proportion": 1.8111732638065892,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 591312,
+      "delta_from_baseline": 1705,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_MJPG_25.000_avi_d1_match1",
+      "cover": "video_MJPG_25.000.avi",
+      "cover_sha256": "5227c8c8d1476b4b6048d69aab6ac78c7d934859369201c8e7ddf29cd4609388",
+      "output_sha256": "760ecc0e00b402621aa5d8f2948096fda9484c05450eabf6d793a6895215454b",
+      "depth": 1,
+      "matching_requested": true,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_MJPG_25.000.avi",
+        "stego": "video_MJPG_25.000_avi_d1_match1.mkv",
+        "cover_size": 210950,
+        "stego_size": 592932,
+        "final_size": 592932,
+        "difference": 381982,
+        "growth_proportion": 1.810770324721498,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 591312,
+      "delta_from_baseline": 1620,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 1,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_MJPG_25.000_avi_d4_match0",
+      "cover": "video_MJPG_25.000.avi",
+      "cover_sha256": "5227c8c8d1476b4b6048d69aab6ac78c7d934859369201c8e7ddf29cd4609388",
+      "output_sha256": "9d6d01b40ae5ac4f4482876d7acd751ff629c7ea8ab267f27a5d80b32a2e23c2",
+      "depth": 4,
+      "matching_requested": false,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_MJPG_25.000.avi",
+        "stego": "video_MJPG_25.000_avi_d4_match0.mkv",
+        "cover_size": 210950,
+        "stego_size": 592814,
+        "final_size": 592814,
+        "difference": 381864,
+        "growth_proportion": 1.8102109504621948,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 591312,
+      "delta_from_baseline": 1502,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_MJPG_25.000_avi_d4_match1",
+      "cover": "video_MJPG_25.000.avi",
+      "cover_sha256": "5227c8c8d1476b4b6048d69aab6ac78c7d934859369201c8e7ddf29cd4609388",
+      "output_sha256": "05253d30160686cafe4db977314fd64ecd814b1a0b0911678f1adf65eb5335d1",
+      "depth": 4,
+      "matching_requested": true,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_MJPG_25.000.avi",
+        "stego": "video_MJPG_25.000_avi_d4_match1.mkv",
+        "cover_size": 210950,
+        "stego_size": 592931,
+        "final_size": 592931,
+        "difference": 381981,
+        "growth_proportion": 1.8107655842616734,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 591312,
+      "delta_from_baseline": 1619,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 15,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_MJPG_25.000_avi_d8_match0",
+      "cover": "video_MJPG_25.000.avi",
+      "cover_sha256": "5227c8c8d1476b4b6048d69aab6ac78c7d934859369201c8e7ddf29cd4609388",
+      "output_sha256": "82b882422ead0bead517b5a76cd9e0a95ddddfd9c61749cfe7a169a280193d8a",
+      "depth": 8,
+      "matching_requested": false,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_MJPG_25.000.avi",
+        "stego": "video_MJPG_25.000_avi_d8_match0.mkv",
+        "cover_size": 210950,
+        "stego_size": 593139,
+        "final_size": 593139,
+        "difference": 382189,
+        "growth_proportion": 1.8117515999051907,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 591312,
+      "delta_from_baseline": 1827,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 192,
+      "outside_payload_unchanged": true
+    },
+    {
+      "case": "video_MJPG_25.000_avi_d8_match1",
+      "cover": "video_MJPG_25.000.avi",
+      "cover_sha256": "5227c8c8d1476b4b6048d69aab6ac78c7d934859369201c8e7ddf29cd4609388",
+      "output_sha256": "7c4c0e15704f57cd0678191139bca45c9fee74c95e1a505a08f8ded946be7fc2",
+      "depth": 8,
+      "matching_requested": true,
+      "size": {
+        "media_type": "video",
+        "container": "MKV",
+        "cover": "video_MJPG_25.000.avi",
+        "stego": "video_MJPG_25.000_avi_d8_match1.mkv",
+        "cover_size": 210950,
+        "stego_size": 593109,
+        "final_size": 593109,
+        "difference": 382159,
+        "growth_proportion": 1.8116093861104527,
+        "exact": false,
+        "attempted": false,
+        "inherent": false,
+        "applicable": false,
+        "strategy": "not applicable: the output is a full re-encode",
+        "content_unchanged": null,
+        "notes": [
+          "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+        ],
+        "details": {}
+      },
+      "manifest_bytes": 679,
+      "baseline_bytes": 591312,
+      "delta_from_baseline": 1797,
+      "before": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "after": {
+        "frames": 12,
+        "width": 256,
+        "height": 192,
+        "channels": 3,
+        "fps": 25.0,
+        "duration_seconds": 0.48
+      },
+      "verdict": "AUTHENTIC",
+      "max_sample_change": 169,
+      "outside_payload_unchanged": true
+    }
+  ],
+  "public_key_bytes": 451
+}

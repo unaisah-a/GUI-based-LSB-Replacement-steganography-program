@@ -1,0 +1,3 @@
+.....................                                                    [100%]
+- generated xml file: A:\Code\GUI-based-LSB-Replacement-steganography-program\evidence\t06\test_gui_consolidation.xml -
+21 passed in 1.73s

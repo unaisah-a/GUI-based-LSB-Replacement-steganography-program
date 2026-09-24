@@ -23,6 +23,7 @@ sequence as verified.
 
 from __future__ import annotations
 
+import math
 import os
 from collections.abc import Iterator
 from dataclasses import dataclass
@@ -63,11 +64,6 @@ _WIDTH = constants.VIDEO_SAMPLE_WIDTH_BITS
 #: ``opencv-python``, so no external encoder has to be installed.
 OUTPUT_CODEC: Final[str] = "FFV1"
 OUTPUT_CONTAINER: Final[str] = constants.CONTAINER_MKV
-
-#: Used when a container reports no frame rate at all. The value has no effect on
-#: the payload; it only stops the output from having a nonsensical rate.
-FALLBACK_FRAME_RATE: Final[float] = 25.0
-
 
 # --------------------------------------------------------------------------- #
 # Descriptors
@@ -150,9 +146,11 @@ def describe_only(path: str | os.PathLike[str]) -> VideoDescriptor:
     except file_utils.UnsupportedMediaError as exc:
         raise DecodeError(str(exc)) from exc
 
-    frame_rate = (
-        properties.frame_rate if properties.frame_rate > 0 else FALLBACK_FRAME_RATE
-    )
+    frame_rate = properties.frame_rate
+    if not math.isfinite(frame_rate) or frame_rate <= 0:
+        raise DecodeError("video must report a finite positive frame rate; timing cannot be preserved")
+    if properties.width % 2 or properties.height % 2:
+        raise DecodeError("video dimensions must be even; the OpenCV encoder can crop odd dimensions")
     samples = (
         properties.frame_count
         * properties.height
@@ -196,12 +194,22 @@ def iterate_frames(
         if not capture.isOpened():
             raise DecodeError(f"{name} could not be opened as a video file")
         index = 0
+        first_timestamp = None
         while True:
             ok, frame = capture.read()
             if not ok:
                 break
             array = np.ascontiguousarray(frame, dtype=np.uint8)
             if descriptor is not None:
+                timestamp = capture.get(cv2.CAP_PROP_POS_MSEC)
+                if first_timestamp is None:
+                    first_timestamp = timestamp
+                expected_time = first_timestamp + index * 1000 / descriptor.frame_rate
+                if not math.isfinite(timestamp) or abs(timestamp - expected_time) > 2.0:
+                    raise DecodeError(
+                        "video timestamps are missing or variable-rate; only constant-rate "
+                        "clips with timestamps within 2 ms of the declared rate are supported"
+                    )
                 expected = (descriptor.height, descriptor.width, VIDEO_CHANNEL_COUNT)
                 if array.shape != expected:
                     raise DecodeError(
@@ -544,6 +552,19 @@ def _assert_round_trip(
             f"the clip that was written is {written.resolution} but the cover was "
             f"{cover.resolution}; the encoder changed the frame size"
         )
+
+    # Allow only container rounding, not a substituted frame rate or duration.
+    if not math.isclose(written.frame_rate, cover.frame_rate, rel_tol=1e-5, abs_tol=1e-6):
+        _discard(output_path)
+        raise DecodeError("the encoder changed the frame rate; video timing was not preserved")
+    try:
+        actual_frames = sum(1 for _ in iterate_frames(output_path, written))
+    except DecodeError:
+        _discard(output_path)
+        raise
+    if actual_frames != written_frames:
+        _discard(output_path)
+        raise DecodeError("the saved video decoded to a different frame count")
 
     try:
         recovered = extract_video(

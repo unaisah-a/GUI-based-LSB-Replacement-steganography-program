@@ -137,8 +137,9 @@ def protect_media(
     :param passphrase: when supplied, the message is encrypted before signing.
     :param match_cover_size: try to make the stego file exactly the cover's size.
         Only meaningful for PNG, where compression makes the size move; WAV and BMP
-        already preserve it and video is a full re-encode, so for those this is
-        recorded as "not applicable" and nothing is done. Whether it succeeds depends
+        usually retain it unless headers/metadata change. Video is a full re-encode.
+        For WAV/BMP the measured outcome is recorded without adjustment; video is
+        recorded as "not applicable". Whether PNG matching succeeds depends
         on the individual file, so the outcome is reported in
         :attr:`ProtectResult.size_preservation` rather than promised. See
         :mod:`app.analysis.size_preservation`.

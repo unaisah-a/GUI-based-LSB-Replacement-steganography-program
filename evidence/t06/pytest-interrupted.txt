@@ -1,0 +1,44 @@
+........................................................................ [  3%]
+........................................................................ [  7%]
+........................................................................ [ 11%]
+........................................................................ [ 15%]
+........................................................................ [ 19%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+Windows fatal exception: access violation
+
+Current thread 0x00002550 (most recent call first):
+  <no Python frame>
+
+Thread 0x00003960 (most recent call first):
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pytestqt\plugin.py", line 222 in _process_events
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pytestqt\plugin.py", line 204 in pytest_runtest_teardown
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_callers.py", line 116 in _multicall
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\runner.py", line 242 in <lambda>
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\runner.py", line 341 in from_call
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\runner.py", line 241 in call_and_report
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\runner.py", line 137 in runtestprotocol
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\runner.py", line 113 in pytest_runtest_protocol
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\main.py", line 362 in pytest_runtestloop
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\main.py", line 337 in _main
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\main.py", line 283 in wrap_session
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\main.py", line 330 in pytest_cmdline_main
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\config\__init__.py", line 175 in main
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\_pytest\config\__init__.py", line 201 in console_main
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t05\Lib\site-packages\pytest\__main__.py", line 9 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 198 in _run_module_as_main
+..................

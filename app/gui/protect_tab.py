@@ -272,7 +272,7 @@ class ProtectTab(QWidget):
             "exactly the cover's length, and closes any remaining shortfall with an "
             "ancillary PNG chunk. It cannot always succeed: a stego PNG is usually "
             "larger than its cover, and bytes cannot be removed without changing the "
-            "pixels. WAV and BMP already preserve the size; video is re-encoded, so "
+            "pixels. WAV and BMP usually retain size, but metadata can be removed; video is re-encoded, so "
             "the question does not apply. A padding chunk is also unusual in an "
             "otherwise plain PNG, which may make the file more conspicuous than a "
             "size mismatch would."
@@ -895,10 +895,15 @@ class ProtectTab(QWidget):
 
         original_size = os.path.getsize(self._cover_path)
         stego_size = os.path.getsize(result.stego_path)
+        difference = stego_size - original_size
+        proportion = 100 * difference / original_size if original_size else 0.0
+        manifest_size = os.path.getsize(result.manifest_path)
 
         rows: list[tuple[str, object]] = [
             ("Original size", f"{file_utils.human_size(original_size)} ({original_size:,} B)"),
             ("Stego size", f"{file_utils.human_size(stego_size)} ({stego_size:,} B)"),
+            ("Size change", f"{difference:+,} B ({proportion:+.2f}%)"),
+            ("Companion manifest", f"{manifest_size:,} B (separate from media)"),
             ("MSE", f"{report.mse:.6f}"),
             (
                 "PSNR",
@@ -956,7 +961,7 @@ class ProtectTab(QWidget):
                 f"{report.extra.get('frame_count')} frames"
                 + (f", worst-frame PSNR {worst:.2f} dB" if worst else "")
                 + ". The clip was re-encoded losslessly as FFV1, so the file size "
-                  "difference reflects the codec change, not the embedding."
+                  "difference reflects re-encoding and embedding; source audio is omitted."
             )
         elif original_size != stego_size:
             self.quality_panel.set_notice(

@@ -445,15 +445,24 @@ signature and a 3072-bit key a 384-byte one.
 ## 12. File-size preservation
 
 Investigated rather than claimed. See
-[`evidence/results/size_preservation.md`](../evidence/results/size_preservation.md)
-for the measured table.
+the current [T06 evidence](../evidence/t06/README.md) for measured sizes, media
+properties and a no-payload re-encoding baseline. Older evidence/results tables
+cover canonical fixtures only and do not establish universal size preservation.
 
 | Container | Exact size? | Why |
 |---|---|---|
-| WAV | always | Samples stored literally at fixed width: values change, counts do not |
-| BMP | always | Uncompressed, fixed-stride pixel storage |
+| WAV | canonical files usually match | Fixed-width samples; metadata may be removed |
+| BMP | canonical files usually match | Fixed-stride pixels; padding/header layout may change |
 | PNG | depends on the image | DEFLATE-compressed, so it is a property of the image, not the format |
 | MKV | not applicable | The output is a full re-encode |
+
+The Protect result displays media byte counts, signed byte/percentage change and
+manifest storage separately. WAV/BMP matching reports the measured result without
+adding padding. Video sizes reflect both codec/container changes and embedding.
+Video protection requires even dimensions and a finite positive frame rate, checks
+decoded timestamps against constant-rate timing within 2 ms, and reads back frame
+count, dimensions and rate (relative tolerance 1e-5, absolute 1e-6 fps). No fallback
+frame rate is substituted. Native playback remains a separate release check.
 
 The PNG strategy re-encodes at every DEFLATE level looking for an exact hit, then
 closes any remaining shortfall with an ancillary `stPd` chunk. It **cannot** always

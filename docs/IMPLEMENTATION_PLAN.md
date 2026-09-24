@@ -4,14 +4,14 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorized execution scope: **T05 only**. Do not start T06-T09 without a subsequent user instruction authorizing further work.
+- Latest authorised execution scope: **T06 only**, following the user's instruction to execute the next task. Do not start T07-T09 without further authorisation.
 - Integration branch: `integration/acw1-consolidated`.
 - Current integration workspace: `A:/Code/GUI-based-LSB-Replacement-steganography-program` (historical setup used `C:/Code/INF2005-ACW1-consolidated`).
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
 - Base: `Tristan`, commit `6167e72203e3a3045cdc4fa8ae36f4080689df34`.
 - Selective source: `gin`, commit `f3c267e10a47fa8bba7ace1078a7dce0e6d68f8e`.
 - T01 status: DONE. Documentation, branch/base and worktree-preservation checks passed.
-- T01-T05: DONE. T06-T09: TODO. T05 challenge actions and reproducible evaluations are implemented and verified.
+- T01-T06: DONE. T07-T09: TODO. T06 size/property measurements and safeguards are complete; combined-process Qt test instability is recorded for T08.
 - T01/T02 established the workspace and clean baseline. T03 added backend safeguards; T04 updated the GUI and regressions. Dependency pins and demo samples remain unchanged.
 
 ## 1. Objective and decisions
@@ -115,7 +115,7 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 | T03 | Publication/security safeguards | T02 | DONE | Path alias, rollback, trust-boundary and capacity regressions pass |
 | T04 | GUI simplification and input handling | T03 | DONE | Agreed cuts completed; retained inputs/previews/workers validated; no orphan controls or stale docs |
 | T05 | Five challenge workflows | T03, T04 | DONE | Each retained capability has reproducible demo, tests/evaluation and stated limitations |
-| T06 | Size/property preservation | T03, T05 | TODO | Representative size/property measurements recorded; unexpected growth investigated |
+| T06 | Size/property preservation | T03, T05 | DONE | Representative size/property measurements recorded; unexpected growth investigated |
 | T07 | Sender/receiver sample bundle | T04, T05, T06 | TODO | Required messages, positives, negatives and challenges reproduce independently without private keys |
 | T08 | Integrated release validation | T07 | TODO | Full suite, lint, clean setup, native desktop checks and extracted-package verification complete |
 | T09 | Demo/submission handoff | T08 | TODO | Feature-complete timed script, evidence index and human-task checklist delivered; actual rehearsal tracked honestly |
@@ -136,9 +136,9 @@ For each task below, replace the placeholder when work is authorized. Record cha
 | T03 | Staged publication/rollback, aliases, bounded JSON/KDF, manual-offset sender capacity, failed-verification plaintext withholding, fingerprint helper | [T03 report](../evidence/t03/README.md): 226 focused and 1785 full tests passed; lint and compatibility/startup probe passed | None for backend T03; GUI gating, preview and fingerprint presentation remain T04 |
 | T04 | Agreed control cuts, shared picker/drop validation and clear handling, background offset-aware capacity, stale-result rejection, AUTHENTIC-only preview/save, fingerprints and video-only notices | [T04 report](../evidence/t04/README.md): 1799 full tests passed; lint, sample compatibility and startup passed | None for T04; native desktop validation remains T08; new challenge actions/evaluation remain T05 |
 | T05 | Wrong-key/wrong-start actions; reproducible five-challenge evaluation and demo guide | [T05 evidence](../evidence/t05/README.md): 1809 tests passed; pinned Python 3.11.16; lint, compatibility/startup and challenge evaluation passed | None for T05; native checks T08, sample bundle T07 |
-| T06 | Not started | None | All acceptance criteria |
+| T06 | 66 saved-file measurements; codec baselines; metadata-aware size reporting; video timing/count safeguards | [T06 evidence](../evidence/t06/README.md): all 66 authentic, properties preserved; 1820 tests pass across five processes; lint and startup/compatibility pass | None for T06; combined-process Qt access violation requires T08 investigation |
 | T07 | Not started | None | All acceptance criteria |
-| T08 | Not started | None | All acceptance criteria |
+| T08 | Not started | T06 records combined-process Qt access violations; individual GUI modules pass | All acceptance criteria, including investigation of Qt test/process instability |
 | T09 | Not started | None | All acceptance criteria |
 
 ## 5. Requirement and feature-to-demo matrix
@@ -254,6 +254,15 @@ For future tasks, append command, environment, tested revision/working-tree stat
 - Commands, provenance, source hashes and remaining limits: [T05 evidence](../evidence/t05/README.md).
 - T06-T09 not started. No private keys persisted; no native playback or rehearsal claimed.
 
+### T06 verification log
+
+- Authorised scope: T06 only. Base HEAD `9b1d6d2824137dc0bfae422c677fae7e0d839f0d` plus T06 working-tree changes; Windows, Python 3.11.16 in `.venv-t05`, unchanged pins.
+- `python -m scripts.evaluate_preservation --output tmp/t06-final`: 66 cases, all AUTHENTIC with exact message recovery; supported properties and samples outside the payload preserved. Flat/photographic PNG, BMP, mono/stereo WAV and short FFV1/MJPEG sources measured at depths 1/4/8 with matching off/on.
+- No-payload baselines attribute MJPEG growth primarily to FFV1 re-encoding and confirm BMP/WAV header/metadata size exceptions. PNG matching succeeds in 6/9 attempts; failures are retained and explained. Manifest bytes are separate.
+- Final test state: **1820 passed across five processes** (1590 excluding four GUI modules; GUI modules 21/43/91/75). Zero test failures/skips in those runs. Ruff and unchanged sample compatibility/real offscreen startup pass.
+- Combined-process caveat: initial 1819-test run passed; after one additional cleanup regression, two full runs stopped with native Qt access violations around GUI teardown/construction. Logs retained; root cause unresolved, assigned to T08. Do not call the final combined-process suite clean.
+- [T06 evidence](../evidence/t06/README.md) records exact commands, measurements, source hashes and limits. No native playback, source-audio-track test, release bundle or rehearsal was performed. T07-T09 not started.
+
 ## 7. Demo and delivery
 
 Every retained user-facing feature must map to a live action. Prepare files/keys/folders ahead of time; reuse mandatory workflows to demonstrate advanced starts and attacks. Screenshots are fallback evidence, not a substitute for required working demonstrations.
@@ -287,14 +296,15 @@ Deliver README, architecture/limitations, this living guide, requirement/demo ma
 | Execute T03 only | Subsequent user authorization; backend safeguards completed |
 | Execute T04 only | GUI simplification/input handling completed under prior authorization |
 | Execute T05 only | Latest user instruction authorises the next task; five challenge workflows completed; T06-T09 remain TODO |
+| Execute T06 only | Subsequent user instruction authorises size/property evaluation; completed with evidence; T07-T09 remain TODO |
 
 ## 9. Handoff
 
 - Current branch/workspace: `integration/acw1-consolidated` at `A:/Code/GUI-based-LSB-Replacement-steganography-program`.
-- Current state: T01-T05 DONE; T06-T09 TODO. Latest authorised scope: T05 only.
-- HEAD: `35b498a6a5becfdc9e0d6a0aa33591d1913cb34c` plus uncommitted T05 changes. No commit requested.
-- T05 adds verification-input demonstrations and reproducible challenge evaluation. See [guide](challenge_workflows.md) and [evidence](../evidence/t05/README.md).
-- Next task when authorised: T06, size/property preservation measurements and investigation of unexpected growth.
+- Current state: T01-T06 DONE; T07-T09 TODO. Latest authorised scope: T06 only.
+- T06 is based on `9b1d6d2824137dc0bfae422c677fae7e0d839f0d`; the evidence identifies the tested working-tree source hashes. The user subsequently authorised committing and pushing T06 on this integration branch. T07-T09 remain unauthorised.
+- T06 measurements and safeguards: [evidence](../evidence/t06/README.md). All 1820 tests pass in separate processes; repeated combined-process Qt access violations remain a T08 investigation item.
+- Next task when authorised: T07, sender/receiver sample bundle.
 - T07 prepares receiver bundles, T08 validates native GUI/playback/drop and packaging, T09 finalises demo/submission handoff.
 - Existing untracked samples/r11 remains untouched. Original branches remain untouched.
 - Human tasks: names/contributions/signatures, real transfer/rehearsal, notifications and submission remain open.

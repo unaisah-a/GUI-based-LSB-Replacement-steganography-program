@@ -274,9 +274,17 @@ The manifest is unsigned and must be, because it publishes the parameters needed
 
 ## 11. File-size preservation is per file, not general
 
-Exact size matching works always for WAV and BMP, never applies to video, and
-**depends on the individual image** for PNG. It is not promised anywhere in the
-interface; the Protect tab reports the outcome after the fact, including the failures.
+WAV/BMP sample storage has fixed width, but whole-file size can change when the
+writer removes metadata/padding or normalises headers. Their optional matching
+result is measured without adjustment. PNG matching depends on the individual
+image; video matching is unsupported. The Protect tab reports media size changes
+and separate manifest bytes. See the [T06 measurements](../evidence/t06/README.md).
+
+Video output uses constant-rate FFV1 and omits source audio. Invalid/missing rates,
+odd dimensions and decoded timestamps departing by more than 2 ms from the declared
+constant rate are rejected. Output rate and decoded frame count are checked again
+before successful protection. Timestamp accuracy depends on the OpenCV backend;
+this is not a claim to preserve arbitrary variable-rate video or container metadata.
 
 When it does work by padding, the resulting file contains an ancillary PNG chunk that
 would not normally be there. That may make it *more* conspicuous to an analyst than a

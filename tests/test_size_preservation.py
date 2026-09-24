@@ -105,9 +105,9 @@ def write_evidence(evidence_directory):
         "",
         "| Container | Exact size? | Why |",
         "|---|---|---|",
-        "| WAV (PCM 16) | always | Samples are stored literally at fixed width, so "
+        "| WAV (PCM 16) | canonical files | Samples are stored literally at fixed width, so "
         "replacing low bits changes values and not counts. |",
-        "| BMP | always | Same reason: uncompressed, fixed-stride pixel storage. |",
+        "| BMP | canonical files | Fixed-stride pixels; headers/metadata can change file size. |",
         "| PNG | depends on the image | The pixel data is DEFLATE-compressed, so the "
         "answer is a property of the individual image rather than of the format. Three "
         "outcomes were measured; see below. |",
@@ -300,7 +300,7 @@ class TestInherentPreservation:
         audio_stego.embed_audio(wav_cover, stego, PAYLOAD, 2, 0)
 
         result = size_preservation.size_outcome(wav_cover, stego)
-        assert any("byte counts" in note for note in result.notes)
+        assert any("fixed width" in note and "metadata" in note for note in result.notes)
 
 
 # --------------------------------------------------------------------------- #
