@@ -1,5 +1,7 @@
 # Media Integrity & Steganography Tool
 
+> Consolidation work: read the [implementation plan and task tracker](docs/IMPLEMENTATION_PLAN.md) for agreed scope, task status, verification evidence and handoff notes.
+
 INF2005 Assignment 1 — a desktop application that hides a **signed** message inside an
 image, audio or video file using LSB replacement, and lets a receiver prove whether that
 message is authentic.
