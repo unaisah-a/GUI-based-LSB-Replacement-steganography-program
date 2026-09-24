@@ -68,7 +68,8 @@ and signatures are fresh, so regenerated protected files differ byte-for-byte.
 In **Verify**, select the indexed file under Party B, its listed companion manifest
 and public key. Enter the relevant start value/passphrase. Select the corresponding
 original as the optional comparison. Damaged files deliberately reuse the original
-manifest: select that path explicitly. Use **Save as evidence...** for results.
+manifest: select that path explicitly. Use **Save recovered payload...** for authenticated bytes. Attack Lab supplies
+**Save as evidence...** for attack results; receiver scripts produce JSON reports.
 
 | Demonstration | Case / action | Expected observation |
 | --- | --- | --- |
@@ -102,7 +103,7 @@ natural-media detection accuracy. A p-value is not the probability of hidden dat
 
 Video output is **video-only FFV1/MKV**: source audio is omitted. This bundle's
 synthetic source has no audio track. Timing uses constant-rate frames; native
-playback and source-audio omission with an audio-bearing input remain T08 checks.
+playback and source-audio omission were checked in [T08](../evidence/t08/README.md).
 The Video tab's frame span is untrusted until verification succeeds.
 
 ## Sender actions and retained extras
@@ -115,8 +116,8 @@ Keep locally generated private keys out of the shared bundle.
 
 Use an image drop and an audio picker selection to demonstrate both input routes.
 Select manual start 37 for the image and HMAC start for audio. Show the depth slider
-offers 1-8 and the capacity display responds to depth/start/message changes. These
-instructions are demo preparation, not a claim of native drag/drop acceptance.
+offers 1-8 and the capacity display responds to depth/start/message changes. T08 subsequently confirmed native picker/drop behaviour; these are live demo
+preparation instructions, not evidence of a team rehearsal.
 
 For capacity rejection, load the indexed original image or audio, depth 1, manual
 start 37, and enter the indexed `message_bytes` count of `X` characters. The builder
@@ -138,8 +139,8 @@ Wrong-key/start actions change verifier inputs and do not create a tampered file
 
 Use recovered text/hex views and save only AUTHENTIC payloads. For file cases the
 verifier's optional recovered directory supplies exact-hash evidence; native GUI
-preview/playback is still a T08 acceptance task. T09 owns the timed team demo,
-names/contributions/signatures, actual transfer and rehearsal records.
+preview/playback passed T08. T09 supplies the [timed script](demo_plan.md) and
+[human completion records](submission_handoff.md).
 
 AUTHENTIC concerns the signed payload and settings, not every cover byte. Timestamp
 and nonce alone do not reject replay. No email, submission or real transfer is made

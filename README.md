@@ -84,7 +84,13 @@ application logs, and it refuses to build if any packaged file holds a private k
 
 ## Demo walkthrough
 
-Committed sample files live in [`samples/`](samples/). Each stego file has a
+For the consolidated presentation use the [T09 timed script](docs/demo_plan.md),
+[evidence index](docs/evidence_index.md) and [submission/human checklist](docs/submission_handoff.md).
+The walkthrough below uses **legacy samples only**; T07 fixtures have a different
+key and demonstration inputs, documented in the bundle guide.
+
+
+Legacy sample files live under `samples/images`, `samples/audio` and `samples/video`. Each stego file has a
 `.manifest.json` beside it and was signed with the sample key in
 [`keys/public/samples_public.pem`](keys/public/). The start-location secret for all of
 them is `demo-start-secret`. When you verify, attack or inspect a committed sample,

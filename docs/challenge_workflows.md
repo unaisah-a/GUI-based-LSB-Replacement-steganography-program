@@ -71,7 +71,8 @@ measurements belong to T06; native playback validation belongs to T08.
 
 Open analysis_noise_0_stego.png in Steganalysis with analysis_noise_0.png as its
 reference. Inspect bit plane 0, amplified reference difference and distortion
-metrics; export the report. Repeat with an even-valued or gradient case.
+metrics. The evaluation script writes the reproducible report; there is no
+Steganalysis GUI export button. Repeat with an even-valued or gradient case.
 
 The evaluation has three synthetic families (uniform random bytes, even-valued
 random bytes and an even-valued gradient), three seed entries and paired

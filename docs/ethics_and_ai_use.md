@@ -55,7 +55,8 @@ untrusted sender.
 
 ## 2. Originality
 
-**Written for this project.** Everything under `app/`, `tests/` and `scripts/`, the
+**Project implementation areas (team authorship review required).** The code and
+documents under these paths require source/AI attribution review: everything under `app/`, `tests/` and `scripts/`, the
 stylesheet under `assets/`, and the documents under `docs/`. That covers:
 
 - the LSB embedding and extraction core shared by image, audio and video
@@ -76,7 +77,8 @@ stylesheet under `assets/`, and the documents under `docs/`. That covers:
 - Repetition coding with majority-vote decoding.
 - HMAC-based derivation.
 
-The algorithms are standard; the code that implements them is this project's own.
+The algorithms are standard. The team must confirm the provenance of their
+implementation before signing the originality declaration.
 
 **Provided by libraries.** Every cryptographic primitive comes from the `cryptography`
 package; none is implemented here. That covers RSA-PSS, AES-256-GCM, scrypt, HMAC and
@@ -106,3 +108,25 @@ All are listed with pinned versions in `requirements.txt` and in
 > - how the team checked what they produced.
 >
 > Do not submit with this section empty or guessed.
+
+
+### Observed consolidation assistance; not a complete team declaration
+
+Codex assisted this consolidation with repository inspection, implementation and
+regression-test edits, generated fixtures/evaluation scripts, documentation,
+validation and packaging. T08 included native desktop automation; the user manually
+confirmed drag/drop and hearing both audio players. T09 prepares the demo and
+handoff documents. Task reports and commits identify affected paths and observed
+checks. The final T08 suite passed 1830 tests with a documented pytest-qt logging
+capture mitigation; native checks and exact recovered-file comparisons are recorded.
+Automated checks do not replace each member understanding and reviewing the code.
+
+The team must add any other tools, earlier branch assistance, copied material,
+actual device/source details, individual review and errors corrected. Do not treat
+this observed record as a complete history or claim all members performed a review.
+The notification required by the brief is listed in the submission handoff; it has
+not been sent by this task.
+
+| Member/tool and actual device/source | Purpose and affected files | Human review/checks and corrections | Notification reference |
+| --- | --- | --- | --- |
+| TO COMPLETE | TO COMPLETE | TO COMPLETE | TO COMPLETE |

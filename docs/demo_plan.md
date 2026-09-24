@@ -1,306 +1,122 @@
-# Demonstration Plan (historical draft)
-
-> This inherited draft is superseded by the current feature/time matrix in
-> [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md). It is not an executable script
-> for the consolidated GUI. Removed attack variants, random-bit controls and video
-> frame/difference exploration below are historical proposals, not current controls.
-> T05 supplies challenge evidence; T09 replaces this draft with the final rehearsed script.
-
-Target duration: **25 minutes**. Every item the brief requires appears below with the
-tab it is shown in and the time it should take.
-
-Two things to prepare and one habit to keep.
-
-**Prepare:** generate the demo key pair from the *Keys* menu before starting, and have
-a PNG, a WAV and a short lossless MKV ready in a folder. Create two folders on the
-desktop named `party_a` and `party_b` — the transfer is shown physically, not
-described.
-
-**Habit:** whenever a verdict appears, read the caveat next to it out loud. The whole
-argument of this project is that the application says what it can establish and no
-more, and the caveats are where that shows.
-
----
-
-## Timeline
-
-| Time | Segment | Tab |
-|---|---|---|
-| 0–3 | Architecture and security design | — |
-| 3–7 | Image positive case, A to B | Protect, Verify |
-| 7–10 | Image attack: the two kinds of failure | Attack Lab |
-| 10–15 | Audio positive case, and depth distortion | Protect |
-| 15–18 | Audio negative case | Attack Lab |
-| 18–21 | Signature and start-location security | Verify, Attack Lab |
-| 21–23 | The innovation: robustness, video, size preservation | Protect, Video |
-| 23–25 | Limitations and conclusion | — |
-
----
-
-## 0–3 min · Architecture and security design
-
-One diagram, three sentences, no code.
-
-Say:
-
-1. **The layering.** Utilities, stego, crypto, verification, GUI. The stego layer
-   carries opaque bytes — no keys, no hashing, no verdicts. Everything cryptographic
-   sits above it, which is why the same crypto works unchanged for three media.
-2. **What is signed.** A canonical-JSON verification record — media ID, timestamp,
-   nonce, SHA-256 of the message, depth, start method — plus the message itself, signed
-   together with RSA-3072 PSS. Encrypt-then-sign when confidentiality is on.
-3. **What is published.** A companion manifest beside the file, carrying the non-secret
-   parameters the receiver needs to *find* the payload. It is unsigned, and it does not
-   need to be: every field it publishes is also inside the signed record, so any edit
-   is detectable.
-
-Then name the trust boundary explicitly: **nothing extracted from a medium is believed
-until the signature verifies.** That single rule explains the order of operations, and
-the rest of the demonstration is that order playing out.
-
-Reference: [`architecture.md`](architecture.md).
-
----
-
-## 3–7 min · Image positive case, party A to party B
-
-This is the brief's core requirement, so do it slowly and in full.
-
-**Protect tab.**
-
-1. Drag the PNG onto the drop zone. The media type, container and size appear —
-   detected from **content**, not extension. Mention that a `.png` file that is really
-   a BMP is handled correctly.
-2. Paste the **short message** — one Learning Objective. Point at the capacity read-out
-   updating as you type: the exact signed payload length, the capacity at the current
-   depth, the percentage used.
-3. Move the **LSB depth slider** through 1 to 8 and let the read-out move with it. This
-   is the capacity/distortion trade-off made visible.
-4. Set the start mode to **derived from a secret** and type one. Say what it does:
-   the position is computed by HMAC from the secret plus the published parameters, so
-   an attacker who knows the depth still cannot read the payload by scanning from zero.
-5. Protect. Note the output path chosen beside the cover, and the reminder listing
-   **what still has to be shared out of band**.
-6. Read the quality panel: MSE, PSNR, largest sample change, and "within the depth
-   bound".
-
-**The transfer.** Copy exactly three files from `party_a` to `party_b`: the stego PNG,
-its `.manifest.json`, and the public key. Say the private key stays behind and the
-secret is spoken, not sent.
-
-**Verify tab, working out of `party_b`.**
-
-7. Drag the received file. Supply the public key and the secret. Verify.
-8. `AUTHENTIC`, with the recovered message shown as **inert text**. Say that recovered
-   content is never executed and never handed to the operating system to open.
-9. Read the scope notice aloud. This is the most important sentence in the
-   demonstration.
-
-Then repeat quickly with the **long message** (the Project Overview paragraph) and the
-**custom message** with encryption on, to cover all three required sizes. Then switch
-the payload to **A file** and protect a small PNG or WAV. On the Verify tab the
-recovered image is shown, or the recovered audio played, inside the application, and
-**Save recovered payload...** writes it out under its original name. For the
-encrypted one, point out that the passphrase is a *second* out-of-band secret, separate
-from the start secret.
-
----
-
-## 7–10 min · Image attack: two kinds of failure
-
-**Attack Lab.** Load the stego PNG and its manifest.
-
-1. **Corrupt the message.** Observed: `SIGNATURE_INVALID`. Explain why this is *not*
-   `TAMPERED`: the signature covers the message as well as the record, so an attacker
-   who can only change bytes cannot reach `TAMPERED`.
-2. **Substitute the message and re-sign.** Observed: `TAMPERED` against the attacker's
-   key, `SIGNATURE_INVALID` against the real sender's. This is the point — reaching
-   `TAMPERED` requires a signing key, and the attack fails against a receiver who holds
-   the right one.
-3. **Modify pixels inside the payload.** Observed: `SIGNATURE_INVALID`. The attack
-   inverts the last 64 samples of the payload region, which carry the signature, so the
-   payload is still found and the signature check is what fails.
-4. **Corrupt the length header.** Observed: `PAYLOAD_MISSING`. One sample changes, in
-   the 4-byte length field that frames the payload. That field is stego framing, not
-   part of the signed envelope, so the verifier never reaches the signature. Read the
-   reason aloud: a payload was expected at this location, its length field is
-   unusable, and this is *consistent with* modification. It does not claim
-   modification, because a wrong secret or depth produces the same evidence.
-5. **Modify pixels outside the payload.** Observed: `AUTHENTIC`. Pause here. The image
-   has visibly changed and the verdict is still `AUTHENTIC`, because what was
-   authenticated is the signed message, not the whole file. Say it as a limitation, not
-   an excuse.
-6. **Re-encode as lossy JPEG.** Observed: `CANNOT_VERIFY` — the verifier refuses lossy
-   input by design, which is why the supported formats are lossless.
-
-Each run shows *expected* beside *observed*. Point at the pairing: the attacks declare
-what they predict, so a surprise is visible rather than glossed over.
-
----
-
-## 10–15 min · Audio positive case and depth distortion
-
-**Protect tab** with the WAV. Same workflow, and say so — the workflow is identical
-because the crypto layer never learned what medium it is working on.
-
-1. Protect at **depth 1**. Play cover and stego. Indistinguishable.
-2. Protect the same message at **depth 8**. Play it. The distortion is audible.
-3. Show the quality figures side by side: PSNR falls, largest sample change rises to
-   255. Note that at depth 8 the whole low byte is replaced, so "least significant bit"
-   has stopped meaning much.
-4. Say plainly that the application recommends no depth. The right answer depends on
-   the cover, so the trade-off is presented rather than decided.
-
-Then verify it in the Verify tab to close the positive case for audio.
-
----
-
-## 15–18 min · Audio negative case
-
-**Attack Lab** on the stego WAV.
-
-1. **Corrupt the verification record.** Observed: `SIGNATURE_INVALID`. Mention the
-   detail: the attack changes one hex digit of the signed nonce, keeping the record
-   both well-formed and the same length. A blind byte flip would break JSON parsing and
-   give `CANNOT_VERIFY`, and a length-changing edit would be rejected during extraction
-   — neither would demonstrate the signature.
-2. **Corrupt the signature.** Observed: `SIGNATURE_INVALID`.
-3. **Scale the amplitude** — a volume adjustment, the most ordinary thing anyone does
-   to audio. Payload destroyed. Every sample changed at once.
-4. **Corrupt samples outside the payload.** `AUTHENTIC` again, on the second medium.
-
----
-
-## 18–21 min · Signature and start-location security
-
-Three demonstrations, all in aid of one point: the parameters an attacker can see do
-not let them forge anything.
-
-1. **Wrong public key.** Verify the good file with an unrelated key. `SIGNATURE_INVALID`.
-2. **Wrong start secret.** Verify with a wrong secret. Not `AUTHENTIC` — and note what
-   the application does *not* say. It does not claim `WRONG_START_LOCATION`, because a
-   wrong secret, a wrong depth, an absent payload and corruption produce
-   indistinguishable bit streams. The verdict carries a note saying exactly that.
-   Reserve `WRONG_START_LOCATION` for the one provable case.
-3. **Tamper with the manifest, twice.**
-   - Edit `message_length`: extraction still works and the cross-check against the
-     signed record catches it → `TAMPERED`.
-   - Edit `media_id`: it feeds the derivation, so the receiver looks in the wrong place
-     and finds nothing → `PAYLOAD_MISSING`.
-
-   Both are detections, by two different mechanisms. That is why the manifest does not
-   need to be signed.
-
-**Say this before anyone asks: authenticity here is payload-scoped.** A pixel flipped
-*before* the payload region, or bytes changed in a WAV *outside* the payload, still
-verify as `AUTHENTIC`. That is by design. The signature covers the verification record
-and the message, not every sample of the file, and an LSB scheme has no way to sign
-the samples that carry the signature. The result says so itself. Its notes carry the
-scope notice ("It does not mean every part of the cover media is unchanged"). When the
-file's SHA-256 no longer matches the digest in the manifest, a second note says the file
-is not byte-for-byte the one that was protected, without changing the verdict, because
-the manifest is unsigned.
-
-**If asked why `TAMPERED` is never produced by modifying the media:** `TAMPERED` means
-the signature verified but the manifest disagrees with the signed record. Any change
-to the media that reaches the signed bytes fails the signature first. So without the
-signing key an attacker can only produce `SIGNATURE_INVALID`, or a payload that cannot
-be found or read.
-
----
-
-## 21–23 min · The innovation and the extensions
-
-State the innovation clearly, with its benefit and its limits. The brief asks for
-exactly that.
-
-**Innovation: the keyed start location bound to the signed record.** The position is
-derived by HMAC from the secret plus the media ID, media type, nonce, depth and payload
-length — and every one of those inputs is inside the signed record. So an attacker
-cannot move the payload without breaking the signature, and cannot find it without the
-secret. *Benefit:* concealment that survives an attacker who knows the algorithm and
-the depth. *Limitation:* it is concealment, not encryption. It provides no
-confidentiality on its own, and the interface says so.
-
-Then, briefly, the extensions:
-
-**Robustness.** Protect the same file twice, once with repetition coding on. Run *flip
-random payload bits* at 0.5 % against both. Uncoded: fails. Coded: `AUTHENTIC`, and the
-verdict includes a note saying how many bits were **repaired**. Then push the rate to
-40 % and show it failing — there is no threshold, only a probability, and the honest
-version of this demonstration includes the point where it stops working. Note the exact
-cost: factor 3 triples the payload.
-
-**Video.** Open the **Video** tab with a protected clip and its manifest. Enter the
-secret and press *Locate the payload frames*. It reports which frames carry the payload
-— a handful out of the whole clip — because video is treated as one flat sample domain
-and the same keyed derivation picks the frame. Step to a carrier frame and then to a
-clean one, with the cover as reference, and show the amplified difference: change in
-one, nothing in the other.
-
-Then run **re-encode with a lossy codec** in the Attack Lab and note that this is not
-an exotic attack. It is what uploading or editing a clip does by default. That is why
-the output codec is fixed to lossless FFV1 rather than offered as a choice.
-
-**File-size preservation.** Tick *Match the cover's file size where possible* on a PNG.
-Show the outcome row: matched, or not matched with the reason. Open
-[`size_preservation.md`](../evidence/results/size_preservation.md) and show all three
-measured outcomes — free, matched by padding, impossible. Say that the failures are
-part of the result, and that a padding chunk may make a file *more* conspicuous than a
-size mismatch would.
-
----
-
-## 23–25 min · Limitations and conclusion
-
-Do not rush this and do not soften it. Read four:
-
-1. **`AUTHENTIC` does not mean the file is unchanged.** Only the payload region is
-   authenticated. Demonstrated twice, in segments 7–10 and 15–18.
-2. **`AUTHENTIC` does not reject a replay.** A timestamp and a nonce record when a file
-   was protected and make it unique. They do not detect resending. A freshness check
-   would need receiver-side state, and there is none.
-3. **Extraction failures cannot be told apart.** Hence `CANNOT_VERIFY` and the notice
-   attached to it.
-4. **LSB replacement is fragile.** Any lossy re-encode, resample or resize destroys the
-   payload. For video that is the default outcome, not an attack.
-
-Close on the actual claim: the application establishes that a specific signed message
-came from the holder of a specific private key and has not changed, and it tells the
-user precisely what that does and does not cover.
-
----
-
-## Contingencies
-
-| If | Then |
-|---|---|
-| Playback fails on the demo machine | The preview says "Playback is not available on this machine" instead of offering a Play button that does nothing. Everything else keeps working. Use the quality figures (PSNR, largest sample change) for audio, and the Steganalysis difference image and the Video tab's per-frame view for image and video. **Test playback on the actual lab machine beforehand**: play `samples/audio/stego/stego.wav` in the Protect tab, and a recovered WAV payload in the Verify tab. |
-| A file picker is slow | Use drag and drop; both routes emit the same signal. |
-| An output path is occupied | The application refuses rather than overwriting. Change the name — this is the safety behaviour, so say so instead of hiding it. |
-| A video encode is slow | Use a shorter clip. Video embedding re-encodes and verifies its own output, which is deliberate and costs a pass. |
-| Time runs short | Drop the size-preservation item first, then the steganalysis indicators. Never drop the limitations segment. |
-
----
-
-## Checklist against the brief
-
-| Requirement | Segment |
-|---|---|
-| Party A to party B, downloaded to their own folder, extracted and verified | 3–7 |
-| Companion manifest shown as part of the transfer | 3–7, 18–21 |
-| Short message from a Learning Objective | 3–7 |
-| Longer message from the Project Overview | 3–7 |
-| Custom payload addressing confidentiality and integrity | 3–7 |
-| Capacity checks | 3–7 |
-| GUI-selectable LSB depth 1 to 8 | 3–7, 10–15 |
-| Start-location selection and derivation explained | 0–3, 3–7, 18–21 |
-| Receiver recovery for image **and** audio | 3–7, 10–15 |
-| Cover and stego displayed or played, before and after | 3–7, 10–15 |
-| Recovered payload displayed, never executed | 3–7 |
-| Payload types: typed text, text file, image, audio | 3–7 |
-| Two positive cases minimum | 3–7, 10–15 |
-| Three negative cases minimum | 7–10, 15–18, 18–21 |
-| Insufficient capacity as input validation | 3–7 |
-| Innovation identified, with benefit and limitations | 21–23 |
-| Limitations stated honestly | 23–25 |
+# T09 live demo script
+
+Plan: **22 minutes of content plus 3 minutes of contingency/questions**. These
+are target timings, not a completed rehearsal. Every member must speak. Member
+numbers allocate presentation time; they do not establish authorship. Replace each
+contribution cue with an accurate account of that person's work and checking.
+
+Use the [case index](../samples/t07/CASE_INDEX.md), [evidence index](evidence_index.md)
+and [delivery checklist](submission_handoff.md).
+
+## Prepare before starting the timer
+
+1. Install Python 3.11 and pinned dependencies on the actual demo machines using
+   the README. Run the receiver check in the handoff guide. Test image preview,
+   received/recovered WAV playback and video playback on that hardware.
+2. Open the app, input folders and empty output folders `tmp/demo-a/`,
+   `tmp/demo-b/` and `tmp/demo-evidence/`. Use fresh filenames for every run.
+   Do not overwrite supplied fixtures or source covers.
+3. Below, A means `samples/t07/party-a/`; B means `samples/t07/party-b/`.
+   Have A's `messages/short.txt`, `long.txt` and `custom.txt` ready. They contain
+   Learning Outcome 1, the Project Overview paragraphs and fictional custom text.
+   Attribution is in `messages/sources.json`.
+4. Existing B fixtures require B's `sender-public.pem` and the applicable public
+   demonstration inputs from `demo-only-secrets.json`. Manual cases need no start
+   secret. The encrypted case also needs its demo passphrase. See the case index.
+5. New live outputs require a new matching key pair. Keep the private key on A;
+   verify with the new public key, not the fixture key. Confirm its fingerprint
+   independently. A key arriving beside a file does not establish its owner's identity.
+6. Arrange a real A-to-B transfer and receiver download. Transfer stego media,
+   companion manifest and public key only. Real secrets need a separate secure
+   channel. A local automated folder copy is not a second person's download.
+7. Pre-open the indexed fixtures and T06/T07 reports as labelled backups. Do not
+   claim a prepared fixture is the output of a failed live action.
+
+## 00:00–02:00 — Member 1: security and keys
+
+- Briefly open **Help → About** and **What verification establishes**. Explain
+  GUI → verification → crypto/stego layers. The stego layer carries opaque bytes.
+- Use **Keys → Generate demo key pair**; show paths and public-key fingerprint.
+  The unencrypted demo private key stays local.
+- Explain SHA-256, RSA-PSS and the record's media ID, timestamp, payload hash,
+  nonce, metadata and embedding settings. Use the architecture guide/record example
+  to point out the fields. Signature verification precedes trusted recovery.
+- Say: “AUTHENTIC covers the payload and signed settings, not every cover byte.
+  Public-key trust is external. Timestamp and nonce alone do not reject replay.”
+- Give one truthful sentence about Member 1's contribution and how it was checked.
+
+## 02:00–07:00 — Member 2: image, manual start and transfer
+
+| Target time | Live action and expected evidence |
+| --- | --- |
+| 02:00–03:00 | Drag A's `original/image.png` into Protect. Paste `short.txt`, set a distinct media ID, manual start 37 and depth 2. Move the slider through 1–8 and show capacity updates; return to 2. Explain depth/distortion and signed-envelope overhead. |
+| 03:00–03:30 | Temporarily move the manual start near the end of the available domain so the message cannot fit. Show the capacity warning/disabled protection; restore 37. Indexed oversized image/audio checks provide reproducible overflow evidence. Capacity rejection is not a verification negative. |
+| 03:30–04:30 | Enable **Match the cover's file size where possible**. Choose a fresh output and **Protect & Sign** with the new private key. Show cover/stego previews, quality, byte/percentage changes and separate manifest storage. Read the actual size-matching outcome; success is not guaranteed. |
+| 04:30–06:30 | Transfer new PNG, manifest and public key. B downloads into their folder, selects them in Verify, selects the original for comparison, and verifies AUTHENTIC. Show recovered short text, checks, text/hex views and comparison. **Save recovered payload...** to a fresh name. |
+| 06:30–07:00 | Explain receiver use of the manual location and cross-checking signed settings. State the member's actual contribution/checks. Briefly select A's `original/image.bmp` to show the other supported image format, then Clear. |
+
+## 07:00–12:00 — Member 3: audio and derived starts
+
+| Target time | Live action and expected evidence |
+| --- | --- |
+| 07:00–08:30 | Use **Select File** for A's `original/audio-mono.wav`. Select `long.txt` as a file payload with **Choose payload file...**. Set depth 2 and HMAC-derived start with a demo value. Show capacity and explain receiver derivation. |
+| 08:30–10:00 | Protect to a new WAV. Play cover and stego; demonstrate pause, seek and stop. Compare sample rate, channels, sample count, size and quality. Do not promise audible or inaudible distortion. WAV metadata can change size even with preserved samples. |
+| 10:00–11:30 | Transfer/download WAV, manifest and corresponding public key. B selects these, enters the same start value and verifies AUTHENTIC. Show recovered Project Overview and per-check results. |
+| 11:30–12:00 | Explain finite start-location search space: hiding the start is not encryption. State the member's actual contribution and checking. |
+
+## 12:00–15:00 — Member 4: encryption and file recovery
+
+- 12:00–13:15: Protect A's fictional `custom.txt` in an image with **Encrypt the
+  message (AES-256-GCM)** enabled, HMAC start and a demo passphrase. Verify with
+  the new matching public key and inputs. Explain confidentiality versus signing.
+  Demonstrate wrong-passphrase rejection and withheld preview/save, then restore
+  the correct passphrase and verify successfully.
+- 13:15–14:30: Show Protect's file selector with A's `messages/payload.png` and
+  explain file metadata. Explicitly switch to the prepared B `image-file` and
+  `audio-file` fixtures, B's key and demonstration inputs. Verify each, preview the
+  recovered PNG, play the WAV and save both to fresh paths. The recovered tone is
+  0.1 seconds; the received cover tone is 2 seconds. Both are 440 Hz.
+- 14:30–15:00: Explain inert text/hex and internal previews: recovered bytes are
+  never executed. State the member's actual contribution and checking.
+
+## 15:00–19:00 — Members 1 and 3: attacks and robustness
+
+Use B's key and indexed inputs. Damaged files reuse their original manifest:
+select it explicitly. Read observed outcomes alongside expectations.
+
+| Target time | Live action | Expected result |
+| --- | --- | --- |
+| 15:00–15:40 | Attack Lab, `image-short`: message corruption | AUTHENTIC baseline then SIGNATURE_INVALID; mandatory image negative |
+| 15:40–16:20 | `audio-long`: signature corruption | AUTHENTIC baseline then SIGNATURE_INVALID; mandatory audio negative |
+| 16:20–17:00 | Authentic `audio-long`: wrong-key and wrong-start actions individually | Wrong key: SIGNATURE_INVALID. Wrong start: rejection with ambiguity notice. These change verification inputs and create no tampered file |
+| 17:00–17:30 | `image-short`: outside-payload edit | AUTHENTIC can remain; explain payload-only authentication |
+| 17:30–18:40 | Show Protect's repetition-3 checkbox. Verify indexed `audio-repetition1-damage1`, `audio-repetition3-damage1`, `audio-repetition3-damage2` | Uncoded failure; coded AUTHENTIC with correction report; coded SIGNATURE_INVALID. Last is the third mandatory negative: unrecoverable audio damage |
+| 18:40–19:00 | Attack Lab **Save as evidence...** | Save actual before/after outcomes. Explain approximately triple storage and controlled one-copy/two-copy damage, not arbitrary lossy-transform resistance |
+
+## 19:00–22:00 — Member 5: video, steganalysis and evidence
+
+- 19:00–20:15: Protect A's short `original/video.mkv` with `short.txt`. Point to
+  the warning before protection: source audio is omitted. Verify the fresh output;
+  open it in Video, play and **Locate the payload frames** using its manifest and
+  start inputs. The span is a manifest claim until verified. Explain FFV1/MKV and
+  codec-driven size changes. Prepared `video-positive` is the labelled fallback:
+  30 frames, 15 fps, two seconds.
+- 20:15–21:15: In Steganalysis select B's `protected/analysis-even-0.png` and
+  reference `analysis/even-0.png`, then Analyse. Show channel selection, bit plane 0,
+  reference difference, distortion and indicators. Scaling is fixed. T07's 18
+  synthetic fixtures gave 2/9 false positives and 8/9 misses; these are not
+  natural-media accuracy estimates. A p-value is not a hidden-data probability.
+- 21:15–22:00: Open the evidence index and actual exported attack log. Point to
+  receiver and preservation reports. Steganalysis has no GUI export button; its
+  reproducible reports come from evaluation/receiver scripts. State the member's
+  actual contribution and explain AI assistance and checking truthfully. Recap
+  key trust, replay, payload scope, fragile LSBs, omitted audio and detection limits.
+
+## 22:00–25:00 — contingency and questions
+
+Do not silently drop retained features. If an operation stalls, identify the failure,
+use its labelled prepared fixture and record the missed live action. Screenshots
+are fallback evidence, not proof of live success. If rehearsal runs long, reduce
+repeated narration, file hunting and setup; retain all challenges, required cases
+and member airtime. Record actual segment timings in the handoff guide. The planned
+22 minutes does not prove feasibility.

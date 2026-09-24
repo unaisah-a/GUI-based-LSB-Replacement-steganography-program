@@ -4,14 +4,14 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorised execution scope: **T08 only**, following the user's instruction to execute the next task. Do not start T09 without further authorisation.
+- Latest authorised execution scope: **T09 only**, following the user's instruction to execute the next task. Prepare the handoff; do not submit or send messages.
 - Integration branch: `integration/acw1-consolidated`.
 - Current integration workspace: `A:/Code/GUI-based-LSB-Replacement-steganography-program` (historical setup used `C:/Code/INF2005-ACW1-consolidated`).
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
 - Base: `Tristan`, commit `6167e72203e3a3045cdc4fa8ae36f4080689df34`.
 - Selective source: `gin`, commit `f3c267e10a47fa8bba7ace1078a7dce0e6d68f8e`.
 - T01 status: DONE. Documentation, branch/base and worktree-preservation checks passed.
-- T01-T08: DONE. T09: TODO. Native checks and final full suite pass with the documented pytest-qt logging-capture mitigation.
+- T01-T09: DONE. Native checks and final full suite pass with the documented pytest-qt logging-capture mitigation.
 - T01/T02 established the workspace and clean baseline. T03 added backend safeguards; T04 updated the GUI and regressions. Dependency pins and existing demo samples remain unchanged; T07 adds a separate samples/t07 bundle.
 
 ## 1. Objective and decisions
@@ -118,7 +118,7 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 | T06 | Size/property preservation | T03, T05 | DONE | Representative size/property measurements recorded; unexpected growth investigated |
 | T07 | Sender/receiver sample bundle | T04, T05, T06 | DONE | Required messages, positives, negatives and challenges reproduce independently without private keys |
 | T08 | Integrated release validation | T07 | DONE | Full suite, lint, clean setup, native desktop checks and extracted-package verification complete |
-| T09 | Demo/submission handoff | T08 | TODO | Feature-complete timed script, evidence index and human-task checklist delivered; actual rehearsal tracked honestly |
+| T09 | Demo/submission handoff | T08 | DONE | Feature-complete timed script, evidence index and human-task checklist delivered; actual rehearsal tracked honestly |
 
 ### T01 work record
 
@@ -139,41 +139,41 @@ For each task below, replace the placeholder when work is authorized. Record cha
 | T06 | 66 saved-file measurements; codec baselines; metadata-aware size reporting; video timing/count safeguards | [T06 evidence](../evidence/t06/README.md): all 66 authentic, properties preserved; 1820 tests pass across five processes; lint and startup/compatibility pass | None for T06; combined-process Qt access violation requires T08 investigation |
 | T07 | Fresh samples/t07, builder, receiver verifier, case index and guide; required PDF message wording checked | [T07 evidence](../evidence/t07/README.md): 27 cases and two capacity checks pass in isolated receiver process; 20 authenticated exports; 82 focused tests and lint pass | None for T07; native/release validation T08, real transfer/rehearsal T09 |
 | T08 | Clean .venv-t08; explicit media-player disposal; scrollable tab pages; corrected alpha metric property; archive exclusions; audio-bearing video and extraction checks | [T08 evidence](../evidence/t08/README.md): current full suite 1830 pass, lint/dependencies/startup pass, audio omission verified, extracted receiver 27 cases/2 capacity checks/20 exports pass | Native checks passed; 932 repeated GUI tests and final 1830-test suite pass with supported --no-qt-log mitigation. Underlying native defect not proven; see evidence limits |
-| T09 | Not started | None | All acceptance criteria |
+| T09 | Current timed script; evidence index; unsigned contribution/AI records; delivery and rehearsal checklist; refreshed archive | [T09 evidence](../evidence/t09/README.md): document links/cases, lint and extracted receiver/startup verification | Real transfer, timed team rehearsal, declarations/signatures, notification and submission remain human tasks |
 
 ## 5. Requirement and feature-to-demo matrix
 
-This is the planned live mapping, not evidence of release completion. T02 reconciled the requirements and actual exposed UI in the [baseline and feature inventory](../evidence/t02/README.md), including per-requirement source/test references and assigned gaps. Existing automated tests pass, but each row still needs final acceptance and live demonstration confirmation. The inventory adds the existing text/hex toggle, original-cover comparison, playback controls and help notices to their corresponding demo segments. One demonstration may satisfy several requirements.
+T09 maps these retained features to the executable [timed script](demo_plan.md). The [evidence index](evidence_index.md) identifies technical validation and its limits. T02 inventory remains historical. Every live segment still requires the real team demonstration/rehearsal; passing tests are not proof of presentation timing. One action can satisfy several requirements.
 
 | Requirement / feature | Planned implementation or check | Live segment / presenter | Current evidence status |
 | --- | --- | --- | --- |
-| FR1 Image input | PNG/BMP input, validation and preview | 2-7 / Member 2 | See T02 inventory; final acceptance pending |
-| FR2 Audio input | PCM-16 WAV, validation and playback | 7-12 / Member 3 | See T02 inventory; final acceptance pending |
-| FR3 Payload generation | Media ID, timestamp, hash, nonce, metadata | 0-2 and image result / Members 1, 2 | See T02 inventory; final acceptance pending |
-| FR4 Digital signature | Generate/select keys, sign, verify, fingerprint | 0-2 and receiver steps / Members 1-3 | See T02 inventory; final acceptance pending |
-| FR5 Image embedding | Saved-file LSB round trip | 2-7 / Member 2 | See T02 inventory; final acceptance pending |
-| FR6 Audio embedding | Saved-file LSB round trip | 7-12 / Member 3 | See T02 inventory; final acceptance pending |
-| FR7 Variable start | Manual and HMAC-derived starts, recovery/security | 2-12 / Members 2, 3 | See T02 inventory; final acceptance pending |
-| FR8 Extraction | Fresh receiver extracts payload/signature | 2-12 / Members 2, 3 | See T02 inventory; final acceptance pending |
-| FR9 Hash verification | Recompute signed payload hash, explain scope | 0-2 and receiver steps / Members 1-3 | See T02 inventory; final acceptance pending |
-| FR10 Verdicts | Per-check results, truthful failure explanations | Receiver steps and 15-19 / Members 1-3 | See T02 inventory; final acceptance pending |
-| FR11 Positive/negative cases | Image/audio positives, three mandatory negatives | 2-12 and 15-19 / Members 1-3 | See T02 inventory; final acceptance pending |
-| FR12 Reproducibility | A-to-B folder transfer, receiver index, evidence export | 2-7 and 19-22 / Members 2, 5 | See T02 inventory; final acceptance pending |
-| FR13 Innovation | Advanced starts and all five challenges with limits | Throughout | See T02 inventory; final acceptance pending |
-| LSB depths 1-8 | Show selector and bit/capacity tradeoff; all depths tested | 2-7 / Member 2 | See T02 inventory; final acceptance pending |
-| Capacity check | Full overhead and start accounted for, overflow rejected | 2-7 / Member 2 | See T02 inventory; final acceptance pending |
-| Cover/stego comparison | Image display and audio playback before/after | 2-12 / Members 2, 3 | See T02 inventory; final acceptance pending |
-| Required message lengths | Brief short/long text and custom confidential payload | 2-15 / Members 2-4 | See T02 inventory; final acceptance pending |
-| File payload preview/save | Applicable image/audio payloads, authenticated recovery | 12-15 / Member 4 | See T02 inventory; final acceptance pending |
-| AES confidentiality | Encrypt/decrypt custom payload, explain signature distinction | 12-15 / Member 4 | See T02 inventory; final acceptance pending |
-| Drag/drop and picker | Valid input through both routes; automated invalid cases | 2-12 / Members 2, 3 | Native behavior unverified |
-| File-size preservation | Optional matching, measured sizes and format limitations | 2-12 / Members 2, 3 | See T02 inventory; final acceptance pending |
-| Advanced start challenge | Derivation and wrong-secret failure | 7-12 and 15-19 / Members 3, 1 | See T02 inventory; final acceptance pending |
-| Attack challenge | Focused five controls, including outside-region limitation | 15-19 / Members 1, 3 | See T02 inventory; final acceptance pending |
-| Robustness challenge | Matched damage, recovery, unrecoverable third negative | 15-19 / Members 1, 3 | See T02 inventory; final acceptance pending |
-| Video challenge | Protect/verify short clip, preview, affected frames, audio omission | 19-22 / Member 5 | See T02 inventory; final acceptance pending |
-| Steganalysis challenge | Bit plane/difference, metrics, indicators, false alarms/misses | 19-22 / Member 5 | See T02 inventory; final acceptance pending |
-| Evidence export | Export the demonstrated results | 19-22 / Member 5 | See T02 inventory; final acceptance pending |
+| FR1 Image input | PNG/BMP input, validation and preview | 2-7 / Member 2 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR2 Audio input | PCM-16 WAV, validation and playback | 7-12 / Member 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR3 Payload generation | Media ID, timestamp, hash, nonce, metadata | 0-2 and image result / Members 1, 2 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR4 Digital signature | Generate/select keys, sign, verify, fingerprint | 0-2 and receiver steps / Members 1-3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR5 Image embedding | Saved-file LSB round trip | 2-7 / Member 2 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR6 Audio embedding | Saved-file LSB round trip | 7-12 / Member 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR7 Variable start | Manual and HMAC-derived starts, recovery/security | 2-12 / Members 2, 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR8 Extraction | Fresh receiver extracts payload/signature | 2-12 / Members 2, 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR9 Hash verification | Recompute signed payload hash, explain scope | 0-2 and receiver steps / Members 1-3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR10 Verdicts | Per-check results, truthful failure explanations | Receiver steps and 15-19 / Members 1-3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR11 Positive/negative cases | Image/audio positives, three mandatory negatives | 2-12 and 15-19 / Members 1-3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR12 Reproducibility | A-to-B folder transfer, receiver index, evidence export | 2-7 and 19-22 / Members 2, 5 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| FR13 Innovation | Advanced starts and all five challenges with limits | Throughout | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| LSB depths 1-8 | Show selector and bit/capacity tradeoff; all depths tested | 2-7 / Member 2 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Capacity check | Full overhead and start accounted for, overflow rejected | 2-7 / Member 2 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Cover/stego comparison | Image display and audio playback before/after | 2-12 / Members 2, 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Required message lengths | Brief short/long text and custom confidential payload | 2-15 / Members 2-4 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| File payload preview/save | Applicable image/audio payloads, authenticated recovery | 12-15 / Member 4 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| AES confidentiality | Encrypt/decrypt custom payload, explain signature distinction | 12-15 / Member 4 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Drag/drop and picker | Valid input through both routes; automated invalid cases | 2-12 / Members 2, 3 | T08 native picker/drop passed; live rehearsal pending |
+| File-size preservation | Optional matching, measured sizes and format limitations | 2-12 / Members 2, 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Advanced start challenge | Derivation and wrong-secret failure | 7-12 and 15-19 / Members 3, 1 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Attack challenge | Focused five controls, including outside-region limitation | 15-19 / Members 1, 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Robustness challenge | Matched damage, recovery, unrecoverable third negative | 15-19 / Members 1, 3 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Video challenge | Protect/verify short clip, preview, affected frames, audio omission | 19-22 / Member 5 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Steganalysis challenge | Bit plane/difference, metrics, indicators, false alarms/misses | 19-22 / Member 5 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
+| Evidence export | Export the demonstrated results | 19-22 / Member 5 | Technical evidence: [index](evidence_index.md); live rehearsal pending |
 | Limitations/AI/contributions | Brief explanations integrated into each member's segment | Throughout / All | Human completion required |
 
 ## 6. Verification plan and logs
@@ -300,6 +300,14 @@ For future tasks, append command, environment, tested revision/working-tree stat
 - Final archive/extraction commands and report: [T08 evidence](../evidence/t08/README.md), `dist/T08-validated-report.json`. The report records exact archive/member hashes and receiver/startup results outside the archive. Check successful report before handoff.
 - T08 DONE with documented mitigation and limits. T09 not started. No commit/push or human transfer/rehearsal/submission claimed.
 
+### T09 verification and handoff log
+
+- Authorised T09 after commit/push of T08 at `2aa68adf83f0e57cefa8cff10b4a78f3ac4c4f41`. Documentation/package changes only; no application or dependency changes. T08 full-suite/native results remain baseline evidence, not a new T09 full run.
+- Replaced historical demo draft with current 22+3 minute script covering all retained features, mandatory cases and all five challenges. Added evidence index and delivery checklist; corrected unsupported ownership and stale GUI export instructions.
+- Read local brief pages 2–4 for package/relative deadlines/all-member airtime/AI notification. Real calendar dates, contributions and signatures remain for the team.
+- Validation commands and exact package report: [T09 evidence](../evidence/t09/README.md). Local links/indexed case references and lint checked; final archive is independently extracted and receiver/startup checked before handoff.
+- T09 DONE means deliverables prepared and rehearsal tracked honestly. No actual human transfer, measured full rehearsal, message or submission is claimed. No automatic commit/push authorised for T09.
+
 ## 7. Demo and delivery
 
 Every retained user-facing feature must map to a live action. Prepare files/keys/folders ahead of time; reuse mandatory workflows to demonstrate advanced starts and attacks. Screenshots are fallback evidence, not a substitute for required working demonstrations.
@@ -335,14 +343,16 @@ Deliver README, architecture/limitations, this living guide, requirement/demo ma
 | Execute T05 only | Latest user instruction authorises the next task; five challenge workflows completed; T06-T09 remain TODO |
 | Execute T06 only | Subsequent user instruction authorises size/property evaluation; completed with evidence; T07-T09 remain TODO |
 | Execute T07 only | Subsequent user instruction authorises fresh sender/receiver bundle; completed with independent receiver evidence; T08-T09 remain TODO |
+| Execute T08 only | Subsequently authorised integrated validation, including resumed native checks; completed with documented mitigation |
+| Execute T09 only | Subsequently authorised the next task after T08 push; prepare handoff without performing human declarations, messages or submission |
 
 ## 9. Handoff
 
 - Current branch/workspace: `integration/acw1-consolidated` at `A:/Code/GUI-based-LSB-Replacement-steganography-program`.
-- Current state: T01-T08 DONE; T09 TODO. Latest authorised scope: T08 only; native checks completed on the authorised retry.
-- HEAD `3b79700c44196f64bc8a9f1f937392e34c056e43` contains committed/pushed T07; T08 changes and evidence are uncommitted. See the T08 retry log and evidence report.
+- Current state: T01-T09 DONE. Latest authorised scope: T09 handoff only. Human delivery actions remain open in [submission_handoff.md](submission_handoff.md).
+- HEAD `2aa68adf83f0e57cefa8cff10b4a78f3ac4c4f41` contains committed/pushed T08. T09 documentation and evidence are uncommitted. See the T09 evidence report.
 - T07 bundle: [guide](sample_bundle.md), [case index](../samples/t07/CASE_INDEX.md), [evidence](../evidence/t07/README.md). 27 receiver cases, two capacity checks, 20 authenticated exports and 82 focused tests pass without private keys.
 - T08 validation is complete with the documented pytest-qt logging-capture mitigation: 1830 full tests and 932 repeated GUI tests pass; native picker/drop/preview/save/playback/layout pass. See final archive report for extraction provenance and evidence report for limits.
-- T09 finalises demo/submission handoff, real transfer and rehearsal records.
+- T09 delivered the [script](demo_plan.md), [evidence index](evidence_index.md) and honest unperformed transfer/rehearsal/submission records. Prepared archive/report are under dist; rebuild after human personalisation.
 - Existing untracked samples/r11 remains untouched. Original branches remain untouched.
 - Human tasks: names/contributions/signatures, real transfer/rehearsal, notifications and submission remain open.

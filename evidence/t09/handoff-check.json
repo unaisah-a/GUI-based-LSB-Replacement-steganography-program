@@ -1,0 +1,18 @@
+{
+  "local_links_checked": 104,
+  "indexed_cases": 27,
+  "demo_cases_present": 12,
+  "sha256": {
+    "README.md": "497a1badef21654e66c14d4f5c8cf372dd24b52f966384f68c5bae71549eef27",
+    "AGENTS.md": "a8c632c27062fdf9feb6318494d5552f1522ee47f1bf599d139cf652261bbde4",
+    "docs/IMPLEMENTATION_PLAN.md": "11822da45aaac96ddb6633ad20ec7133087d6615f2ddae6006b926c2daf22982",
+    "docs/demo_plan.md": "c2a36079f5037a6e39ddf02be4b444fcc664412c27c9d6e50f05534627bb1f48",
+    "docs/evidence_index.md": "7ff6868cd22177c52d0ad49ec711fbc8179ed87d0b02a5bb0f42d0cc98a2b528",
+    "docs/submission_handoff.md": "4870aec3e51e7328458a7e00c19376ef0affeab340185540786def44025b2872",
+    "docs/contribution_statement.md": "44daa5cc807eaad15560706d4bcb63d8c8cc5bef2286b552e496221820f25ca7",
+    "docs/ethics_and_ai_use.md": "c932c35093fb2f688565ad171752e7b1b7e5b064203c416d85cebf93e3e2d562",
+    "docs/sample_bundle.md": "b36a93127ff376971dff407752f5ccdf1ae044bee2f8290dc720cb592e38799e",
+    "docs/challenge_workflows.md": "7d05f76d1f95d89facf35553ddd78e4576e189c992ef4b4c57fbe129f0316cd6",
+    "evidence/t09/README.md": "39eb65303f564016fc1b8140b1efdb281c73997d72ac7e607c8a28928c6c5020"
+  }
+}
