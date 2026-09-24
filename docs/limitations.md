@@ -335,3 +335,18 @@ overwrites, and says so.
 - GUI tests run under Qt's `offscreen` platform. Playback through QtMultimedia depends
   on platform codecs and is not exercised; the widget degrades to a message when a
   player cannot be created, and that path is what the tests cover.
+
+## T03 publication and input limits
+
+Bundle rollback covers caught errors, not power failure or a killed process, and
+two files cannot be published atomically as a pair. Do not publish concurrently to
+the same destinations. If rollback itself fails, the error identifies retained
+backup files for manual recovery. Source/output/manifest aliases and symbolic-link
+output destinations are rejected. On POSIX, no-overwrite publication requires a
+filesystem supporting hard links; an unsupported destination fails safely.
+
+This build accepts manifests up to 1 MiB and bounds scrypt to estimated memory
+`128*N*r <= 128 MiB` and work `N*r*p <= 2**22`. These are local resource limits;
+they may reject an otherwise well-signed payload using unusually expensive costs.
+The application's normal parameters are unchanged. They are not guarantees about
+exact process memory use or elapsed time.

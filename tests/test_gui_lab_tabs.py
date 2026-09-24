@@ -13,8 +13,6 @@ on the wiring and on the honesty properties that only exist in the interface:
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 pytest.importorskip("PySide6", reason="PySide6 is required for the interface tests")
@@ -197,7 +195,7 @@ class TestAttackTabConstruction:
         load(attack_tab, protected_png)
         keys = listed_keys(attack_tab)
 
-        assert "image.inside" in keys
+        assert keys == {"payload.message", "payload.signature", "image.outside"}
         assert "image.outside" in keys
         assert "audio.resample" not in keys
 
@@ -205,8 +203,7 @@ class TestAttackTabConstruction:
         load(attack_tab, protected_wav)
         keys = listed_keys(attack_tab)
 
-        assert "audio.resample" in keys
-        assert "audio.amplitude" in keys
+        assert keys == {"payload.message", "payload.signature", "audio.outside"}
         assert "image.blank" not in keys
 
     def test_payload_attacks_apply_to_both_media(
@@ -220,23 +217,6 @@ class TestAttackTabConstruction:
         result, _, _ = protected_png
         load(attack_tab, protected_png)
         assert attack_tab.manifest_edit.text() == result.manifest_path
-
-    def test_options_appear_only_for_the_attacks_that_use_them(
-        self, attack_tab, protected_png
-    ):
-        load(attack_tab, protected_png)
-
-        attack_tab._show_options("payload.random_bits")
-        assert attack_tab.bit_error_spin.isVisibleTo(attack_tab) is True
-        assert attack_tab.manifest_field_combo.isVisibleTo(attack_tab) is False
-
-        attack_tab._show_options("manifest.tamper")
-        assert attack_tab.bit_error_spin.isVisibleTo(attack_tab) is False
-        assert attack_tab.manifest_field_combo.isVisibleTo(attack_tab) is True
-
-        attack_tab._show_options("payload.signature")
-        assert attack_tab.bit_error_spin.isVisibleTo(attack_tab) is False
-        assert attack_tab.manifest_field_combo.isVisibleTo(attack_tab) is False
 
     def test_only_the_needed_secret_fields_are_enabled(self, attack_tab, protected_png):
         load(attack_tab, protected_png)
@@ -311,7 +291,7 @@ class TestAttackTabRunning:
 
     def test_the_log_records_expected_and_observed(self, attack_tab, protected_png):
         load(attack_tab, protected_png)
-        self._select(attack_tab, "payload.magic")
+        self._select(attack_tab, "payload.signature")
         attack_tab._on_attack_finished(
             attack_tab._run_one(
                 attack_tab.selected_attack(), attack_tab._collect_inputs()
@@ -321,128 +301,20 @@ class TestAttackTabRunning:
         text = attack_tab.log_view.toPlainText()
         assert "expected:" in text
         assert "matched:" in text
-        assert verdicts.VERDICT_PAYLOAD_MISSING in text
-
-    def test_the_bit_error_rate_option_is_passed_through(
-        self, attack_tab, protected_png
-    ):
-        load(attack_tab, protected_png)
-        self._select(attack_tab, "payload.random_bits")
-        attack_tab.bit_error_spin.setValue(0.05)
-
-        run = attack_tab._run_one(
-            attack_tab.selected_attack(), attack_tab._collect_inputs()
-        )
-        assert run.outcome.details["bit_error_rate"] == 0.05
-
-    def test_the_manifest_field_option_is_passed_through(
-        self, attack_tab, protected_png
-    ):
-        load(attack_tab, protected_png)
-        self._select(attack_tab, "manifest.tamper")
-        index = attack_tab.manifest_field_combo.findData("message_length")
-        attack_tab.manifest_field_combo.setCurrentIndex(index)
-
-        run = attack_tab._run_one(
-            attack_tab.selected_attack(), attack_tab._collect_inputs()
-        )
-
-        assert run.outcome.details["field"] == "message_length"
-        assert run.after.verdict == verdicts.VERDICT_TAMPERED
-
-    def test_a_manifest_attack_verifies_the_original_file(
-        self, attack_tab, protected_png
-    ):
-        """The manifest changed, not the cover, so the pairing has to be right."""
-        result, _, _ = protected_png
-        load(attack_tab, protected_png)
-        self._select(attack_tab, "manifest.tamper")
-
-        run = attack_tab._run_one(
-            attack_tab.selected_attack(), attack_tab._collect_inputs()
-        )
-
-        assert run.attack.target == "manifest"
-        assert run.outcome.output_path != result.stego_path
-        assert Path(result.stego_path).is_file()
-
-    def test_the_resigning_attack_generates_its_own_key(
-        self, attack_tab, protected_png
-    ):
-        """An attacker with their own signing key is the scenario being modelled."""
-        load(attack_tab, protected_png)
-        self._select(attack_tab, "payload.resign")
-
-        run = attack_tab._run_one(
-            attack_tab.selected_attack(), attack_tab._collect_inputs()
-        )
-
-        # Against the genuine sender's public key it fails, which is the point.
-        assert run.after.verdict == verdicts.VERDICT_SIGNATURE_INVALID
-        assert run.matched_expectation is True
+        assert verdicts.VERDICT_SIGNATURE_INVALID in text
 
     def test_an_audio_attack_runs(self, attack_tab, protected_wav):
         load(attack_tab, protected_wav)
-        self._select(attack_tab, "audio.amplitude")
+        self._select(attack_tab, "payload.signature")
 
         run = attack_tab._run_one(
             attack_tab.selected_attack(), attack_tab._collect_inputs()
         )
         assert run.after.verdict != verdicts.VERDICT_AUTHENTIC
 
-    def test_running_every_attack_reports_matches_and_skips(
-        self, attack_tab, protected_png
-    ):
-        load(attack_tab, protected_png)
-        completed, skipped = attack_tab._run_every(attack_tab._collect_inputs())
-        attack_tab._on_all_finished((completed, skipped))
-
-        assert completed
-        for run in completed:
-            assert run.matched_expectation, (
-                f"{run.attack.key} produced {run.after.verdict}, expected one of "
-                f"{sorted(run.outcome.expected_verdicts)}"
-            )
-
-        text = attack_tab.log_view.toPlainText()
-        assert "Ran every applicable attack" in text
-        assert constants.AUTHENTIC_SCOPE_NOTICE in text
-
-    def test_a_skipped_attack_is_reported_with_its_reason(self, tmp_path, keys, attack_tab):
-        """Modifying outside the payload needs room outside the payload."""
-        private_key, public_key = keys
-        # A cover only just large enough: the payload fills it, so there is no
-        # region outside the payload to modify.
-        cover = write_cover(str(tmp_path), make_cover(48, 48, 3), image_io.PNG, "tight")
-        public_path = str(tmp_path / "pub.pem")
-        key_manager.save_public_key(public_key, public_path)
-        result = protect_media(
-            cover,
-            str(tmp_path / "tight_stego.png"),
-            MESSAGE,
-            private_key,
-            media_id="IMG-TIGHT",
-            lsb_depth=1,
-            start_secret=START_SECRET,
-            scrypt_n=MIN_SCRYPT_N,
-            scrypt_r=8,
-            scrypt_p=1,
-        )
-
-        attack_tab.drop_zone.accept_path(result.stego_path)
-        attack_tab.key_edit.setText(public_path)
-        attack_tab.start_secret_edit.setText(START_SECRET)
-
-        completed, skipped = attack_tab._run_every(attack_tab._collect_inputs())
-        attack_tab._on_all_finished((completed, skipped))
-
-        if skipped:
-            text = attack_tab.log_view.toPlainText()
-            assert "Not applicable to this file" in text
-
     def test_the_log_can_be_cleared(self, attack_tab, protected_png):
         load(attack_tab, protected_png)
-        self._select(attack_tab, "payload.magic")
+        self._select(attack_tab, "payload.signature")
         attack_tab._on_attack_finished(
             attack_tab._run_one(
                 attack_tab.selected_attack(), attack_tab._collect_inputs()

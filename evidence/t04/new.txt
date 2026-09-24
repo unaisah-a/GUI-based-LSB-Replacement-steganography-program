@@ -1,0 +1,202 @@
+.......FFFFF.........                                                    [100%]
+================================== FAILURES ===================================
+__ test_failed_verdict_never_displays_or_saves_attached_plaintext[TAMPERED] ___
+
+qtbot = <pytestqt.qtbot.QtBot object at 0x00000235170C9F10>
+tmp_path = WindowsPath('C:/Code/INF2005-ACW1-consolidated/tmp/t04-new/test_failed_verdict_never_disp0')
+verdict = 'TAMPERED'
+
+    @pytest.mark.parametrize("verdict", [v for v in constants.VERDICTS if v != constants.VERDICT_AUTHENTIC])
+    def test_failed_verdict_never_displays_or_saves_attached_plaintext(qtbot, tmp_path, verdict):
+        tab = widget(qtbot, VerifyTab)
+        tab._on_verified(VerificationResult(verdict=constants.VERDICT_AUTHENTIC,
+                                         reason="verified", message=b"previous"))
+        assert tab.result_panel.save_enabled
+        tab._on_verified(VerificationResult(verdict=verdict, reason="failure", message=b"untrusted"))
+        assert not tab.result_panel.save_enabled
+        assert tab.result_panel.payload_text == ""
+        assert tab.payload_preview_path is None
+        output = tmp_path / "must-not-exist.bin"
+        with pytest.raises(ValueError):
+>           tab.result_panel.save_payload(str(output))
+
+tests\test_gui_consolidation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <app.gui.widgets.result_panel.ResultPanel(0x235163e89b0, name="resultPanel") at 0x00000235170CBF40>
+path = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-new\\test_failed_verdict_never_disp0\\must-not-exist.bin'
+
+    def save_payload(self, path: str) -> str:
+        """Write the recovered bytes to *path*, exactly as recovered.
+    
+        The save dialog has already asked about replacing an existing file, so this
+        overwrites. Nothing is opened afterwards.
+        """
+        if (self._message is None or self._result is None
+                or self._result.verdict != constants.VERDICT_AUTHENTIC):
+>           raise OSError("there is no authentic recovered payload to save")
+E           OSError: there is no authentic recovered payload to save
+
+app\gui\widgets\result_panel.py:350: OSError
+---------------------------- Captured Qt messages -----------------------------
+QtWarningMsg: QFontDatabase: Cannot find font directory C:/Code/INF2005-ACW1-consolidated/.venv/Lib/site-packages/PySide6/lib/fonts.
+Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
+_ test_failed_verdict_never_displays_or_saves_attached_plaintext[SIGNATURE_INVALID] _
+
+qtbot = <pytestqt.qtbot.QtBot object at 0x00000235170C3790>
+tmp_path = WindowsPath('C:/Code/INF2005-ACW1-consolidated/tmp/t04-new/test_failed_verdict_never_disp1')
+verdict = 'SIGNATURE_INVALID'
+
+    @pytest.mark.parametrize("verdict", [v for v in constants.VERDICTS if v != constants.VERDICT_AUTHENTIC])
+    def test_failed_verdict_never_displays_or_saves_attached_plaintext(qtbot, tmp_path, verdict):
+        tab = widget(qtbot, VerifyTab)
+        tab._on_verified(VerificationResult(verdict=constants.VERDICT_AUTHENTIC,
+                                         reason="verified", message=b"previous"))
+        assert tab.result_panel.save_enabled
+        tab._on_verified(VerificationResult(verdict=verdict, reason="failure", message=b"untrusted"))
+        assert not tab.result_panel.save_enabled
+        assert tab.result_panel.payload_text == ""
+        assert tab.payload_preview_path is None
+        output = tmp_path / "must-not-exist.bin"
+        with pytest.raises(ValueError):
+>           tab.result_panel.save_payload(str(output))
+
+tests\test_gui_consolidation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <app.gui.widgets.result_panel.ResultPanel(0x235163255c0, name="resultPanel") at 0x0000023517521BC0>
+path = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-new\\test_failed_verdict_never_disp1\\must-not-exist.bin'
+
+    def save_payload(self, path: str) -> str:
+        """Write the recovered bytes to *path*, exactly as recovered.
+    
+        The save dialog has already asked about replacing an existing file, so this
+        overwrites. Nothing is opened afterwards.
+        """
+        if (self._message is None or self._result is None
+                or self._result.verdict != constants.VERDICT_AUTHENTIC):
+>           raise OSError("there is no authentic recovered payload to save")
+E           OSError: there is no authentic recovered payload to save
+
+app\gui\widgets\result_panel.py:350: OSError
+_ test_failed_verdict_never_displays_or_saves_attached_plaintext[PAYLOAD_MISSING] _
+
+qtbot = <pytestqt.qtbot.QtBot object at 0x0000023517446FD0>
+tmp_path = WindowsPath('C:/Code/INF2005-ACW1-consolidated/tmp/t04-new/test_failed_verdict_never_disp2')
+verdict = 'PAYLOAD_MISSING'
+
+    @pytest.mark.parametrize("verdict", [v for v in constants.VERDICTS if v != constants.VERDICT_AUTHENTIC])
+    def test_failed_verdict_never_displays_or_saves_attached_plaintext(qtbot, tmp_path, verdict):
+        tab = widget(qtbot, VerifyTab)
+        tab._on_verified(VerificationResult(verdict=constants.VERDICT_AUTHENTIC,
+                                         reason="verified", message=b"previous"))
+        assert tab.result_panel.save_enabled
+        tab._on_verified(VerificationResult(verdict=verdict, reason="failure", message=b"untrusted"))
+        assert not tab.result_panel.save_enabled
+        assert tab.result_panel.payload_text == ""
+        assert tab.payload_preview_path is None
+        output = tmp_path / "must-not-exist.bin"
+        with pytest.raises(ValueError):
+>           tab.result_panel.save_payload(str(output))
+
+tests\test_gui_consolidation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <app.gui.widgets.result_panel.ResultPanel(0x235164cabb0, name="resultPanel") at 0x000002351752E640>
+path = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-new\\test_failed_verdict_never_disp2\\must-not-exist.bin'
+
+    def save_payload(self, path: str) -> str:
+        """Write the recovered bytes to *path*, exactly as recovered.
+    
+        The save dialog has already asked about replacing an existing file, so this
+        overwrites. Nothing is opened afterwards.
+        """
+        if (self._message is None or self._result is None
+                or self._result.verdict != constants.VERDICT_AUTHENTIC):
+>           raise OSError("there is no authentic recovered payload to save")
+E           OSError: there is no authentic recovered payload to save
+
+app\gui\widgets\result_panel.py:350: OSError
+_ test_failed_verdict_never_displays_or_saves_attached_plaintext[WRONG_START_LOCATION] _
+
+qtbot = <pytestqt.qtbot.QtBot object at 0x0000023517523A90>
+tmp_path = WindowsPath('C:/Code/INF2005-ACW1-consolidated/tmp/t04-new/test_failed_verdict_never_disp3')
+verdict = 'WRONG_START_LOCATION'
+
+    @pytest.mark.parametrize("verdict", [v for v in constants.VERDICTS if v != constants.VERDICT_AUTHENTIC])
+    def test_failed_verdict_never_displays_or_saves_attached_plaintext(qtbot, tmp_path, verdict):
+        tab = widget(qtbot, VerifyTab)
+        tab._on_verified(VerificationResult(verdict=constants.VERDICT_AUTHENTIC,
+                                         reason="verified", message=b"previous"))
+        assert tab.result_panel.save_enabled
+        tab._on_verified(VerificationResult(verdict=verdict, reason="failure", message=b"untrusted"))
+        assert not tab.result_panel.save_enabled
+        assert tab.result_panel.payload_text == ""
+        assert tab.payload_preview_path is None
+        output = tmp_path / "must-not-exist.bin"
+        with pytest.raises(ValueError):
+>           tab.result_panel.save_payload(str(output))
+
+tests\test_gui_consolidation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <app.gui.widgets.result_panel.ResultPanel(0x2351651e650, name="resultPanel") at 0x0000023517570F00>
+path = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-new\\test_failed_verdict_never_disp3\\must-not-exist.bin'
+
+    def save_payload(self, path: str) -> str:
+        """Write the recovered bytes to *path*, exactly as recovered.
+    
+        The save dialog has already asked about replacing an existing file, so this
+        overwrites. Nothing is opened afterwards.
+        """
+        if (self._message is None or self._result is None
+                or self._result.verdict != constants.VERDICT_AUTHENTIC):
+>           raise OSError("there is no authentic recovered payload to save")
+E           OSError: there is no authentic recovered payload to save
+
+app\gui\widgets\result_panel.py:350: OSError
+_ test_failed_verdict_never_displays_or_saves_attached_plaintext[CANNOT_VERIFY] _
+
+qtbot = <pytestqt.qtbot.QtBot object at 0x00000235174FDE50>
+tmp_path = WindowsPath('C:/Code/INF2005-ACW1-consolidated/tmp/t04-new/test_failed_verdict_never_disp4')
+verdict = 'CANNOT_VERIFY'
+
+    @pytest.mark.parametrize("verdict", [v for v in constants.VERDICTS if v != constants.VERDICT_AUTHENTIC])
+    def test_failed_verdict_never_displays_or_saves_attached_plaintext(qtbot, tmp_path, verdict):
+        tab = widget(qtbot, VerifyTab)
+        tab._on_verified(VerificationResult(verdict=constants.VERDICT_AUTHENTIC,
+                                         reason="verified", message=b"previous"))
+        assert tab.result_panel.save_enabled
+        tab._on_verified(VerificationResult(verdict=verdict, reason="failure", message=b"untrusted"))
+        assert not tab.result_panel.save_enabled
+        assert tab.result_panel.payload_text == ""
+        assert tab.payload_preview_path is None
+        output = tmp_path / "must-not-exist.bin"
+        with pytest.raises(ValueError):
+>           tab.result_panel.save_payload(str(output))
+
+tests\test_gui_consolidation.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <app.gui.widgets.result_panel.ResultPanel(0x23516551090, name="resultPanel") at 0x00000235174FCDC0>
+path = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-new\\test_failed_verdict_never_disp4\\must-not-exist.bin'
+
+    def save_payload(self, path: str) -> str:
+        """Write the recovered bytes to *path*, exactly as recovered.
+    
+        The save dialog has already asked about replacing an existing file, so this
+        overwrites. Nothing is opened afterwards.
+        """
+        if (self._message is None or self._result is None
+                or self._result.verdict != constants.VERDICT_AUTHENTIC):
+>           raise OSError("there is no authentic recovered payload to save")
+E           OSError: there is no authentic recovered payload to save
+
+app\gui\widgets\result_panel.py:350: OSError
+=========================== short test summary info ===========================
+FAILED tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[TAMPERED]
+FAILED tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[SIGNATURE_INVALID]
+FAILED tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[PAYLOAD_MISSING]
+FAILED tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[WRONG_START_LOCATION]
+FAILED tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[CANNOT_VERIFY]
+5 failed, 16 passed in 2.51s

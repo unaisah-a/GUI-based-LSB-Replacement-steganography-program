@@ -107,22 +107,24 @@ Regenerate the samples with `python scripts/generate_samples.py`.
    (and passphrase, if you used one) and click **Verify**. The verdict should be
    `AUTHENTIC`, with the recovered message. A recovered image or audio file is shown
    or played in the tab, and **Save recovered payload...** writes it out under its
-   original name. A wrong secret gives `PAYLOAD_MISSING`,
+   original name. Preview and save require an `AUTHENTIC` verdict. Compare the displayed
+   public-key SHA-256 fingerprint through an independently trusted channel. A wrong secret gives `PAYLOAD_MISSING`,
    and a different public key gives `SIGNATURE_INVALID`.
 
-4. **Attack it.** On the **Attack Lab** tab, load the same stego file, choose an attack
-   (for example *Modify pixels inside the payload*) and run it. The tampered copy is
-   verified straight away and should no longer be `AUTHENTIC`. An attack *outside* the
-   payload region is shown to still verify, which is the limit of what the signature
-   covers. Audio attacks work the same way with `samples/audio/stego/stego.wav`.
+4. **Attack it.** On **Attack Lab**, load the protected file and select payload
+   corruption, signature corruption, or an edit outside the payload. Run one attack
+   to compare its expected and observed verdicts. Outside-payload edits can still
+   verify because the signature does not authenticate every cover byte. The bulk
+   runner and extra GUI attack variants have been removed; backend experiments remain.
+   Dedicated wrong-key/wrong-start demo actions are planned in T05.
 
-5. **Analyse it.** On the **Steganalysis** tab, load the stego file and give the
-   original cover as the reference. You see the bit planes, an amplified difference
-   image, distortion figures (MSE, PSNR) and statistical indicators. On the **Video**
-   tab, load `samples/video/stego/cover_stego.mkv` with its manifest and secret to see
-   which frames carry the payload.
+5. **Inspect it.** **Steganalysis** shows bit planes with fixed display scaling,
+   a reference difference, distortion figures and experimental statistical indicators.
+   **Video** provides playback, clip properties and the claimed payload frame range
+   from the manifest. Use **Verify** to authenticate those claims. Video protection
+   creates video-only FFV1/MKV output: source audio is omitted. Capacity is measured
+   in **Protect**, including the selected manual start, on a background worker.
 
----
 
 ## Repository layout
 

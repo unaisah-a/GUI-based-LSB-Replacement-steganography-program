@@ -77,6 +77,11 @@ OVERHEAD_BYTES: Final[int] = constants.GCM_NONCE_BYTES + constants.GCM_TAG_BYTES
 #: the signature first.
 MIN_SCRYPT_N: Final[int] = 1 << 10
 
+# Local resource policy, not a cryptographic strength guarantee. The default
+# N=32768, r=8, p=1 uses roughly 32 MiB and is comfortably within these limits.
+MAX_SCRYPT_MEMORY_BYTES: Final[int] = 128 * 1024 * 1024
+MAX_SCRYPT_WORK: Final[int] = 1 << 22
+
 
 def generate_salt() -> bytes:
     """Return a fresh random scrypt salt."""
@@ -138,6 +143,10 @@ def _validate_cost(n: object, r: object, p: object) -> tuple[int, int, int]:
         raise EncryptionError(
             f"scrypt parameter n must be at least {MIN_SCRYPT_N}, got {n}"
         )
+    if 128 * n * r > MAX_SCRYPT_MEMORY_BYTES:
+        raise EncryptionError("scrypt memory cost exceeds the 128 MiB limit")
+    if n * r * p > MAX_SCRYPT_WORK:
+        raise EncryptionError("scrypt work cost exceeds the local processing limit")
     return int(n), int(r), int(p)
 
 

@@ -1,0 +1,25 @@
+{
+  "task": "T03",
+  "base_head": "27572c98cc734e0daa24dcc1377df0234a970618",
+  "working_tree": "uncommitted T03 changes",
+  "python": "3.11.16",
+  "tests": 1785,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "focused_passed": 226,
+  "ruff": "PASS",
+  "sample_and_offscreen_startup_probe": "PASS",
+  "native_gui_verified": false,
+  "source_sha256": {
+    "app/crypto/encryption.py": "f9bcaa25ae3258f9f2b17a0df45bfa657498788a3880359cf1829493a80c0039",
+    "app/crypto/envelope.py": "c9a9edcf4ca63830a281aebb01cf3c93eb2c041219f3d95ccd4af4c6b390fe0c",
+    "app/crypto/key_manager.py": "77afc3b5b6c9f53da6598b6d3fdd6cb504e4ef811a826cde2a62b783d67da035",
+    "app/crypto/manifest.py": "445d79be0032bd8c6d8c10865e98f9e61d7274f6e52dcec917d64ff1f8814c81",
+    "app/stego/paths.py": "7a8437f91e6fb35180a5887eb3fc16e652a91cbf45db7ac79f8fbf4095e4fb58",
+    "app/verification/protect.py": "ada03f5158c86344de547e517808235691b5a962c36e0868a986500d089b2e8c",
+    "app/verification/verifier.py": "1dde24df296559a279c328135f05c84fabfddfff9004cc56398dae193f29b3a0",
+    "app/verification/publication.py": "d173009afb4bece754802f1921df68a2a2af6ed22bada71c4a89435103839999",
+    "tests/test_publication_security.py": "35c7945bca411a8ba2013b17a4de1263835a8d5567f27decd9e855eab2495a06"
+  }
+}

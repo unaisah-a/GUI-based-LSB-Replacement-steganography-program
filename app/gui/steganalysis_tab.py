@@ -30,7 +30,6 @@ import numpy as np
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QImage, QPixmap
 from PySide6.QtWidgets import (
-    QCheckBox,
     QComboBox,
     QFileDialog,
     QFormLayout,
@@ -127,6 +126,7 @@ class SteganalysisTab(QWidget):
         self.setObjectName("steganalysisTab")
 
         self._runner = BackgroundRunner()
+        self._generation = 0
         self._path: str | None = None
         self._report: AnalysisReport | None = None
 
@@ -138,6 +138,7 @@ class SteganalysisTab(QWidget):
             prompt="Drag a file to analyse here",
         )
         self.drop_zone.fileSelected.connect(self._on_file_selected)
+        self.drop_zone.selectionCleared.connect(self._clear_selection)
         self.drop_zone.selectionRejected.connect(self.statusMessage.emit)
         outer.addWidget(self.drop_zone)
 
@@ -161,20 +162,13 @@ class SteganalysisTab(QWidget):
         reference_layout = QHBoxLayout(reference_row)
         reference_layout.setContentsMargins(0, 0, 0, 0)
         self.reference_edit = QLineEdit(reference_row)
+        self.reference_edit.textChanged.connect(self._invalidate_operation)
         self.reference_edit.setPlaceholderText("optional: the original, for comparison")
         reference_layout.addWidget(self.reference_edit, 1)
         self.reference_browse_button = QPushButton("Browse...", reference_row)
         self.reference_browse_button.clicked.connect(self._choose_reference)
         reference_layout.addWidget(self.reference_browse_button)
         form.addRow("Original:", reference_row)
-
-        self.scaled_check = QCheckBox("Scale bit planes to black and white", options)
-        self.scaled_check.setChecked(True)
-        self.scaled_check.setToolTip(
-            "A bit plane holds only 0 and 1. Unscaled it appears solid black, so it is "
-            "mapped to 0 and 255 to be viewable."
-        )
-        form.addRow("", self.scaled_check)
 
         layout.addWidget(options)
 
@@ -255,9 +249,29 @@ class SteganalysisTab(QWidget):
     def report(self) -> AnalysisReport | None:
         return self._report
 
+    def _invalidate_operation(self):
+        self._generation += 1
+        self._report = None
+        self._clear_output()
+
+    def _clear_selection(self):
+        self._generation += 1
+        self._path = None
+        self._report = None
+        self._clear_output()
+
+    def shutdown(self):
+        self._generation += 1
+        self._runner.wait()
+
+    def closeEvent(self, event):
+        self.shutdown()
+        super().closeEvent(event)
+
     # -- reactions --------------------------------------------------------- #
 
     def _on_file_selected(self, path: str) -> None:
+        self._generation += 1
         self._path = path
         self._report = None
         self._clear_output()
@@ -315,8 +329,10 @@ class SteganalysisTab(QWidget):
         self._runner.submit(
             self._run_analysis,
             self._collect_inputs(),
-            on_success=self._on_analysed,
-            on_error=self._on_analysis_failed,
+            on_success=lambda result, generation=self._generation: self._on_analysed(result)
+            if generation == self._generation else None,
+            on_error=lambda message, detail, generation=self._generation: self._on_analysis_failed(message, detail)
+            if generation == self._generation else None,
             on_finished=lambda: self.analyse_button.setEnabled(True),
         )
 
@@ -326,7 +342,7 @@ class SteganalysisTab(QWidget):
         return AnalysisInputs(
             path=self._path,
             reference=self.reference_edit.text().strip() or None,
-            scaled_planes=self.scaled_check.isChecked(),
+            scaled_planes=True,
         )
 
     @staticmethod

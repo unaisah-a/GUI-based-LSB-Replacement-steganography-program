@@ -20,6 +20,7 @@ key; only the demo helper opts out.
 
 from __future__ import annotations
 
+import hashlib
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -37,6 +38,7 @@ __all__ = [
     "generate_key_pair",
     "load_private_key",
     "load_public_key",
+    "public_key_fingerprint",
     "save_private_key",
     "save_public_key",
     "ensure_demo_keys",
@@ -278,3 +280,18 @@ def ensure_demo_keys(
         created=True,
         key_size=private_key.key_size,
     )
+
+
+def public_key_fingerprint(key: rsa.RSAPublicKey | rsa.RSAPrivateKey) -> str:
+    """SHA-256 of canonical DER SubjectPublicKeyInfo, for out-of-band comparison.
+
+    A fingerprint identifies a key; it does not establish trust in its owner.
+    """
+    if isinstance(key, rsa.RSAPrivateKey):
+        key = key.public_key()
+    if not isinstance(key, rsa.RSAPublicKey):
+        raise KeyMaterialError("fingerprint requires an RSA public or private key")
+    encoded = key.public_bytes(
+        serialization.Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+    )
+    return hashlib.sha256(encoded).hexdigest()

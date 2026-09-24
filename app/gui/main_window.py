@@ -103,10 +103,6 @@ class MainWindow(QMainWindow):
         self.generate_keys_action.triggered.connect(self.generate_demo_keys)
         keys_menu.addAction(self.generate_keys_action)
 
-        self.show_key_paths_action = QAction("Show key &locations", self)
-        self.show_key_paths_action.triggered.connect(self.show_key_locations)
-        keys_menu.addAction(self.show_key_paths_action)
-
         help_menu = self.menuBar().addMenu("&Help")
 
         self.about_action = QAction("&About", self)
@@ -178,17 +174,6 @@ class MainWindow(QMainWindow):
         _log.error("demo key preparation failed: %s", message)
         QMessageBox.critical(self, "Demo key pair", message)
 
-    def show_key_locations(self) -> None:
-        private_path, public_path = key_manager.demo_key_paths()
-        QMessageBox.information(
-            self,
-            "Key locations",
-            f"Private key:\n{private_path}\n\n"
-            f"Public key:\n{public_path}\n\n"
-            f"The public key is the one party B needs. The private key stays with "
-            f"party A and is never sent.",
-        )
-
     # -- help -------------------------------------------------------------- #
 
     def show_about(self) -> None:
@@ -226,7 +211,11 @@ class MainWindow(QMainWindow):
         halfway would leave a stego file with no manifest, which a receiver cannot
         use, so the window waits rather than dropping the work.
         """
-        if self._runner.active_count:
-            self.set_status("Finishing background work before closing...")
-            self._runner.wait()
+        for tab in (self.protect_tab, self.verify_tab, self.attack_tab,
+                    self.steganalysis_tab, self.video_tab):
+            if hasattr(tab, "shutdown"):
+                tab.shutdown()
+            else:
+                tab._runner.wait()
+        self._runner.wait()
         super().closeEvent(event)

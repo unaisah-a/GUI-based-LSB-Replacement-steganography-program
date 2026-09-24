@@ -70,6 +70,7 @@ class DropZone(QFrame):
 
     #: Emitted with an absolute path when a file is accepted by either route.
     fileSelected = Signal(str)
+    selectionCleared = Signal()
     #: Emitted with a reason when a drop is refused, so a tab can show it.
     selectionRejected = Signal(str)
 
@@ -135,6 +136,7 @@ class DropZone(QFrame):
         self._clear_button.setEnabled(False)
         self.setProperty("state", "")
         self._restyle()
+        self.selectionCleared.emit()
 
     # -- selection --------------------------------------------------------- #
 
@@ -206,8 +208,8 @@ class DropZone(QFrame):
     def _single_local_file(mime: QMimeData) -> str | None:
         if not mime.hasUrls():
             return None
-        urls = [url for url in mime.urls() if url.isLocalFile()]
-        if len(urls) != 1:
+        urls = mime.urls()
+        if len(urls) != 1 or not urls[0].isLocalFile():
             return None
         return urls[0].toLocalFile()
 

@@ -1,4 +1,10 @@
-# Demonstration Plan
+# Demonstration Plan (historical draft)
+
+> This inherited draft is superseded by the current feature/time matrix in
+> [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md). It is not an executable script
+> for the consolidated GUI. Removed attack variants, random-bit controls and video
+> frame/difference exploration below are historical proposals, not current controls.
+> T05 supplies challenge evidence; T09 replaces this draft with the final rehearsed script.
 
 Target duration: **25 minutes**. Every item the brief requires appears below with the
 tab it is shown in and the time it should take.

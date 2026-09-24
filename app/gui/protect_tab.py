@@ -138,6 +138,14 @@ class ProtectTab(QWidget):
         self.setObjectName("protectTab")
 
         self._runner = BackgroundRunner()
+        self._capacity_runner = BackgroundRunner(max_thread_count=1)
+        self._capacity_generation = 0
+        self._capacity_pending = False
+        self._closing = False
+        self._capacity_timer = QTimer(self)
+        self._capacity_timer.setSingleShot(True)
+        self._capacity_timer.setInterval(150)
+        self._capacity_timer.timeout.connect(self._start_capacity)
         self._cover_path: str | None = None
         self._cover_media_type: str = constants.MEDIA_IMAGE
         self._result: ProtectResult | None = None
@@ -162,8 +170,17 @@ class ProtectTab(QWidget):
             prompt=_cover_prompt(),
         )
         self.drop_zone.fileSelected.connect(self._on_cover_selected)
+        self.drop_zone.selectionCleared.connect(self._clear_cover)
         self.drop_zone.selectionRejected.connect(self.statusMessage.emit)
         outer.addWidget(self.drop_zone)
+        self.video_notice = QLabel("Video output is video-only FFV1/MKV; source audio is omitted.", self)
+        self.video_notice.setWordWrap(True)
+        self.video_notice.setVisible(False)
+        outer.addWidget(self.video_notice)
+        self.fingerprint_label = QLabel("Select a signing key to see its public-key fingerprint.", self)
+        self.fingerprint_label.setWordWrap(True)
+        self.fingerprint_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        outer.addWidget(self.fingerprint_label)
 
         splitter = QSplitter(Qt.Orientation.Horizontal, self)
         splitter.addWidget(self._build_settings())
@@ -456,6 +473,7 @@ class ProtectTab(QWidget):
         self._key_read_timer.stop()
         candidate = self.key_edit.text().strip()
         size = constants.RSA_KEY_SIZE_DEFAULT // 8
+        self.fingerprint_label.setText("Public-key fingerprint unavailable; select a valid signing key.")
 
         if candidate and os.path.isfile(candidate):
             try:
@@ -464,6 +482,10 @@ class ProtectTab(QWidget):
                 pass
             else:
                 size = (key.key_size + 7) // 8
+                self.fingerprint_label.setText(
+                    "Public key SHA-256: " + key_manager.public_key_fingerprint(key)
+                    + "\nCompare through an independently trusted channel."
+                )
 
         if size != self._signature_size:
             self._signature_size = size
@@ -484,6 +506,7 @@ class ProtectTab(QWidget):
             # be the same length so the prediction is unaffected either way.
             self._cover_media_type = constants.MEDIA_IMAGE
 
+        self.video_notice.setVisible(self._cover_media_type == constants.MEDIA_VIDEO)
         self.cover_preview.show_file(path)
 
         if not self.media_id_edit.text().strip():
@@ -570,70 +593,111 @@ class ProtectTab(QWidget):
             self._estimated_envelope_length(), self._ecc_parameters()
         )
 
+    def _clear_cover(self):
+        self._cover_path = None
+        self._result = None
+        self.cover_preview.clear()
+        self.stego_preview.clear()
+        self.quality_panel.clear()
+        self.secrets_label.setVisible(False)
+        self.video_notice.setVisible(False)
+        self._update_readout()
+
+    @property
+    def capacity_busy(self):
+        return (self._capacity_timer.isActive() or self._capacity_pending
+                or bool(self._capacity_runner.active_count))
+
     def _update_readout(self) -> None:
-        message_length = len(self.message_bytes())
-        self.message_length_label.setText(f"{message_length:,} bytes")
-
-        if self._cover_path is None:
-            self.info_panel.clear()
+        if self._closing:
             return
+        self._capacity_generation += 1
+        self.message_length_label.setText(f"{len(self.message_bytes()):,} bytes")
+        self.info_panel.clear()
+        if self._cover_path is None:
+            self._capacity_timer.stop()
+            self._capacity_pending = False
+            return
+        self.info_panel.set_notice("Calculating capacity...")
+        self._capacity_pending = True
+        self._capacity_timer.start()
 
-        envelope_length = self._estimated_envelope_length()
-        embedded_length = self._estimated_embedded_length()
-        ecc = self._ecc_parameters()
+    @staticmethod
+    def _measure_capacity(path, depth, start, length):
+        return (file_utils.describe_file(path),
+                media.measure(path, depth, start_location=start, payload_length=length))
 
+    def _start_capacity(self):
+        if self._closing or self._cover_path is None:
+            return
+        if self._capacity_runner.active_count:
+            self._capacity_pending = True
+            return
         try:
-            description = file_utils.describe_file(self._cover_path)
-            capacity = media.measure(
-                self._cover_path,
-                self.lsb_depth,
-                payload_length=embedded_length,
-            )
-        except (StegoError, file_utils.UnsupportedMediaError) as exc:
-            self.info_panel.clear()
+            envelope_length = self._estimated_envelope_length()
+            ecc = self._ecc_parameters()
+            embedded_length = error_correction.encoded_length(envelope_length, ecc)
+            depth = self.lsb_depth
+            start = (self.start_location_spin.value()
+                     if self.start_method == constants.START_METHOD_MANUAL else 0)
+            message_length = len(self.message_bytes())
+        except Exception as exc:
+            self._capacity_pending = False
             self.info_panel.set_notice(str(exc))
             return
-
-        self.info_panel.show_capacity(
-            description,
-            capacity,
-            payload_length=embedded_length,
-            lsb_depth=self.lsb_depth,
+        generation = self._capacity_generation
+        self._capacity_pending = False
+        self._capacity_runner.submit(
+            self._measure_capacity, self._cover_path, depth, start, embedded_length,
+            on_success=lambda result: self._apply_capacity(
+                generation, result, depth, envelope_length, embedded_length, message_length, ecc
+            ),
+            on_error=lambda message, detail: self.info_panel.set_notice(message)
+            if not self._closing and generation == self._capacity_generation else None,
+            on_finished=self._capacity_finished,
         )
 
-        overhead = envelope_length - message_length
-        coding = ""
-        if ecc is not None:
-            coding = (
-                f" That is multiplied to {embedded_length:,} bytes by {ecc.scheme} "
-                f"coding at factor {ecc.factor}, which is the cost of being able to "
-                f"repair damage."
-            )
+    def _capacity_finished(self):
+        if self._capacity_pending and not self._closing:
+            # The runner releases this worker after the finished callback returns.
+            self._capacity_timer.start()
 
+    def _apply_capacity(self, generation, result, depth, envelope_length,
+                        embedded_length, message_length, ecc):
+        if self._closing or generation != self._capacity_generation:
+            return
+        description, capacity = result
+        self.info_panel.show_capacity(description, capacity, payload_length=embedded_length,
+                                      lsb_depth=depth)
+        overhead = envelope_length - message_length
+        coding = "" if ecc is None else f" Repetition multiplies this to {embedded_length:,} bytes."
         if capacity.report.payload_fits:
             self.info_panel.set_notice(
-                f"The signed payload is {envelope_length:,} bytes: the "
-                f"{message_length:,}-byte message plus {overhead:,} bytes of record "
-                f"and signature.{coding}"
+                f"The signed payload is {envelope_length:,} bytes: the {message_length:,}-byte "
+                f"message plus {overhead:,} bytes of record and signature.{coding}"
             )
         else:
-            largest = max(
-                0,
-                error_correction.largest_raw_payload(
-                    capacity.report.max_payload_length, ecc
-                )
-                - overhead,
-            )
+            largest = max(0, error_correction.largest_raw_payload(
+                capacity.report.max_payload_length, ecc) - overhead)
             self.info_panel.set_notice(
-                f"The message does not fit at depth {self.lsb_depth}. The largest "
-                f"message that fits is about {largest:,} bytes. A greater depth, a "
-                f"larger cover, or turning off error correction would raise that."
+                f"The message does not fit at depth {depth} from start "
+                f"{capacity.report.start_location}. The largest message that fits is about "
+                f"{largest:,} bytes. Choose an earlier start, greater depth or larger cover."
             )
 
-        if self.start_method == constants.START_METHOD_MANUAL:
-            self.start_location_spin.setMaximum(
-                max(0, capacity.report.total_embeddable_samples - 1)
-            )
+    def shutdown(self):
+        self._closing = True
+        self._capacity_generation += 1
+        self._capacity_timer.stop()
+        self._key_read_timer.stop()
+        self._capacity_runner.wait()
+        self._runner.wait()
+        self.cover_preview.clear()
+        self.stego_preview.clear()
+
+    def closeEvent(self, event):
+        self.shutdown()
+        super().closeEvent(event)
 
     # -- file pickers ------------------------------------------------------ #
 
@@ -741,8 +805,10 @@ class ProtectTab(QWidget):
         self._runner.submit(
             self._run_protect,
             self._collect_inputs(),
-            on_success=self._on_protected,
-            on_error=self._on_protect_failed,
+            on_success=lambda result, generation=self._capacity_generation: self._on_protected(result)
+            if not self._closing and generation == self._capacity_generation else None,
+            on_error=lambda message, detail, generation=self._capacity_generation: self._on_protect_failed(message, detail)
+            if not self._closing and generation == self._capacity_generation else None,
             on_finished=lambda: self.protect_button.setEnabled(True),
         )
 
@@ -803,6 +869,8 @@ class ProtectTab(QWidget):
                 "Send the stego file and its manifest together. No secret is needed "
                 "for a manually chosen start location."
             )
+        if result.media_type == constants.MEDIA_VIDEO:
+            self.secrets_label.setText(self.secrets_label.text() + " Video-only FFV1/MKV: source audio is omitted.")
         self.secrets_label.setVisible(True)
 
         message = (

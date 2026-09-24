@@ -16,12 +16,7 @@ One attack is expected to leave the verdict at ``AUTHENTIC``: modifying the cove
 *outside* the payload region. That is not a failed attack, it is the scope of what
 verification establishes, and the tab reports it as a match rather than hiding it.
 
-Run all
--------
-The "Run every applicable attack" button produces the whole table in one go, which is
-what the demonstration and the evidence folder want. Attacks that cannot run on the
-loaded file — modifying outside the payload when the payload fills the medium, for
-instance — are reported as skipped with the reason, not silently dropped.
+The GUI offers focused message/signature corruption and outside-region edits.
 """
 
 from __future__ import annotations
@@ -31,8 +26,6 @@ from dataclasses import dataclass
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
-    QComboBox,
-    QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
     QGroupBox,
@@ -50,7 +43,7 @@ from PySide6.QtWidgets import (
 )
 
 from app.attacks import registry
-from app.attacks.base import Attack, AttackContext, AttackError
+from app.attacks.base import Attack, AttackContext
 from app.attacks.registry import AttackRun
 from app.crypto import key_manager
 from app.crypto import manifest as manifest_module
@@ -64,14 +57,9 @@ __all__ = ["AttackTab"]
 
 _log = get_logger(__name__)
 
-#: Manifest fields offered for the manifest-tampering attack. Two are start-location
-#: derivation inputs and two are not, so both detection routes can be demonstrated.
-_MANIFEST_FIELDS: tuple[tuple[str, str], ...] = (
-    ("message_length", "message_length (caught by the cross-check)"),
-    ("lsb_depth", "lsb_depth (breaks extraction)"),
-    ("media_id", "media_id (breaks extraction)"),
-    ("encrypted", "encrypted (caught by the cross-check)"),
-)
+FOCUSED_ATTACKS = frozenset({
+    "payload.message", "payload.signature", "image.outside", "audio.outside", "video.outside"
+})
 
 
 @dataclass(frozen=True)
@@ -103,6 +91,7 @@ class AttackTab(QWidget):
         self.setObjectName("attackTab")
 
         self._runner = BackgroundRunner()
+        self._generation = 0
         self._stego_path: str | None = None
         self._media_type: str | None = None
         self._runs: list[AttackRun] = []
@@ -111,6 +100,7 @@ class AttackTab(QWidget):
 
         self.drop_zone = DropZone(self, prompt="Drag a protected stego file here")
         self.drop_zone.fileSelected.connect(self._on_stego_selected)
+        self.drop_zone.selectionCleared.connect(self._clear_selection)
         self.drop_zone.selectionRejected.connect(self.statusMessage.emit)
         outer.addWidget(self.drop_zone)
 
@@ -121,6 +111,8 @@ class AttackTab(QWidget):
         splitter.setStretchFactor(1, 3)
         outer.addWidget(splitter, 1)
 
+        for field in (self.manifest_edit, self.key_edit, self.start_secret_edit, self.passphrase_edit):
+            field.textChanged.connect(self._invalidate_operation)
         self._load_default_key()
         self._refresh_attack_list()
 
@@ -180,23 +172,6 @@ class AttackTab(QWidget):
         self.attack_summary.setWordWrap(True)
         attacks_layout.addWidget(self.attack_summary)
 
-        options_form = QFormLayout()
-
-        self.bit_error_spin = QDoubleSpinBox(attacks_box)
-        self.bit_error_spin.setDecimals(4)
-        self.bit_error_spin.setRange(0.0001, 1.0)
-        self.bit_error_spin.setSingleStep(0.005)
-        self.bit_error_spin.setValue(0.01)
-        self.bit_error_label = QLabel("Bit error rate:", attacks_box)
-        options_form.addRow(self.bit_error_label, self.bit_error_spin)
-
-        self.manifest_field_combo = QComboBox(attacks_box)
-        for value, label in _MANIFEST_FIELDS:
-            self.manifest_field_combo.addItem(label, value)
-        self.manifest_field_label = QLabel("Manifest field:", attacks_box)
-        options_form.addRow(self.manifest_field_label, self.manifest_field_combo)
-
-        attacks_layout.addLayout(options_form)
         layout.addWidget(attacks_box, 1)
 
         buttons = QHBoxLayout()
@@ -205,10 +180,6 @@ class AttackTab(QWidget):
         self.run_button.clicked.connect(self.run_selected_attack)
         buttons.addWidget(self.run_button)
 
-        self.run_all_button = QPushButton("Run every applicable attack", container)
-        self.run_all_button.setMinimumHeight(32)
-        self.run_all_button.clicked.connect(self.run_all_attacks)
-        buttons.addWidget(self.run_all_button)
         layout.addLayout(buttons)
 
         return container
@@ -273,9 +244,28 @@ class AttackTab(QWidget):
         if not os.path.isfile(self.key_edit.text().strip()):
             self.key_edit.setText(public_path)
 
+    def _invalidate_operation(self):
+        self._generation += 1
+
+    def _clear_selection(self):
+        self._generation += 1
+        self._stego_path = None
+        self._media_type = None
+        self._refresh_attack_list()
+        self.clear_log()
+
+    def shutdown(self):
+        self._generation += 1
+        self._runner.wait()
+
+    def closeEvent(self, event):
+        self.shutdown()
+        super().closeEvent(event)
+
     # -- reactions --------------------------------------------------------- #
 
     def _on_stego_selected(self, path: str) -> None:
+        self._generation += 1
         self._stego_path = path
         try:
             self._media_type = file_utils.detect_media_type(path)
@@ -311,6 +301,8 @@ class AttackTab(QWidget):
             return
 
         for attack in registry.available_attacks(self._media_type):
+            if attack.key not in FOCUSED_ATTACKS:
+                continue
             item = QListWidgetItem(attack.label, self.attack_list)
             item.setData(Qt.ItemDataRole.UserRole, attack.key)
             item.setToolTip(attack.summary)
@@ -322,20 +314,8 @@ class AttackTab(QWidget):
         attack = self.selected_attack()
         if attack is None:
             self.attack_summary.setText("")
-            self._show_options(None)
             return
         self.attack_summary.setText(attack.summary)
-        self._show_options(attack.key)
-
-    def _show_options(self, key: str | None) -> None:
-        """Show only the options the selected attack actually uses."""
-        wants_rate = key == "payload.random_bits"
-        wants_field = key == "manifest.tamper"
-
-        self.bit_error_label.setVisible(wants_rate)
-        self.bit_error_spin.setVisible(wants_rate)
-        self.manifest_field_label.setVisible(wants_field)
-        self.manifest_field_combo.setVisible(wants_field)
 
     # -- file pickers ------------------------------------------------------ #
 
@@ -384,8 +364,8 @@ class AttackTab(QWidget):
             key_path=self.key_edit.text().strip(),
             start_secret=self.start_secret_edit.text() or None,
             passphrase=self.passphrase_edit.text() or None,
-            bit_error_rate=self.bit_error_spin.value(),
-            manifest_field=self.manifest_field_combo.currentData(),
+            bit_error_rate=0.01,
+            manifest_field="message_length",
         )
 
     @staticmethod
@@ -454,8 +434,10 @@ class AttackTab(QWidget):
             self._run_one,
             attack,
             self._collect_inputs(),
-            on_success=self._on_attack_finished,
-            on_error=self._on_attack_failed,
+            on_success=lambda result, generation=self._generation: self._on_attack_finished(result)
+            if generation == self._generation else None,
+            on_error=lambda message, detail, generation=self._generation: self._on_attack_failed(message, detail)
+            if generation == self._generation else None,
             on_finished=lambda: self._set_running(False),
         )
 
@@ -469,46 +451,8 @@ class AttackTab(QWidget):
             passphrase=inputs.passphrase,
         )
 
-    def run_all_attacks(self) -> None:
-        """Run every attack that applies, reporting any that cannot run."""
-        problem = self.validation_error()
-        if problem is not None:
-            self.statusMessage.emit(problem)
-            QMessageBox.warning(self, "Attack Lab", problem)
-            return
-
-        self._set_running(True)
-        self.statusMessage.emit("Running every applicable attack...")
-
-        self._runner.submit(
-            self._run_every,
-            self._collect_inputs(),
-            on_success=self._on_all_finished,
-            on_error=self._on_attack_failed,
-            on_finished=lambda: self._set_running(False),
-        )
-
-    def _run_every(
-        self, inputs: AttackInputs
-    ) -> tuple[list[AttackRun], list[tuple[str, str]]]:
-        """Runs on a worker thread and reads only *inputs*."""
-        assert inputs.media_type is not None
-        completed: list[AttackRun] = []
-        skipped: list[tuple[str, str]] = []
-
-        for attack in registry.available_attacks(inputs.media_type):
-            try:
-                completed.append(self._run_one(attack, inputs))
-            except AttackError as exc:
-                # Not every attack applies to every file: modifying outside the
-                # payload needs a payload that does not fill the medium, for one.
-                skipped.append((attack.label, str(exc)))
-
-        return completed, skipped
-
     def _set_running(self, running: bool) -> None:
         self.run_button.setEnabled(not running)
-        self.run_all_button.setEnabled(not running)
 
     # -- reporting --------------------------------------------------------- #
 
@@ -524,43 +468,6 @@ class AttackTab(QWidget):
             "attack %s: %s -> %s", run.attack.key, run.before.verdict, run.after.verdict
         )
 
-    def _on_all_finished(
-        self, outcome: tuple[list[AttackRun], list[tuple[str, str]]]
-    ) -> None:
-        completed, skipped = outcome
-        self._runs.extend(completed)
-
-        lines = ["Ran every applicable attack.", ""]
-        lines.append(f"{'Attack':<40} {'Before':<18} {'After':<18} Match")
-        lines.append("-" * 88)
-        for run in completed:
-            lines.append(
-                f"{run.attack.label:<40} {run.before.verdict:<18} "
-                f"{run.after.verdict:<18} {'yes' if run.matched_expectation else 'no'}"
-            )
-
-        if skipped:
-            lines += ["", "Not applicable to this file:"]
-            for label, reason in skipped:
-                lines.append(f"  {label}: {reason}")
-
-        unchanged = [run for run in completed if not run.verdict_changed]
-        if unchanged:
-            lines += [
-                "",
-                "Attacks that left the verdict unchanged, and why that is correct:",
-            ]
-            for run in unchanged:
-                lines.append(f"  {run.attack.label}: {run.outcome.description}")
-
-        lines += ["", constants.AUTHENTIC_SCOPE_NOTICE, "", constants.AMBIGUOUS_FAILURE_NOTICE]
-        self.append_log("\n".join(lines))
-
-        if completed:
-            self._show_summary(completed[-1])
-        self.statusMessage.emit(
-            f"Ran {len(completed)} attacks, skipped {len(skipped)}."
-        )
 
     def _show_summary(self, run: AttackRun) -> None:
         self.summary_panel.set_rows(

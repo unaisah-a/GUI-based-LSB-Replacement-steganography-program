@@ -49,6 +49,7 @@ signature over the verification record is the guarantee.
 
 from __future__ import annotations
 
+import json
 import os
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -73,6 +74,7 @@ SUPPORTED_MANIFEST_VERSIONS: Final[tuple[int, ...]] = (constants.MANIFEST_VERSIO
 
 #: Refuse an absurd declared envelope length before it reaches the stego layer.
 _MAX_ENVELOPE_LENGTH: Final[int] = constants.MAX_ENVELOPE_SECTION_BYTES
+MAX_MANIFEST_BYTES: Final[int] = 1024 * 1024
 
 
 # --------------------------------------------------------------------------- #
@@ -407,7 +409,12 @@ def read_manifest(path: str | os.PathLike[str]) -> Manifest:
     name = file_utils.display_name(target)
 
     try:
-        payload = file_utils.read_json(target)
+        # Read at most the limit plus one; stat alone would permit a growth race.
+        with open(target, "rb") as handle:
+            encoded = handle.read(MAX_MANIFEST_BYTES + 1)
+        if len(encoded) > MAX_MANIFEST_BYTES:
+            raise ManifestError("manifest exceeds the 1 MiB input limit")
+        payload = json.loads(encoded.decode("utf-8"))
     except FileNotFoundError as exc:
         raise ManifestError(
             f"companion manifest not found: {name}. The manifest is sent alongside "
@@ -419,7 +426,7 @@ def read_manifest(path: str | os.PathLike[str]) -> Manifest:
         raise ManifestError(f"read access denied for manifest: {name}") from exc
     except UnicodeDecodeError as exc:
         raise ManifestError(f"manifest {name} is not valid UTF-8") from exc
-    except ValueError as exc:
+    except (ValueError, RecursionError) as exc:
         # json.JSONDecodeError is a ValueError subclass.
         raise ManifestError(f"manifest {name} is not valid JSON: {exc}") from exc
     except OSError as exc:

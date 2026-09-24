@@ -465,7 +465,6 @@ def verify_extracted_payload(
                 manifest_consistent=False,
                 mismatched_fields=mismatched,
                 record=record,
-                message=recovered.message,
                 details={"stage": "manifest_cross_check"},
                 **shared,
             )

@@ -38,12 +38,13 @@ import tempfile
 import weakref
 from dataclasses import dataclass
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtWidgets import (
     QFileDialog,
     QFormLayout,
     QGroupBox,
     QHBoxLayout,
+    QLabel,
     QLineEdit,
     QMessageBox,
     QPlainTextEdit,
@@ -96,6 +97,7 @@ class VerifyTab(QWidget):
         self.setObjectName("verifyTab")
 
         self._runner = BackgroundRunner()
+        self._generation = 0
         self._stego_path: str | None = None
         self._original_path: str | None = None
         self._result: VerificationResult | None = None
@@ -110,6 +112,7 @@ class VerifyTab(QWidget):
             self, prompt="Drag the received stego file here"
         )
         self.drop_zone.fileSelected.connect(self._on_stego_selected)
+        self.drop_zone.selectionCleared.connect(self._clear_selection)
         self.drop_zone.selectionRejected.connect(self.statusMessage.emit)
         outer.addWidget(self.drop_zone)
 
@@ -120,7 +123,54 @@ class VerifyTab(QWidget):
         splitter.setStretchFactor(1, 3)
         outer.addWidget(splitter, 1)
 
+        self.fingerprint_label = QLabel("Select the trusted public key to see its fingerprint.", self)
+        self.fingerprint_label.setWordWrap(True)
+        self.fingerprint_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        outer.addWidget(self.fingerprint_label)
+        self._fingerprint_timer = QTimer(self)
+        self._fingerprint_timer.setSingleShot(True)
+        self._fingerprint_timer.setInterval(250)
+        self._fingerprint_timer.timeout.connect(self._show_fingerprint)
+        for field in (self.key_edit, self.manifest_edit, self.start_secret_edit, self.passphrase_edit):
+            field.textChanged.connect(self._invalidate_result)
+        self.key_edit.textChanged.connect(lambda: self._fingerprint_timer.start())
         self._load_default_key()
+
+    def _invalidate_result(self):
+        self._generation += 1
+        self._result = None
+        self.result_panel.clear()
+        self._clear_payload_preview()
+        self.comparison_view.clear()
+
+    def _clear_selection(self):
+        self._stego_path = None
+        self._invalidate_result()
+        self.preview.clear()
+        self.manifest_edit.clear()
+        self.manifest_panel.clear()
+
+    def _show_fingerprint(self):
+        try:
+            key = key_manager.load_public_key(self.key_edit.text().strip())
+            value = key_manager.public_key_fingerprint(key)
+        except Exception:
+            self.fingerprint_label.setText("Select a valid trusted public key.")
+        else:
+            self.fingerprint_label.setText(
+                f"Public key SHA-256: {value}\nCompare through an independently trusted channel."
+            )
+
+    def shutdown(self):
+        self._generation += 1
+        self._fingerprint_timer.stop()
+        self._runner.wait()
+        self._clear_payload_preview()
+        self.preview.clear()
+
+    def closeEvent(self, event):
+        self.shutdown()
+        super().closeEvent(event)
 
     # -- construction ------------------------------------------------------ #
 
@@ -250,6 +300,7 @@ class VerifyTab(QWidget):
     # -- reactions --------------------------------------------------------- #
 
     def _on_stego_selected(self, path: str) -> None:
+        self._invalidate_result()
         self._stego_path = path
         self._result = None
         self.result_panel.clear()
@@ -379,8 +430,10 @@ class VerifyTab(QWidget):
         self._runner.submit(
             self._run_verify,
             self._collect_inputs(),
-            on_success=self._on_verified,
-            on_error=self._on_verify_failed,
+            on_success=lambda result, generation=self._generation: self._on_verified(result)
+            if generation == self._generation else None,
+            on_error=lambda message, detail, generation=self._generation: self._on_verify_failed(message, detail)
+            if generation == self._generation else None,
             on_finished=lambda: self.verify_button.setEnabled(True),
         )
 
@@ -410,7 +463,7 @@ class VerifyTab(QWidget):
         """Every one of the six verdicts arrives here; none is an error."""
         self._result = result
         self.result_panel.show_result(result)
-        self._show_payload_preview(result.message)
+        self._show_payload_preview(result.message if result.verdict == constants.VERDICT_AUTHENTIC else None)
         self._show_comparison(result)
 
         self.statusMessage.emit(f"{result.verdict}: {result.reason}")

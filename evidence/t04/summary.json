@@ -1,0 +1,24 @@
+{
+  "task": "T04",
+  "base_head": "27572c98cc734e0daa24dcc1377df0234a970618",
+  "working_tree": "uncommitted T03/T04 changes",
+  "tests": 1799,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "native_gui_verified": false,
+  "t03_source_hashes_preserved": true,
+  "source_sha256": {
+    "app/gui/attack_tab.py": "2dee9a7a981563aeacbef7892d5bb7b531388c3adfc25ac03a2e2227735875ea",
+    "app/gui/main_window.py": "8aacf1e6993ca2f1318828dd6e276758b590ce2c249c57e7abc071dff71f157e",
+    "app/gui/protect_tab.py": "0d78886ee6233bfb9a65571675115011b5cdb893fe85a439612257ce541505b6",
+    "app/gui/steganalysis_tab.py": "dc90e54996edfe488488eed8f35c54e7087826041abef6a050452fc298e062fd",
+    "app/gui/verify_tab.py": "ac9c293d682703cbd85ae0f207484ec7257e5dd4eb91c0985f8e968cbdb9b32c",
+    "app/gui/video_tab.py": "5c9fd182299c574e493c3e4de934a028c3a5eec41aa27731b557855db1f9298a",
+    "app/gui/workers.py": "d899befb80e28aea5eb919cbb768221fa692c2ad423bc94a7329636be5e4cddb",
+    "app/gui/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "app/gui/widgets/drop_zone.py": "7b562048be4d966f5244d0853bafeae035b4bd069c3bd7dea959e70c4169b8c4",
+    "app/gui/widgets/result_panel.py": "b279816aace34a6b4a4263f26cef6a062abfd8174673071df3caeb6016d2110d",
+    "tests/test_gui_consolidation.py": "7bdf6c6d7f018c1aa54d6709ec0adc9f70464b15ff7f6cbbfa12e7cebc5fc0b7"
+  }
+}

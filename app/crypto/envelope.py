@@ -459,8 +459,8 @@ def decode_record(data: bytes) -> dict[str, Any]:
         raise RecordError("record is not valid UTF-8") from exc
     try:
         decoded = json.loads(text)
-    except json.JSONDecodeError as exc:
-        raise RecordError(f"record is not valid JSON: {exc.msg}") from exc
+    except (ValueError, RecursionError) as exc:
+        raise RecordError(f"record is not valid JSON: {exc}") from exc
     if not isinstance(decoded, dict):
         raise RecordError(
             f"record must be a JSON object, got {type(decoded).__name__}"

@@ -1,0 +1,471 @@
+.........F........FFF.F................................................. [ 25%]
+..............F......................................................... [ 50%]
+............................FF..F.......FFFFFFFFF....................... [ 75%]
+......................................................................FF [100%]
+================================== FAILURES ===================================
+__ TestProtectTabReadout.test_selecting_a_cover_fills_the_information_panel ___
+
+self = <test_gui_tabs.TestProtectTabReadout object at 0x000001ED983253D0>
+protect_tab = <app.gui.protect_tab.ProtectTab(0x1ed975c6530, name="protectTab") at 0x000001ED9906E580>
+png_cover = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_selecting_a_cover_fills_t0\\cover.png'
+
+    def test_selecting_a_cover_fills_the_information_panel(
+        self, protect_tab, png_cover
+    ):
+        protect_tab.drop_zone.accept_path(png_cover)
+    
+        assert protect_tab.cover_path == os.path.abspath(png_cover)
+>       assert protect_tab.info_panel.value_for("Media type") == constants.MEDIA_IMAGE
+E       assert None == 'image'
+E        +  where None = value_for('Media type')
+E        +    where value_for = <app.gui.widgets.file_info_panel.FileInfoPanel(0x1ed9767f320, name="fileInfoPanel") at 0x000001ED9908CC80>.value_for
+E        +      where <app.gui.widgets.file_info_panel.FileInfoPanel(0x1ed9767f320, name="fileInfoPanel") at 0x000001ED9908CC80> = <app.gui.protect_tab.ProtectTab(0x1ed975c6530, name="protectTab") at 0x000001ED9906E580>.info_panel
+E        +  and   'image' = constants.MEDIA_IMAGE
+
+tests\test_gui_tabs.py:173: AssertionError
+____________ TestProtectTabReadout.test_capacity_rises_with_depth _____________
+
+self = <test_gui_tabs.TestProtectTabReadout object at 0x000001ED98327A10>
+protect_tab = <app.gui.protect_tab.ProtectTab(0x1ed973b6950, name="protectTab") at 0x000001ED9897D840>
+png_cover = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_capacity_rises_with_depth0\\cover.png'
+
+    def test_capacity_rises_with_depth(self, protect_tab, png_cover):
+        protect_tab.drop_zone.accept_path(png_cover)
+    
+        protect_tab.depth_slider.setValue(1)
+        at_one = protect_tab.info_panel.value_for("Capacity")
+        protect_tab.depth_slider.setValue(8)
+        at_eight = protect_tab.info_panel.value_for("Capacity")
+    
+>       assert at_one != at_eight
+E       assert None != None
+
+tests\test_gui_tabs.py:264: AssertionError
+_ TestProtectTabReadout.test_an_oversized_message_is_reported_before_any_attempt _
+
+self = <test_gui_tabs.TestProtectTabReadout object at 0x000001ED9832C090>
+protect_tab = <app.gui.protect_tab.ProtectTab(0x1ed973ae970, name="protectTab") at 0x000001EDFB770740>
+tmp_path = WindowsPath('C:/Code/INF2005-ACW1-consolidated/tmp/t04-focused1/test_an_oversized_message_is_r0')
+
+    def test_an_oversized_message_is_reported_before_any_attempt(
+        self, protect_tab, tmp_path
+    ):
+        small = write_cover(str(tmp_path), make_cover(16, 16, 3), image_io.PNG, "small")
+        protect_tab.drop_zone.accept_path(small)
+        protect_tab.depth_slider.setValue(1)
+        protect_tab.message_edit.setPlainText("x" * 5_000)
+    
+>       assert protect_tab.info_panel.value_for("Fits") == "no"
+E       assert None == 'no'
+E        +  where None = value_for('Fits')
+E        +    where value_for = <app.gui.widgets.file_info_panel.FileInfoPanel(0x1ed97969c60, name="fileInfoPanel") at 0x000001ED9945EB80>.value_for
+E        +      where <app.gui.widgets.file_info_panel.FileInfoPanel(0x1ed97969c60, name="fileInfoPanel") at 0x000001ED9945EB80> = <app.gui.protect_tab.ProtectTab(0x1ed973ae970, name="protectTab") at 0x000001EDFB770740>.info_panel
+
+tests\test_gui_tabs.py:274: AssertionError
+______ TestProtectTabReadout.test_the_overhead_is_explained_when_it_fits ______
+
+self = <test_gui_tabs.TestProtectTabReadout object at 0x000001ED9832C750>
+protect_tab = <app.gui.protect_tab.ProtectTab(0x1ed979520e0, name="protectTab") at 0x000001ED98588740>
+png_cover = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_overhead_is_explained0\\cover.png'
+
+    def test_the_overhead_is_explained_when_it_fits(self, protect_tab, png_cover):
+        protect_tab.drop_zone.accept_path(png_cover)
+        protect_tab.message_edit.setPlainText(MESSAGE)
+    
+        notice = protect_tab.info_panel._notice_label.text()
+>       assert "record and signature" in notice
+E       AssertionError: assert 'record and signature' in 'Calculating capacity...'
+
+tests\test_gui_tabs.py:283: AssertionError
+_________ TestProtectTabReadout.test_audio_shows_audio_specific_rows __________
+
+self = <test_gui_tabs.TestProtectTabReadout object at 0x000001ED9832D550>
+protect_tab = <app.gui.protect_tab.ProtectTab(0x1ed97694d40, name="protectTab") at 0x000001ED985AA100>
+wav_cover = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_audio_shows_audio_specifi0\\cover.wav'
+
+    def test_audio_shows_audio_specific_rows(self, protect_tab, wav_cover):
+        protect_tab.drop_zone.accept_path(wav_cover)
+    
+>       assert protect_tab.info_panel.value_for("Sample rate") == "44,100 Hz"
+E       assert None == '44,100 Hz'
+E        +  where None = value_for('Sample rate')
+E        +    where value_for = <app.gui.widgets.file_info_panel.FileInfoPanel(0x1ed972b7a30, name="fileInfoPanel") at 0x000001ED994175C0>.value_for
+E        +      where <app.gui.widgets.file_info_panel.FileInfoPanel(0x1ed972b7a30, name="fileInfoPanel") at 0x000001ED994175C0> = <app.gui.protect_tab.ProtectTab(0x1ed97694d40, name="protectTab") at 0x000001ED985AA100>.info_panel
+
+tests\test_gui_tabs.py:298: AssertionError
+_________________ TestMainWindow.test_key_actions_are_present _________________
+
+self = <test_gui_shell.TestMainWindow object at 0x000001ED984A7750>
+qtbot = <pytestqt.qtbot.QtBot object at 0x000001ED9B7A97D0>
+
+    def test_key_actions_are_present(self, qtbot):
+        window = MainWindow()
+        qtbot.addWidget(window)
+        assert window.generate_keys_action.isEnabled()
+>       assert window.show_key_paths_action is not None
+E       AttributeError: 'MainWindow' object has no attribute 'show_key_paths_action'
+
+tests\test_gui_shell.py:153: AttributeError
+___ TestAttackTabConstruction.test_loading_an_image_lists_the_image_attacks ___
+
+self = <test_gui_lab_tabs.TestAttackTabConstruction object at 0x000001ED984F1690>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed973a1770, name="attackTab") at 0x000001ED9897C540>
+protected_png = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_loading_an_image_lists_th0\\co...th0\\public.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_loading_an_image_lists_th0\\cover.png')
+
+    def test_loading_an_image_lists_the_image_attacks(self, attack_tab, protected_png):
+        load(attack_tab, protected_png)
+        keys = listed_keys(attack_tab)
+    
+>       assert "image.inside" in keys
+E       AssertionError: assert 'image.inside' in {'image.outside', 'payload.message', 'payload.signature'}
+
+tests\test_gui_lab_tabs.py:200: AssertionError
+____ TestAttackTabConstruction.test_loading_audio_lists_the_audio_attacks _____
+
+self = <test_gui_lab_tabs.TestAttackTabConstruction object at 0x000001ED984F1D10>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed973a5610, name="attackTab") at 0x000001ED991F26C0>
+protected_wav = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_loading_audio_lists_the_a0\\au...audio.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_loading_audio_lists_the_a0\\audio_cover.wav')
+
+    def test_loading_audio_lists_the_audio_attacks(self, attack_tab, protected_wav):
+        load(attack_tab, protected_wav)
+        keys = listed_keys(attack_tab)
+    
+>       assert "audio.resample" in keys
+E       AssertionError: assert 'audio.resample' in {'audio.outside', 'payload.message', 'payload.signature'}
+
+tests\test_gui_lab_tabs.py:208: AssertionError
+_ TestAttackTabConstruction.test_options_appear_only_for_the_attacks_that_use_them _
+
+self = <test_gui_lab_tabs.TestAttackTabConstruction object at 0x000001ED984F2FD0>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed9aeed6c0, name="attackTab") at 0x000001ED9945EE00>
+protected_png = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_options_appear_only_for_t0\\co..._t0\\public.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_options_appear_only_for_t0\\cover.png')
+
+    def test_options_appear_only_for_the_attacks_that_use_them(
+        self, attack_tab, protected_png
+    ):
+        load(attack_tab, protected_png)
+    
+>       attack_tab._show_options("payload.random_bits")
+E       AttributeError: 'AttackTab' object has no attribute '_show_options'
+
+tests\test_gui_lab_tabs.py:229: AttributeError
+_______ TestAttackTabRunning.test_the_log_records_expected_and_observed _______
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98500AD0>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed99db71b0, name="attackTab") at 0x000001ED9B951940>
+protected_png = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_log_records_expected_0\\co...d_0\\public.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_log_records_expected_0\\cover.png')
+
+    def test_the_log_records_expected_and_observed(self, attack_tab, protected_png):
+        load(attack_tab, protected_png)
+>       self._select(attack_tab, "payload.magic")
+
+tests\test_gui_lab_tabs.py:314: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98500AD0>
+tab = <app.gui.attack_tab.AttackTab(0x1ed99db71b0, name="attackTab") at 0x000001ED9B951940>
+key = 'payload.magic'
+
+    def _select(self, tab: AttackTab, key: str) -> None:
+        for index in range(tab.attack_list.count()):
+            if tab.attack_list.item(index).data(Qt.ItemDataRole.UserRole) == key:
+                tab.attack_list.setCurrentRow(index)
+                return
+>       raise AssertionError(
+            f"{key} is not in the list; offered: {sorted(listed_keys(tab))}"
+        )
+E       AssertionError: payload.magic is not in the list; offered: ['image.outside', 'payload.message', 'payload.signature']
+
+tests\test_gui_lab_tabs.py:272: AssertionError
+____ TestAttackTabRunning.test_the_bit_error_rate_option_is_passed_through ____
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED985010D0>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed99dbdbd0, name="attackTab") at 0x000001ED9904B500>
+protected_png = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_bit_error_rate_option0\\co...on0\\public.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_bit_error_rate_option0\\cover.png')
+
+    def test_the_bit_error_rate_option_is_passed_through(
+        self, attack_tab, protected_png
+    ):
+        load(attack_tab, protected_png)
+>       self._select(attack_tab, "payload.random_bits")
+
+tests\test_gui_lab_tabs.py:330: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED985010D0>
+tab = <app.gui.attack_tab.AttackTab(0x1ed99dbdbd0, name="attackTab") at 0x000001ED9904B500>
+key = 'payload.random_bits'
+
+    def _select(self, tab: AttackTab, key: str) -> None:
+        for index in range(tab.attack_list.count()):
+            if tab.attack_list.item(index).data(Qt.ItemDataRole.UserRole) == key:
+                tab.attack_list.setCurrentRow(index)
+                return
+>       raise AssertionError(
+            f"{key} is not in the list; offered: {sorted(listed_keys(tab))}"
+        )
+E       AssertionError: payload.random_bits is not in the list; offered: ['image.outside', 'payload.message', 'payload.signature']
+
+tests\test_gui_lab_tabs.py:272: AssertionError
+____ TestAttackTabRunning.test_the_manifest_field_option_is_passed_through ____
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98501710>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed99dc62d0, name="attackTab") at 0x000001ED9A7BE140>
+protected_png = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_manifest_field_option0\\co...on0\\public.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_manifest_field_option0\\cover.png')
+
+    def test_the_manifest_field_option_is_passed_through(
+        self, attack_tab, protected_png
+    ):
+        load(attack_tab, protected_png)
+>       self._select(attack_tab, "manifest.tamper")
+
+tests\test_gui_lab_tabs.py:342: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98501710>
+tab = <app.gui.attack_tab.AttackTab(0x1ed99dc62d0, name="attackTab") at 0x000001ED9A7BE140>
+key = 'manifest.tamper'
+
+    def _select(self, tab: AttackTab, key: str) -> None:
+        for index in range(tab.attack_list.count()):
+            if tab.attack_list.item(index).data(Qt.ItemDataRole.UserRole) == key:
+                tab.attack_list.setCurrentRow(index)
+                return
+>       raise AssertionError(
+            f"{key} is not in the list; offered: {sorted(listed_keys(tab))}"
+        )
+E       AssertionError: manifest.tamper is not in the list; offered: ['image.outside', 'payload.message', 'payload.signature']
+
+tests\test_gui_lab_tabs.py:272: AssertionError
+___ TestAttackTabRunning.test_a_manifest_attack_verifies_the_original_file ____
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98501D50>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed99dd0650, name="attackTab") at 0x000001ED9A55F380>
+protected_png = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_a_manifest_attack_verifie0\\co...ie0\\public.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_a_manifest_attack_verifie0\\cover.png')
+
+    def test_a_manifest_attack_verifies_the_original_file(
+        self, attack_tab, protected_png
+    ):
+        """The manifest changed, not the cover, so the pairing has to be right."""
+        result, _, _ = protected_png
+        load(attack_tab, protected_png)
+>       self._select(attack_tab, "manifest.tamper")
+
+tests\test_gui_lab_tabs.py:359: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98501D50>
+tab = <app.gui.attack_tab.AttackTab(0x1ed99dd0650, name="attackTab") at 0x000001ED9A55F380>
+key = 'manifest.tamper'
+
+    def _select(self, tab: AttackTab, key: str) -> None:
+        for index in range(tab.attack_list.count()):
+            if tab.attack_list.item(index).data(Qt.ItemDataRole.UserRole) == key:
+                tab.attack_list.setCurrentRow(index)
+                return
+>       raise AssertionError(
+            f"{key} is not in the list; offered: {sorted(listed_keys(tab))}"
+        )
+E       AssertionError: manifest.tamper is not in the list; offered: ['image.outside', 'payload.message', 'payload.signature']
+
+tests\test_gui_lab_tabs.py:272: AssertionError
+____ TestAttackTabRunning.test_the_resigning_attack_generates_its_own_key _____
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98502390>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed9af2cc00, name="attackTab") at 0x000001ED9A5FE080>
+protected_png = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_resigning_attack_gene0\\co...ne0\\public.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_resigning_attack_gene0\\cover.png')
+
+    def test_the_resigning_attack_generates_its_own_key(
+        self, attack_tab, protected_png
+    ):
+        """An attacker with their own signing key is the scenario being modelled."""
+        load(attack_tab, protected_png)
+>       self._select(attack_tab, "payload.resign")
+
+tests\test_gui_lab_tabs.py:374: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98502390>
+tab = <app.gui.attack_tab.AttackTab(0x1ed9af2cc00, name="attackTab") at 0x000001ED9A5FE080>
+key = 'payload.resign'
+
+    def _select(self, tab: AttackTab, key: str) -> None:
+        for index in range(tab.attack_list.count()):
+            if tab.attack_list.item(index).data(Qt.ItemDataRole.UserRole) == key:
+                tab.attack_list.setCurrentRow(index)
+                return
+>       raise AssertionError(
+            f"{key} is not in the list; offered: {sorted(listed_keys(tab))}"
+        )
+E       AssertionError: payload.resign is not in the list; offered: ['image.outside', 'payload.message', 'payload.signature']
+
+tests\test_gui_lab_tabs.py:272: AssertionError
+_______________ TestAttackTabRunning.test_an_audio_attack_runs ________________
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED985029D0>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed9af3c6e0, name="attackTab") at 0x000001ED9B906780>
+protected_wav = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_an_audio_attack_runs0\\audio_c...blic_audio.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_an_audio_attack_runs0\\audio_cover.wav')
+
+    def test_an_audio_attack_runs(self, attack_tab, protected_wav):
+        load(attack_tab, protected_wav)
+>       self._select(attack_tab, "audio.amplitude")
+
+tests\test_gui_lab_tabs.py:386: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED985029D0>
+tab = <app.gui.attack_tab.AttackTab(0x1ed9af3c6e0, name="attackTab") at 0x000001ED9B906780>
+key = 'audio.amplitude'
+
+    def _select(self, tab: AttackTab, key: str) -> None:
+        for index in range(tab.attack_list.count()):
+            if tab.attack_list.item(index).data(Qt.ItemDataRole.UserRole) == key:
+                tab.attack_list.setCurrentRow(index)
+                return
+>       raise AssertionError(
+            f"{key} is not in the list; offered: {sorted(listed_keys(tab))}"
+        )
+E       AssertionError: audio.amplitude is not in the list; offered: ['audio.outside', 'payload.message', 'payload.signature']
+
+tests\test_gui_lab_tabs.py:272: AssertionError
+__ TestAttackTabRunning.test_running_every_attack_reports_matches_and_skips ___
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98503010>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed9ac7a3f0, name="attackTab") at 0x000001ED9908D900>
+protected_png = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_running_every_attack_repo0\\co...po0\\public.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_running_every_attack_repo0\\cover.png')
+
+    def test_running_every_attack_reports_matches_and_skips(
+        self, attack_tab, protected_png
+    ):
+        load(attack_tab, protected_png)
+>       completed, skipped = attack_tab._run_every(attack_tab._collect_inputs())
+E       AttributeError: 'AttackTab' object has no attribute '_run_every'
+
+tests\test_gui_lab_tabs.py:397: AttributeError
+___ TestAttackTabRunning.test_a_skipped_attack_is_reported_with_its_reason ____
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98503610>
+tmp_path = WindowsPath('C:/Code/INF2005-ACW1-consolidated/tmp/t04-focused1/test_a_skipped_attack_is_repor0')
+keys = (<cryptography.hazmat.bindings._rust.openssl.rsa.RSAPrivateKey object at 0x000001ED9A7307B0>, <cryptography.hazmat.bindings._rust.openssl.rsa.RSAPublicKey object at 0x000001ED9A730770>)
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed9aed3aa0, name="attackTab") at 0x000001ED9A6FE2C0>
+
+    def test_a_skipped_attack_is_reported_with_its_reason(self, tmp_path, keys, attack_tab):
+        """Modifying outside the payload needs room outside the payload."""
+        private_key, public_key = keys
+        # A cover only just large enough: the payload fills it, so there is no
+        # region outside the payload to modify.
+        cover = write_cover(str(tmp_path), make_cover(48, 48, 3), image_io.PNG, "tight")
+        public_path = str(tmp_path / "pub.pem")
+        key_manager.save_public_key(public_key, public_path)
+        result = protect_media(
+            cover,
+            str(tmp_path / "tight_stego.png"),
+            MESSAGE,
+            private_key,
+            media_id="IMG-TIGHT",
+            lsb_depth=1,
+            start_secret=START_SECRET,
+            scrypt_n=MIN_SCRYPT_N,
+            scrypt_r=8,
+            scrypt_p=1,
+        )
+    
+        attack_tab.drop_zone.accept_path(result.stego_path)
+        attack_tab.key_edit.setText(public_path)
+        attack_tab.start_secret_edit.setText(START_SECRET)
+    
+>       completed, skipped = attack_tab._run_every(attack_tab._collect_inputs())
+E       AttributeError: 'AttackTab' object has no attribute '_run_every'
+
+tests\test_gui_lab_tabs.py:436: AttributeError
+______________ TestAttackTabRunning.test_the_log_can_be_cleared _______________
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98503C50>
+attack_tab = <app.gui.attack_tab.AttackTab(0x1ed99929c30, name="attackTab") at 0x000001ED99096B80>
+protected_png = (ProtectResult(stego_path='C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_log_can_be_cleared0\\cover...eared0\\public.pem', 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_log_can_be_cleared0\\cover.png')
+
+    def test_the_log_can_be_cleared(self, attack_tab, protected_png):
+        load(attack_tab, protected_png)
+>       self._select(attack_tab, "payload.magic")
+
+tests\test_gui_lab_tabs.py:445: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <test_gui_lab_tabs.TestAttackTabRunning object at 0x000001ED98503C50>
+tab = <app.gui.attack_tab.AttackTab(0x1ed99929c30, name="attackTab") at 0x000001ED99096B80>
+key = 'payload.magic'
+
+    def _select(self, tab: AttackTab, key: str) -> None:
+        for index in range(tab.attack_list.count()):
+            if tab.attack_list.item(index).data(Qt.ItemDataRole.UserRole) == key:
+                tab.attack_list.setCurrentRow(index)
+                return
+>       raise AssertionError(
+            f"{key} is not in the list; offered: {sorted(listed_keys(tab))}"
+        )
+E       AssertionError: payload.magic is not in the list; offered: ['image.outside', 'payload.message', 'payload.signature']
+
+tests\test_gui_lab_tabs.py:272: AssertionError
+___________ TestVideoTab.test_the_capacity_table_covers_every_depth ___________
+
+self = <test_video_stego.TestVideoTab object at 0x000001ED98575650>
+tab = <app.gui.video_tab.VideoTab(0x1eda37e7fa0) at 0x000001ED9A78A480>
+cover = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_the_capacity_table_covers0\\cover.mkv'
+
+    def test_the_capacity_table_covers_every_depth(self, tab, cover):
+        tab._path = cover
+        tab._on_described(video_stego.describe_only(cover))
+    
+>       assert tab.capacity_table.rowCount() == len(constants.LSB_DEPTHS)
+E       AttributeError: 'VideoTab' object has no attribute 'capacity_table'
+
+tests\test_video_stego.py:801: AttributeError
+__________ TestVideoTab.test_a_frame_that_carries_no_payload_says_so __________
+
+self = <test_video_stego.TestVideoTab object at 0x000001ED98575C50>
+tab = <app.gui.video_tab.VideoTab(0x1eda37e17c0) at 0x000001ED9907E4C0>
+big_cover = 'C:\\Code\\INF2005-ACW1-consolidated\\tmp\\t04-focused1\\test_a_frame_that_carries_no_p0\\big.mkv'
+tmp_path = WindowsPath('C:/Code/INF2005-ACW1-consolidated/tmp/t04-focused1/test_a_frame_that_carries_no_p0')
+keys = (<cryptography.hazmat.bindings._rust.openssl.rsa.RSAPrivateKey object at 0x000001ED9B84B110>, <cryptography.hazmat.bindings._rust.openssl.rsa.RSAPublicKey object at 0x000001ED9B84ACB0>)
+
+    def test_a_frame_that_carries_no_payload_says_so(
+        self, tab, big_cover, tmp_path, keys
+    ):
+        result, _ = protect_clip(big_cover, tmp_path, keys)
+    
+        tab._path = result.stego_path
+        tab._on_described(video_stego.describe_only(result.stego_path))
+        tab.manifest_edit.setText(result.manifest_path)
+        tab.secret_edit.setText(START_SECRET)
+        tab.locate_payload()
+    
+        # Pick a frame the payload does not reach.
+        outside = (tab.span.last_frame + 1) % tab.span.frame_count
+        if outside == tab.span.first_frame:  # pragma: no cover - tiny clip guard
+            pytest.skip("the payload covers the whole clip")
+>       tab.frame_slider.setValue(outside)
+E       AttributeError: 'VideoTab' object has no attribute 'frame_slider'
+
+tests\test_video_stego.py:818: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/test_gui_tabs.py::TestProtectTabReadout::test_selecting_a_cover_fills_the_information_panel
+FAILED tests/test_gui_tabs.py::TestProtectTabReadout::test_capacity_rises_with_depth
+FAILED tests/test_gui_tabs.py::TestProtectTabReadout::test_an_oversized_message_is_reported_before_any_attempt
+FAILED tests/test_gui_tabs.py::TestProtectTabReadout::test_the_overhead_is_explained_when_it_fits
+FAILED tests/test_gui_tabs.py::TestProtectTabReadout::test_audio_shows_audio_specific_rows
+FAILED tests/test_gui_shell.py::TestMainWindow::test_key_actions_are_present
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_loading_an_image_lists_the_image_attacks
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_loading_audio_lists_the_audio_attacks
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_options_appear_only_for_the_attacks_that_use_them
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_the_log_records_expected_and_observed
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_the_bit_error_rate_option_is_passed_through
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_the_manifest_field_option_is_passed_through
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_a_manifest_attack_verifies_the_original_file
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_the_resigning_attack_generates_its_own_key
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_an_audio_attack_runs
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_running_every_attack_reports_matches_and_skips
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_a_skipped_attack_is_reported_with_its_reason
+FAILED tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_the_log_can_be_cleared
+FAILED tests/test_video_stego.py::TestVideoTab::test_the_capacity_table_covers_every_depth
+FAILED tests/test_video_stego.py::TestVideoTab::test_a_frame_that_carries_no_payload_says_so
+20 failed, 268 passed in 10.55s

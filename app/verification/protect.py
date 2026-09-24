@@ -21,8 +21,8 @@ The order of operations, and why it is forced
     5. resolve the start location               (needs 2 and 3)
     6. embed, into a temporary file beside the output
     6b. optionally match the cover's file size  (PNG only, and only if asked)
-    7. write the companion manifest
-    8. move the stego file into place
+    7. write the companion manifest to a staging file
+    8. publish both files with backups and exception rollback
 
 Step 6b sits where it does for one reason: the manifest records a digest of the
 stego file, so anything that rewrites that file has to happen *before* the manifest
@@ -30,10 +30,10 @@ is written. Doing it afterwards would leave a manifest describing a file that no
 longer exists, which is exactly the kind of quiet inconsistency a receiver would hit
 much later and be unable to explain.
 
-Steps 6 to 8 are arranged so that a stego file never appears without its manifest.
-Both output paths are checked before anything is written, the stego file is built
-under a temporary name, and it is renamed into place only once the manifest has been
-written. If any of those steps fails, whatever was written is removed again.
+Steps 6 to 8 stage both outputs and retain backups while publishing. Caught
+publication failures restore previous outputs. The two replacements are not a
+single filesystem transaction: concurrent readers can see a mixed pair briefly;
+process termination and power loss are outside the rollback guarantee.
 
 Step 2 has to precede step 5 because a derived start location depends on the
 envelope length, and step 5 has to precede step 6 for obvious reasons. That is
@@ -59,12 +59,12 @@ from app.crypto import hashing, start_location
 from app.crypto import manifest as manifest_module
 from app.crypto import payload as payload_module
 from app.crypto.envelope import ErrorCorrectionParameters, VerificationRecord
-from app.crypto.errors import ManifestError
 from app.robustness import error_correction
-from app.stego import media, paths
+from app.stego import media
 from app.stego.errors import CapacityError
 from app.utils import constants, file_utils
 from app.utils.logging_utils import get_logger
+from app.verification.publication import staged_bundle, validate_bundle
 
 __all__ = ["ProtectResult", "protect_media"]
 
@@ -152,21 +152,11 @@ def protect_media(
     # 1. What kind of cover is this? Detected from content.
     media_type = media.detect_media_type(input_path)
 
-    # Both outputs are checked now, so a refusal cannot come after the stego file
-    # has been written and leave it without a manifest.
-    paths.assert_distinct_paths(input_path, output_path)
-    paths.check_output_writable(output_path, overwrite)
     manifest_target = (
-        os.fspath(manifest_path)
-        if manifest_path is not None
+        os.fspath(manifest_path) if manifest_path is not None
         else file_utils.manifest_path_for(output_path)
     )
-    if os.path.exists(manifest_target) and not overwrite:
-        raise ManifestError(
-            f"manifest path is already occupied: "
-            f"{file_utils.display_name(manifest_target)}; pass overwrite=True to "
-            f"replace it"
-        )
+    validate_bundle(input_path, output_path, manifest_target, overwrite)
 
     # 2. Build and sign the payload. Media-free, so this can happen first.
     prepared = payload_module.prepare_payload(
@@ -201,7 +191,11 @@ def protect_media(
 
     # 3. Measure the cover.
     capacity = media.measure(
-        input_path, lsb_depth, payload_length=embedded_length
+        input_path, lsb_depth,
+        start_location=(
+            manual_start_location if start_method == constants.START_METHOD_MANUAL else 0
+        ),
+        payload_length=embedded_length,
     )
 
     # 4. Refuse an oversized payload here, with a figure the user can act on.
@@ -224,7 +218,8 @@ def protect_media(
             f"the message does not fit: a {prepared.message_length}-byte message "
             f"becomes a {prepared.envelope_length}-byte signed payload{coding}, but "
             f"{file_utils.display_name(input_path)} holds at most "
-            f"{capacity.max_payload_length} bytes at depth {lsb_depth}. The largest "
+            f"{capacity.max_payload_length} bytes at depth {lsb_depth} from "
+            f"start {capacity.report.start_location}. The largest "
             f"message that fits at this depth is about {fits} bytes; a greater depth "
             f"or a larger cover would raise that"
         )
@@ -242,48 +237,26 @@ def protect_media(
         nonce_hex=prepared.record.nonce_hex,
     )
 
-    # 6. Embed, under a temporary name in the destination directory. Leaving the
-    # block normally is step 8, the rename into place; leaving it by an exception
-    # removes the temporary file.
+    # Stage both artifacts before publishing. Roll back caught publication failures.
     final_path = os.fspath(output_path)
-    written_manifest_path: str | None = None
-    try:
-        with file_utils.atomic_output(final_path) as partial_path:
-            embed_result = media.embed(
-                input_path,
-                partial_path,
-                embedded_payload,
-                lsb_depth,
-                start,
-                overwrite=True,
-            )
-
-            # 6b. Optionally rewrite the stego file at the cover's exact size.
-            #
-            # Before the manifest, because the manifest records the file's digest.
-            # The pixels are unchanged by this, so the payload still extracts and
-            # the signature still covers the same bytes; only the container's
-            # compression and padding differ.
-            size_result = None
-            if match_cover_size:
-                size_result = _match_cover_size(input_path, partial_path)
-
-            # 7. Publish the non-secret parameters.
-            manifest = manifest_module.Manifest.from_record(
-                prepared.record,
-                envelope_length=prepared.envelope_length,
-                container_format=embed_result.container_format,
-                resolved_start_location=start,
-                stego_file_name=file_utils.display_name(final_path),
-                stego_sha256=hashing.file_sha256(partial_path),
-            )
-            written_manifest_path = manifest_module.write_manifest(
-                manifest, manifest_target, overwrite=overwrite
-            )
-    except BaseException:
-        if written_manifest_path is not None:
-            _discard(written_manifest_path)
-        raise
+    with staged_bundle(input_path, final_path, manifest_target, overwrite=overwrite) as (
+        partial_path, staged_manifest
+    ):
+        embed_result = media.embed(
+            input_path, partial_path, embedded_payload, lsb_depth, start, overwrite=True
+        )
+        size_result = None
+        if match_cover_size:
+            size_result = _match_cover_size(input_path, partial_path)
+        manifest = manifest_module.Manifest.from_record(
+            prepared.record,
+            envelope_length=prepared.envelope_length,
+            container_format=embed_result.container_format,
+            resolved_start_location=start,
+            stego_file_name=file_utils.display_name(final_path),
+            stego_sha256=hashing.file_sha256(partial_path),
+        )
+        manifest_module.write_manifest(manifest, staged_manifest, overwrite=True)
 
     # The results were produced against the temporary name; report the real one.
     embed_result = dataclasses.replace(embed_result, output_path=final_path)
@@ -315,7 +288,7 @@ def protect_media(
 
     return ProtectResult(
         stego_path=embed_result.output_path,
-        manifest_path=written_manifest_path,
+        manifest_path=manifest_target,
         manifest=manifest,
         record=prepared.record,
         embed_result=embed_result,
@@ -327,13 +300,6 @@ def protect_media(
         required_secrets=tuple(secrets),
         size_preservation=size_result,
     )
-
-
-def _discard(path: str) -> None:
-    try:
-        os.unlink(path)
-    except OSError:
-        pass
 
 
 def _match_cover_size(

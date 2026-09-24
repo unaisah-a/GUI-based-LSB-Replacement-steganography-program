@@ -272,7 +272,7 @@ class ResultPanel(QGroupBox):
             self._flags_form.addRow("Start location used:", widget)
 
         self.set_notes(result.notes)
-        self.show_message(result.message)
+        self.show_message(result.message if result.verdict == constants.VERDICT_AUTHENTIC else None)
 
     def set_notes(self, notes: Iterable[str]) -> None:
         collected = [note for note in notes if note]
@@ -280,6 +280,8 @@ class ResultPanel(QGroupBox):
 
     def show_message(self, message: bytes | None) -> None:
         """Show recovered bytes, as inert text or a hex dump."""
+        if self._result is None or self._result.verdict != constants.VERDICT_AUTHENTIC:
+            message = None
         self._message = message
         if message is None:
             self._payload_view.setPlainText("")
@@ -345,8 +347,9 @@ class ResultPanel(QGroupBox):
         The save dialog has already asked about replacing an existing file, so this
         overwrites. Nothing is opened afterwards.
         """
-        if self._message is None:
-            raise OSError("there is no recovered payload to save")
+        if (self._message is None or self._result is None
+                or self._result.verdict != constants.VERDICT_AUTHENTIC):
+            raise OSError("there is no authentic recovered payload to save")
         return file_utils.write_bytes_atomic(path, self._message, overwrite=True)
 
     def show_error(self, message: str) -> None:

@@ -410,8 +410,8 @@ number that means nothing.
 Video is not analysed here, and that is a scope decision rather than an oversight: a
 clip is hundreds of separate images of which a handful carry anything, so a clip-wide
 statistic would be dominated by the untouched frames and a per-frame one would be
-hundreds of numbers with no meaningful summary. The Video tab shows the per-frame
-difference against the cover instead, which is the question a viewer actually has.
+hundreds of numbers with no meaningful summary. The Video tab shows clip playback and the manifest-claimed payload frame range.
+It does not expose arbitrary-frame or reference-difference exploration.
 
 ---
 
@@ -423,9 +423,9 @@ Five tabs, all real.
 |---|---|
 | Protect | Collects settings, runs `protect_media`, shows capacity live and quality after |
 | Verify | Runs `verify_media`, renders the verdict, its reasons and its caveats |
-| Attack Lab | Runs any catalogued attack and shows the verdict before and after |
+| Attack Lab | Runs focused payload/signature corruption or outside-payload edits and shows before/after verdicts; further challenge actions are T05 |
 | Steganalysis | Renders indicators, bit planes and, with a reference, the difference image |
-| Video | Clip properties, capacity by depth, and *which frames* carry the payload |
+| Video | Clip properties, playback and the manifest-claimed payload frame range; video-only output disclosure |
 
 Every backend call runs on a `QThreadPool` worker. Qt repaints only from the main
 thread, so a long call there produces a window that stops responding, which during a
@@ -433,7 +433,7 @@ live demonstration looks like a crash. An exception inside a worker cannot propa
 to a caller — there is none left on that stack — so workers catch everything and emit
 a message, which becomes a visible label rather than a traceback nobody sees.
 
-The Protect tab's capacity read-out updates as the user types. That needs the *exact*
+The Protect tab's capacity read-out is debounced and measured on a background worker as the user types. Manual offsets are included; generation checks discard superseded results. That needs the *exact*
 payload length before anything is signed, which is possible because every
 variable-width field in the record is either fixed-length (nonce, digest, timestamp)
 or already known (media ID, depth, start method). The signature size is read from the
@@ -479,3 +479,55 @@ Modifying samples outside the payload region leaves the verdict `AUTHENTIC` — 
 demonstrated by an attack rather than left unmentioned.
 
 See [`limitations.md`](limitations.md) for the full list.
+
+## T03: Sender publication and receiver resource policy
+
+The sender validates the cover, output and manifest paths pairwise (including
+hard-link and case-normalized aliases) and rejects symbolic-link destinations.
+Media and manifest are staged beside their destinations. Existing files are copied
+to temporary backups before publication. Caught publication failures restore prior
+outputs; a failed restoration raises `PublicationError` and retains the relevant
+backups in its `recovery_paths` attribute for manual recovery. Staging files and
+unneeded backups are cleaned up; cleanup failures are logged.
+
+Each file replacement is atomic, but the pair is not a filesystem transaction.
+Concurrent readers can briefly observe a mixed pair. Power loss, forced process
+termination and concurrent writers to the same pair are outside the guarantee.
+No-overwrite publication uses exclusive Windows rename or POSIX hard-link creation
+so a destination appearing after validation is not overwritten. POSIX destinations
+must support hard links; unsupported filesystems fail safely rather than fall back
+to a potentially destructive overwrite.
+
+Capacity checks use the selected manual offset and the actual serialized envelope,
+encryption and repetition lengths. The offset's own serialized digit count is part
+of the signed metadata overhead. The GUI preview still needs the T04 update.
+
+Manifest reads are bounded to 1 MiB before JSON parsing; excessive nesting produces
+a domain error. The existing envelope-section bounds remain in place. Scrypt calls
+are refused before library allocation when estimated memory `128*N*r` exceeds
+128 MiB or work `N*r*p` exceeds `2**22`. These are local compatibility/resource
+limits, not exact process memory/time limits or claims of cryptographic strength.
+The default `N=32768, r=8, p=1` is unchanged. Unsupported signed costs return
+Cannot Verify; signature verification still precedes decryption.
+
+A manifest-cross-check failure no longer returns recovered plaintext in
+`VerificationResult.message`. Failure diagnostics and signature/hash flags remain.
+This enforces the existing backend contract that recovered bytes are returned only
+on success. T04 must still gate GUI preview/save directly on the final verdict.
+
+`key_manager.public_key_fingerprint` returns lowercase SHA-256 hex of canonical DER
+SubjectPublicKeyInfo for an RSA public key (or the public half of a private key).
+It supports later out-of-band key comparison; no fingerprint UI, trust store or
+payload format change was introduced in T03.
+
+### T04 interface boundaries
+
+Picker and drag/drop selections use the same validation route. A drop must contain
+exactly one local URL; mixed local/remote drops are rejected. Clear resets the tab's
+input as well as the drop widget. Workers discard results after their relevant
+inputs change. Recovered plaintext preview/save requires the final AUTHENTIC verdict.
+Sender and receiver inputs show the canonical public-key SHA-256 fingerprint with
+an independent-trust reminder. The separate key-location menu, bulk attack runner,
+extra GUI attack variants, arbitrary video-frame explorer, separate video capacity
+table and steganalysis scaling checkbox have been removed. Backend catalogues and
+experiments remain available for tests and T05 evaluation.

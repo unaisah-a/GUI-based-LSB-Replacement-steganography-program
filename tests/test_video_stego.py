@@ -794,11 +794,10 @@ class TestVideoTab:
         tab.locate_payload()
         assert tab.span is None
 
-    def test_the_capacity_table_covers_every_depth(self, tab, cover):
-        tab._path = cover
-        tab._on_described(video_stego.describe_only(cover))
-
-        assert tab.capacity_table.rowCount() == len(constants.LSB_DEPTHS)
+    def test_video_exploration_controls_are_removed(self, tab):
+        assert not hasattr(tab, "capacity_table")
+        assert not hasattr(tab, "frame_slider")
+        assert "source audio is omitted" in tab.notice_label.text()
 
     def test_a_frame_that_carries_no_payload_says_so(
         self, tab, big_cover, tmp_path, keys
@@ -811,10 +810,6 @@ class TestVideoTab:
         tab.secret_edit.setText(START_SECRET)
         tab.locate_payload()
 
-        # Pick a frame the payload does not reach.
-        outside = (tab.span.last_frame + 1) % tab.span.frame_count
-        if outside == tab.span.first_frame:  # pragma: no cover - tiny clip guard
-            pytest.skip("the payload covers the whole clip")
-        tab.frame_slider.setValue(outside)
-
-        assert "carries no payload" in tab.carrier_label.text()
+        assert tab.span is not None
+        assert "untrusted" in tab.span_panel._notice_label.text()
+        assert "outside" in tab.span_panel._notice_label.text()

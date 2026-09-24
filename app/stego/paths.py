@@ -60,7 +60,7 @@ def assert_distinct_paths(
     source = os.fspath(input_path)
     target = os.fspath(output_path)
 
-    same = os.path.realpath(source) == os.path.realpath(target)
+    same = os.path.normcase(os.path.realpath(source)) == os.path.normcase(os.path.realpath(target))
     if not same and os.path.exists(target):
         try:
             same = os.path.samefile(source, target)

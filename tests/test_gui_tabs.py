@@ -165,12 +165,14 @@ class TestProtectTabConstruction:
 
 class TestProtectTabReadout:
     def test_selecting_a_cover_fills_the_information_panel(
-        self, protect_tab, png_cover
+        self, qtbot, protect_tab, png_cover
     ):
         protect_tab.drop_zone.accept_path(png_cover)
 
         assert protect_tab.cover_path == os.path.abspath(png_cover)
+        qtbot.waitUntil(lambda: not protect_tab.capacity_busy)
         assert protect_tab.info_panel.value_for("Media type") == constants.MEDIA_IMAGE
+        qtbot.waitUntil(lambda: not protect_tab.capacity_busy)
         assert protect_tab.info_panel.value_for("Dimensions") == "96 x 96"
 
     def test_selecting_a_cover_proposes_an_output_path(self, protect_tab, png_cover):
@@ -253,32 +255,36 @@ class TestProtectTabReadout:
         )
         assert predicted == result.envelope_length
 
-    def test_capacity_rises_with_depth(self, protect_tab, png_cover):
+    def test_capacity_rises_with_depth(self, qtbot, protect_tab, png_cover):
         protect_tab.drop_zone.accept_path(png_cover)
 
         protect_tab.depth_slider.setValue(1)
+        qtbot.waitUntil(lambda: not protect_tab.capacity_busy)
         at_one = protect_tab.info_panel.value_for("Capacity")
         protect_tab.depth_slider.setValue(8)
+        qtbot.waitUntil(lambda: not protect_tab.capacity_busy)
         at_eight = protect_tab.info_panel.value_for("Capacity")
 
         assert at_one != at_eight
 
     def test_an_oversized_message_is_reported_before_any_attempt(
-        self, protect_tab, tmp_path
+        self, qtbot, protect_tab, tmp_path
     ):
         small = write_cover(str(tmp_path), make_cover(16, 16, 3), image_io.PNG, "small")
         protect_tab.drop_zone.accept_path(small)
         protect_tab.depth_slider.setValue(1)
         protect_tab.message_edit.setPlainText("x" * 5_000)
 
+        qtbot.waitUntil(lambda: not protect_tab.capacity_busy)
         assert protect_tab.info_panel.value_for("Fits") == "no"
         assert "does not fit" in protect_tab.info_panel._notice_label.text()
         assert "largest message that fits" in protect_tab.info_panel._notice_label.text()
 
-    def test_the_overhead_is_explained_when_it_fits(self, protect_tab, png_cover):
+    def test_the_overhead_is_explained_when_it_fits(self, qtbot, protect_tab, png_cover):
         protect_tab.drop_zone.accept_path(png_cover)
         protect_tab.message_edit.setPlainText(MESSAGE)
 
+        qtbot.waitUntil(lambda: not protect_tab.capacity_busy)
         notice = protect_tab.info_panel._notice_label.text()
         assert "record and signature" in notice
 
@@ -292,10 +298,12 @@ class TestProtectTabReadout:
 
         assert encrypted > plain
 
-    def test_audio_shows_audio_specific_rows(self, protect_tab, wav_cover):
+    def test_audio_shows_audio_specific_rows(self, qtbot, protect_tab, wav_cover):
         protect_tab.drop_zone.accept_path(wav_cover)
 
+        qtbot.waitUntil(lambda: not protect_tab.capacity_busy)
         assert protect_tab.info_panel.value_for("Sample rate") == "44,100 Hz"
+        qtbot.waitUntil(lambda: not protect_tab.capacity_busy)
         assert protect_tab.info_panel.value_for("Dimensions") is None
 
 

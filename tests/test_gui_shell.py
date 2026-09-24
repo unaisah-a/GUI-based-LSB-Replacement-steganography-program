@@ -150,7 +150,7 @@ class TestMainWindow:
         window = MainWindow()
         qtbot.addWidget(window)
         assert window.generate_keys_action.isEnabled()
-        assert window.show_key_paths_action is not None
+        assert not hasattr(window, "show_key_paths_action")
 
     def test_generated_keys_reach_the_tabs_without_a_restart(self, qtbot):
         window = MainWindow()
