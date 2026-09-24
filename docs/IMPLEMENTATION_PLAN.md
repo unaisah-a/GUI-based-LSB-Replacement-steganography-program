@@ -4,15 +4,15 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorized execution scope: **T01 only**. Do not start T02-T09 without a subsequent user instruction authorizing further work.
+- Latest authorized execution scope: **T02 only**. Do not start T03-T09 without a subsequent user instruction authorizing further work.
 - Integration branch: `integration/acw1-consolidated`.
 - Integration worktree: `C:/Code/INF2005-ACW1-consolidated`.
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
 - Base: `Tristan`, commit `6167e72203e3a3045cdc4fa8ae36f4080689df34`.
 - Selective source: `gin`, commit `f3c267e10a47fa8bba7ace1078a7dce0e6d68f8e`.
 - T01 status: DONE. Documentation, branch/base and worktree-preservation checks passed.
-- T02-T09: TODO; application implementation has not begun.
-- No application files, tests, dependencies or existing feature behavior have been changed by T01.
+- T02: DONE. T03-T09: TODO; application implementation has not begun.
+- No application files, existing tests, dependency pins or existing feature behavior have been changed by T01/T02. T02 provisioned an isolated Python 3.11 environment and added baseline evidence.
 
 ## 1. Objective and decisions
 
@@ -35,7 +35,7 @@ Use the full assignment brief as the source of requirements. The group compariso
 - Keep all five optional challenges. Integrate overlapping demonstrations to save time.
 - Focused GUI polish, not a full redesign.
 - Fresh samples using Tristan's envelope/manifest format; no Gin-format compatibility reader.
-- Python 3.11 remains the documented baseline; clean installation and compatible dependency pins are to be verified in T02.
+- Python 3.11 remains the documented baseline; T02 verified clean installation on Python 3.11.16 with every existing direct dependency pin unchanged.
 - Keep OpenCV/FFV1 video processing with **video-only output**. Source audio is omitted. Disclose this before protection and in the result. Do not add external FFmpeg as a required dependency.
 - Preserve original branches and uncommitted work. Do not merge or delete them.
 - Do not import Gin's complete service architecture or encrypted original-file recovery sidecars.
@@ -111,7 +111,7 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 | ID | Task | Dependencies | Status | Acceptance criteria |
 | --- | --- | --- | --- | --- |
 | T01 | Integration workspace and living guide | None | DONE | Branch/worktree from exact Tristan base; original work preserved; guide, root agent pointer and README link present; documentation diff checked |
-| T02 | Reproducible baseline and feature/demo inventory | T01 | TODO | Clean Python 3.11 setup results, dependency checks and FR1-FR13/challenge/extra gap inventory recorded |
+| T02 | Reproducible baseline and feature/demo inventory | T01 | DONE | Clean Python 3.11 setup results, dependency checks and FR1-FR13/challenge/extra gap inventory recorded |
 | T03 | Publication/security safeguards | T02 | TODO | Path alias, rollback, trust-boundary and capacity regressions pass |
 | T04 | GUI simplification and input handling | T03 | TODO | Agreed cuts completed; retained inputs/previews/workers validated; no orphan controls or stale docs |
 | T05 | Five challenge workflows | T03, T04 | TODO | Each retained capability has reproducible demo, tests/evaluation and stated limitations |
@@ -124,7 +124,7 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 
 - Changes: created branch/worktree from the agreed Tristan SHA; added this guide, root AGENTS.md instructions and README discovery link.
 - Evidence: PowerShell assertions verified exact base/branch, original refs/status, the three-file change scope, README/AGENTS guide links and T02-T09 TODO statuses. git diff --check passed; see the verification log below.
-- Remaining: none for T01. Changes are intentionally uncommitted. T02-T09 are not authorized by this execution request.
+- Remaining: none for T01. T01 was subsequently committed as a8ac5dc. T02 was authorized by the next user request; T03-T09 remain unauthorized.
 
 ### T02-T09 work records
 
@@ -132,7 +132,7 @@ For each task below, replace the placeholder when work is authorized. Record cha
 
 | Task | Changes | Evidence | Remaining |
 | --- | --- | --- | --- |
-| T02 | Not started | None | All acceptance criteria |
+| T02 | Clean Python 3.11.16 environment; unchanged pins; baseline and complete feature/demo gap inventory | [T02 report](../evidence/t02/README.md): 1729 tests passed, pip check/lint/startup passed, three committed samples AUTHENTIC | None for T02; identified gaps assigned to T03-T09, not fixed |
 | T03 | Not started | None | All acceptance criteria |
 | T04 | Not started | None | All acceptance criteria |
 | T05 | Not started | None | All acceptance criteria |
@@ -143,37 +143,37 @@ For each task below, replace the placeholder when work is authorized. Record cha
 
 ## 5. Requirement and feature-to-demo matrix
 
-This is the planned mapping, not evidence of completion. T02 must reconcile it against the full brief and actual retained UI. Each row needs current test/evidence links and demonstration confirmation before release. One demonstration may satisfy several requirements.
+This is the planned live mapping, not evidence of release completion. T02 reconciled the requirements and actual exposed UI in the [baseline and feature inventory](../evidence/t02/README.md), including per-requirement source/test references and assigned gaps. Existing automated tests pass, but each row still needs final acceptance and live demonstration confirmation. The inventory adds the existing text/hex toggle, original-cover comparison, playback controls and help notices to their corresponding demo segments. One demonstration may satisfy several requirements.
 
 | Requirement / feature | Planned implementation or check | Live segment / presenter | Current evidence status |
 | --- | --- | --- | --- |
-| FR1 Image input | PNG/BMP input, validation and preview | 2-7 / Member 2 | Integration unverified |
-| FR2 Audio input | PCM-16 WAV, validation and playback | 7-12 / Member 3 | Integration unverified |
-| FR3 Payload generation | Media ID, timestamp, hash, nonce, metadata | 0-2 and image result / Members 1, 2 | Integration unverified |
-| FR4 Digital signature | Generate/select keys, sign, verify, fingerprint | 0-2 and receiver steps / Members 1-3 | Integration unverified |
-| FR5 Image embedding | Saved-file LSB round trip | 2-7 / Member 2 | Integration unverified |
-| FR6 Audio embedding | Saved-file LSB round trip | 7-12 / Member 3 | Integration unverified |
-| FR7 Variable start | Manual and HMAC-derived starts, recovery/security | 2-12 / Members 2, 3 | Integration unverified |
-| FR8 Extraction | Fresh receiver extracts payload/signature | 2-12 / Members 2, 3 | Integration unverified |
-| FR9 Hash verification | Recompute signed payload hash, explain scope | 0-2 and receiver steps / Members 1-3 | Integration unverified |
-| FR10 Verdicts | Per-check results, truthful failure explanations | Receiver steps and 15-19 / Members 1-3 | Integration unverified |
-| FR11 Positive/negative cases | Image/audio positives, three mandatory negatives | 2-12 and 15-19 / Members 1-3 | Integration unverified |
-| FR12 Reproducibility | A-to-B folder transfer, receiver index, evidence export | 2-7 and 19-22 / Members 2, 5 | Integration unverified |
-| FR13 Innovation | Advanced starts and all five challenges with limits | Throughout | Integration unverified |
-| LSB depths 1-8 | Show selector and bit/capacity tradeoff; all depths tested | 2-7 / Member 2 | Integration unverified |
-| Capacity check | Full overhead and start accounted for, overflow rejected | 2-7 / Member 2 | Integration unverified |
-| Cover/stego comparison | Image display and audio playback before/after | 2-12 / Members 2, 3 | Integration unverified |
-| Required message lengths | Brief short/long text and custom confidential payload | 2-15 / Members 2-4 | Integration unverified |
-| File payload preview/save | Applicable image/audio payloads, authenticated recovery | 12-15 / Member 4 | Integration unverified |
-| AES confidentiality | Encrypt/decrypt custom payload, explain signature distinction | 12-15 / Member 4 | Integration unverified |
+| FR1 Image input | PNG/BMP input, validation and preview | 2-7 / Member 2 | See T02 inventory; final acceptance pending |
+| FR2 Audio input | PCM-16 WAV, validation and playback | 7-12 / Member 3 | See T02 inventory; final acceptance pending |
+| FR3 Payload generation | Media ID, timestamp, hash, nonce, metadata | 0-2 and image result / Members 1, 2 | See T02 inventory; final acceptance pending |
+| FR4 Digital signature | Generate/select keys, sign, verify, fingerprint | 0-2 and receiver steps / Members 1-3 | See T02 inventory; final acceptance pending |
+| FR5 Image embedding | Saved-file LSB round trip | 2-7 / Member 2 | See T02 inventory; final acceptance pending |
+| FR6 Audio embedding | Saved-file LSB round trip | 7-12 / Member 3 | See T02 inventory; final acceptance pending |
+| FR7 Variable start | Manual and HMAC-derived starts, recovery/security | 2-12 / Members 2, 3 | See T02 inventory; final acceptance pending |
+| FR8 Extraction | Fresh receiver extracts payload/signature | 2-12 / Members 2, 3 | See T02 inventory; final acceptance pending |
+| FR9 Hash verification | Recompute signed payload hash, explain scope | 0-2 and receiver steps / Members 1-3 | See T02 inventory; final acceptance pending |
+| FR10 Verdicts | Per-check results, truthful failure explanations | Receiver steps and 15-19 / Members 1-3 | See T02 inventory; final acceptance pending |
+| FR11 Positive/negative cases | Image/audio positives, three mandatory negatives | 2-12 and 15-19 / Members 1-3 | See T02 inventory; final acceptance pending |
+| FR12 Reproducibility | A-to-B folder transfer, receiver index, evidence export | 2-7 and 19-22 / Members 2, 5 | See T02 inventory; final acceptance pending |
+| FR13 Innovation | Advanced starts and all five challenges with limits | Throughout | See T02 inventory; final acceptance pending |
+| LSB depths 1-8 | Show selector and bit/capacity tradeoff; all depths tested | 2-7 / Member 2 | See T02 inventory; final acceptance pending |
+| Capacity check | Full overhead and start accounted for, overflow rejected | 2-7 / Member 2 | See T02 inventory; final acceptance pending |
+| Cover/stego comparison | Image display and audio playback before/after | 2-12 / Members 2, 3 | See T02 inventory; final acceptance pending |
+| Required message lengths | Brief short/long text and custom confidential payload | 2-15 / Members 2-4 | See T02 inventory; final acceptance pending |
+| File payload preview/save | Applicable image/audio payloads, authenticated recovery | 12-15 / Member 4 | See T02 inventory; final acceptance pending |
+| AES confidentiality | Encrypt/decrypt custom payload, explain signature distinction | 12-15 / Member 4 | See T02 inventory; final acceptance pending |
 | Drag/drop and picker | Valid input through both routes; automated invalid cases | 2-12 / Members 2, 3 | Native behavior unverified |
-| File-size preservation | Optional matching, measured sizes and format limitations | 2-12 / Members 2, 3 | Integration unverified |
-| Advanced start challenge | Derivation and wrong-secret failure | 7-12 and 15-19 / Members 3, 1 | Integration unverified |
-| Attack challenge | Focused five controls, including outside-region limitation | 15-19 / Members 1, 3 | Integration unverified |
-| Robustness challenge | Matched damage, recovery, unrecoverable third negative | 15-19 / Members 1, 3 | Integration unverified |
-| Video challenge | Protect/verify short clip, preview, affected frames, audio omission | 19-22 / Member 5 | Integration unverified |
-| Steganalysis challenge | Bit plane/difference, metrics, indicators, false alarms/misses | 19-22 / Member 5 | Integration unverified |
-| Evidence export | Export the demonstrated results | 19-22 / Member 5 | Integration unverified |
+| File-size preservation | Optional matching, measured sizes and format limitations | 2-12 / Members 2, 3 | See T02 inventory; final acceptance pending |
+| Advanced start challenge | Derivation and wrong-secret failure | 7-12 and 15-19 / Members 3, 1 | See T02 inventory; final acceptance pending |
+| Attack challenge | Focused five controls, including outside-region limitation | 15-19 / Members 1, 3 | See T02 inventory; final acceptance pending |
+| Robustness challenge | Matched damage, recovery, unrecoverable third negative | 15-19 / Members 1, 3 | See T02 inventory; final acceptance pending |
+| Video challenge | Protect/verify short clip, preview, affected frames, audio omission | 19-22 / Member 5 | See T02 inventory; final acceptance pending |
+| Steganalysis challenge | Bit plane/difference, metrics, indicators, false alarms/misses | 19-22 / Member 5 | See T02 inventory; final acceptance pending |
+| Evidence export | Export the demonstrated results | 19-22 / Member 5 | See T02 inventory; final acceptance pending |
 | Limitations/AI/contributions | Brief explanations integrated into each member's segment | Throughout / All | Human completion required |
 
 ## 6. Verification plan and logs
@@ -212,6 +212,17 @@ Measured existing Tristan sample byte sizes: PNG 122431 -> 122497 (+66, +0.054%)
 
 For future tasks, append command, environment, tested revision/working-tree state, actual result and evidence paths. Record skipped/blocked checks explicitly. Never log private keys or real secrets.
 
+### T02 verification log
+
+- Authorized scope: next task only, T02; T03-T09 were not executed.
+- Tested HEAD: `a8ac5dcd0cd5256c9280e95db77b3747607e463d`; application/tests identical to Tristan `6167e72`.
+- Windows, local CPython 3.11.16, fresh .venv; all 14 existing direct pins installed unchanged and verified. `pip check`: no broken requirements.
+- `python -m pytest -q --basetemp=tmp/t02-pytest --junitxml=evidence/t02/pytest.xml`: **1729 passed in 66.24s**, zero failures/errors/skips, QT_QPA_PLATFORM=offscreen.
+- `python -m ruff check .`: PASS before and after the T02 evidence probe was added.
+- `python evidence/t02/probe_baseline.py`: exact pins PASS, existing PNG/WAV/MKV samples AUTHENTIC, real main.main offscreen startup/normal timed exit PASS.
+- Full commands, environment, logs and per-feature gaps: [T02 evidence report](../evidence/t02/README.md).
+- Native drag/drop, audible playback, remote CI, fresh sample generation, real transfer and timed rehearsal were not performed. They remain later-task acceptance items.
+- No code fixes were made. Findings include publication/path safety, final-verdict preview/save gating, unbounded upper KDF costs, manual-start capacity preview, mixed-URL drops, absent fingerprint presentation, sample wording/negative-bundle gaps and optional-feature simplification/evaluation.
 ## 7. Demo and delivery
 
 Every retained user-facing feature must map to a live action. Prepare files/keys/folders ahead of time; reuse mandatory workflows to demonstrate advanced starts and attacks. Screenshots are fallback evidence, not a substitute for required working demonstrations.
@@ -240,15 +251,16 @@ Deliver README, architecture/limitations, this living guide, requirement/demo ma
 | Video-only output | User explicitly chose simpler OpenCV flow over audio preservation with FFmpeg |
 | Retain size matching and drag/drop | Explicit protected user preferences |
 | Fresh samples, focused GUI polish, no Gin-format reader | Confirmed user choices |
-| Execute T01 only | Latest explicit user authorization; other tasks remain planned |
+| Execute T01 only | Original setup authorization, completed and committed as a8ac5dc |
+| Execute T02 only | Subsequent user authorization; baseline/inventory complete, T03-T09 remain TODO |
 
 ## 9. Handoff
 
 - Current branch/worktree: `integration/acw1-consolidated` at `C:/Code/INF2005-ACW1-consolidated`.
-- Current implementation state: T01 DONE; documentation-only setup verified. No T02-T09 work performed.
-- Uncommitted changed files: `AGENTS.md`, `README.md`, `docs/IMPLEMENTATION_PLAN.md` only.
+- Current implementation state: T01 and T02 DONE. Baseline/inventory verified; no T03-T09 work performed.
+- T01 is committed at a8ac5dc. Current uncommitted T02 changes: `AGENTS.md`, `docs/IMPLEMENTATION_PLAN.md` and `evidence/t02/`. Local runtime/tool/cache directories are ignored.
 - Application code: unchanged from Tristan base.
-- Next immediate action: stop and hand off T01. Do not start T02 under the current authorization.
-- Next implementation task when authorized: T02, clean Python 3.11 baseline and actual feature/demo inventory.
-- Future validation risks: prior dependency/application-control restrictions, unverified native GUI interactions and unmeasured rehearsal duration. These are not evidence that application functionality fails.
+- Next immediate action: stop and hand off T02. Do not start T03 under the current authorization.
+- Next implementation task when authorized: T03, publication/security safeguards; start with the prioritized gaps in the T02 report.
+- Future validation risks: native GUI/playback and rehearsal duration remain unverified. The earlier Python 3.13 dependency/application-control uncertainty was resolved for the clean Python 3.11 baseline; final release must rerun validation after changes.
 - Human tasks: names/contributions/signatures, real transfer/rehearsal, notifications and submission remain open.
