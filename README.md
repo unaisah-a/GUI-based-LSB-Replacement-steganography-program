@@ -116,7 +116,7 @@ Regenerate the samples with `python scripts/generate_samples.py`.
    to compare its expected and observed verdicts. Outside-payload edits can still
    verify because the signature does not authenticate every cover byte. The bulk
    runner and extra GUI attack variants have been removed; backend experiments remain.
-   Dedicated wrong-key/wrong-start demo actions are planned in T05.
+   Dedicated wrong-key and wrong-start actions reverify the unchanged file with a substituted receiver input. Wrong-start requires HMAC-derived protection.
 
 5. **Inspect it.** **Steganalysis** shows bit planes with fixed display scaling,
    a reference difference, distortion figures and experimental statistical indicators.
@@ -151,3 +151,5 @@ main.py           entry point
 planning brief) and [`docs/image_layer_requirements.md`](docs/image_layer_requirements.md)
 (the image layer's working specification, cited by requirement number in the code) are
 internal working documents, not deliverables.
+
+Challenge demonstrations and reproducible evaluation: [T05 guide](docs/challenge_workflows.md).

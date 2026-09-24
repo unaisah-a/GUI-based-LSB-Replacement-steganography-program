@@ -16,7 +16,8 @@ One attack is expected to leave the verdict at ``AUTHENTIC``: modifying the cove
 *outside* the payload region. That is not a failed attack, it is the scope of what
 verification establishes, and the tab reports it as a match rather than hiding it.
 
-The GUI offers focused message/signature corruption and outside-region edits.
+The GUI offers message/signature corruption, outside-region edits and wrong-key/
+wrong-start verification demonstrations.
 """
 
 from __future__ import annotations
@@ -58,6 +59,7 @@ __all__ = ["AttackTab"]
 _log = get_logger(__name__)
 
 FOCUSED_ATTACKS = frozenset({
+    "verification.wrong_key", "verification.wrong_start",
     "payload.message", "payload.signature", "image.outside", "audio.outside", "video.outside"
 })
 
@@ -479,7 +481,8 @@ class AttackTab(QWidget):
                 ("Changed", "yes" if run.verdict_changed else "no"),
                 ("Expected", ", ".join(sorted(run.outcome.expected_verdicts))),
                 ("Matched expectation", "yes" if run.matched_expectation else "no"),
-                ("Output", file_utils.display_name(run.outcome.output_path)),
+                ("Input" if run.attack.target == "verification" else "Output",
+                 file_utils.display_name(run.outcome.output_path)),
             ]
         )
         self.summary_panel.set_notice(run.outcome.description)
@@ -489,7 +492,8 @@ class AttackTab(QWidget):
         lines = [
             f"{run.attack.label} [{run.attack.key}]",
             f"  {run.outcome.description}",
-            f"  wrote:    {file_utils.display_name(run.outcome.output_path)}",
+            f"  {'input' if run.attack.target == 'verification' else 'wrote'}:    "
+            f"{file_utils.display_name(run.outcome.output_path)}",
             f"  before:   {run.before.verdict}",
             f"  after:    {run.after.verdict}",
             f"  expected: {', '.join(sorted(run.outcome.expected_verdicts))}",

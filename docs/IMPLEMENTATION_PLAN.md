@@ -4,14 +4,14 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorized execution scope: **T04 only**. Do not start T05-T09 without a subsequent user instruction authorizing further work.
+- Latest authorized execution scope: **T05 only**. Do not start T06-T09 without a subsequent user instruction authorizing further work.
 - Integration branch: `integration/acw1-consolidated`.
-- Integration worktree: `C:/Code/INF2005-ACW1-consolidated`.
+- Current integration workspace: `A:/Code/GUI-based-LSB-Replacement-steganography-program` (historical setup used `C:/Code/INF2005-ACW1-consolidated`).
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
 - Base: `Tristan`, commit `6167e72203e3a3045cdc4fa8ae36f4080689df34`.
 - Selective source: `gin`, commit `f3c267e10a47fa8bba7ace1078a7dce0e6d68f8e`.
 - T01 status: DONE. Documentation, branch/base and worktree-preservation checks passed.
-- T01-T04: DONE. T05-T09: TODO. T04 GUI simplification/input safeguards are implemented and verified.
+- T01-T05: DONE. T06-T09: TODO. T05 challenge actions and reproducible evaluations are implemented and verified.
 - T01/T02 established the workspace and clean baseline. T03 added backend safeguards; T04 updated the GUI and regressions. Dependency pins and demo samples remain unchanged.
 
 ## 1. Objective and decisions
@@ -114,7 +114,7 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 | T02 | Reproducible baseline and feature/demo inventory | T01 | DONE | Clean Python 3.11 setup results, dependency checks and FR1-FR13/challenge/extra gap inventory recorded |
 | T03 | Publication/security safeguards | T02 | DONE | Path alias, rollback, trust-boundary and capacity regressions pass |
 | T04 | GUI simplification and input handling | T03 | DONE | Agreed cuts completed; retained inputs/previews/workers validated; no orphan controls or stale docs |
-| T05 | Five challenge workflows | T03, T04 | TODO | Each retained capability has reproducible demo, tests/evaluation and stated limitations |
+| T05 | Five challenge workflows | T03, T04 | DONE | Each retained capability has reproducible demo, tests/evaluation and stated limitations |
 | T06 | Size/property preservation | T03, T05 | TODO | Representative size/property measurements recorded; unexpected growth investigated |
 | T07 | Sender/receiver sample bundle | T04, T05, T06 | TODO | Required messages, positives, negatives and challenges reproduce independently without private keys |
 | T08 | Integrated release validation | T07 | TODO | Full suite, lint, clean setup, native desktop checks and extracted-package verification complete |
@@ -135,7 +135,7 @@ For each task below, replace the placeholder when work is authorized. Record cha
 | T02 | Clean Python 3.11.16 environment; unchanged pins; baseline and complete feature/demo gap inventory | [T02 report](../evidence/t02/README.md): 1729 tests passed, pip check/lint/startup passed, three committed samples AUTHENTIC | None for T02; identified gaps assigned to T03-T09, not fixed |
 | T03 | Staged publication/rollback, aliases, bounded JSON/KDF, manual-offset sender capacity, failed-verification plaintext withholding, fingerprint helper | [T03 report](../evidence/t03/README.md): 226 focused and 1785 full tests passed; lint and compatibility/startup probe passed | None for backend T03; GUI gating, preview and fingerprint presentation remain T04 |
 | T04 | Agreed control cuts, shared picker/drop validation and clear handling, background offset-aware capacity, stale-result rejection, AUTHENTIC-only preview/save, fingerprints and video-only notices | [T04 report](../evidence/t04/README.md): 1799 full tests passed; lint, sample compatibility and startup passed | None for T04; native desktop validation remains T08; new challenge actions/evaluation remain T05 |
-| T05 | Not started | None | All acceptance criteria |
+| T05 | Wrong-key/wrong-start actions; reproducible five-challenge evaluation and demo guide | [T05 evidence](../evidence/t05/README.md): 1809 tests passed; pinned Python 3.11.16; lint, compatibility/startup and challenge evaluation passed | None for T05; native checks T08, sample bundle T07 |
 | T06 | Not started | None | All acceptance criteria |
 | T07 | Not started | None | All acceptance criteria |
 | T08 | Not started | None | All acceptance criteria |
@@ -244,6 +244,16 @@ For future tasks, append command, environment, tested revision/working-tree stat
 - Offscreen screenshots have unavailable font glyphs; they do not establish visual readability. Native appearance/playback/drop validation remains T08.
 - See [T04 evidence](../evidence/t04/README.md) for commands, scope and remaining work.
 
+### T05 verification log
+
+- Authorised scope: T05 only, following the user instruction to execute the next task.
+- Python 3.11.16 isolated .venv-t05, unchanged direct pins; HEAD 35b498a plus T05 working tree.
+- Full suite: **1809 passed in 38.17s**, no failures/errors/skips; offscreen Qt.
+- Ruff, dependency check, existing PNG/WAV/MKV compatibility and offscreen startup: PASS.
+- Five challenge workflows reproduced; synthetic steganalysis measured 2/9 false positives and 7/9 misses. Controlled repetition-3 recovery and failure demonstrated for image/audio.
+- Commands, provenance, source hashes and remaining limits: [T05 evidence](../evidence/t05/README.md).
+- T06-T09 not started. No private keys persisted; no native playback or rehearsal claimed.
+
 ## 7. Demo and delivery
 
 Every retained user-facing feature must map to a live action. Prepare files/keys/folders ahead of time; reuse mandatory workflows to demonstrate advanced starts and attacks. Screenshots are fallback evidence, not a substitute for required working demonstrations.
@@ -275,16 +285,16 @@ Deliver README, architecture/limitations, this living guide, requirement/demo ma
 | Execute T01 only | Original setup authorization, completed and committed as a8ac5dc |
 | Execute T02 only | Subsequent user authorization; baseline/inventory completed |
 | Execute T03 only | Subsequent user authorization; backend safeguards completed |
-| Execute T04 only | Latest next-task authorization; GUI simplification/input handling completed; T05-T09 remain TODO |
+| Execute T04 only | GUI simplification/input handling completed under prior authorization |
+| Execute T05 only | Latest user instruction authorises the next task; five challenge workflows completed; T06-T09 remain TODO |
 
 ## 9. Handoff
 
-- Current branch/worktree: `integration/acw1-consolidated` at `C:/Code/INF2005-ACW1-consolidated`.
-- Current implementation state: T01-T04 DONE. T05-T09 TODO.
-- T01/T02 are committed through 27572c9. T03 and T04 source, tests, docs and evidence remain uncommitted; no commit was requested.
-- T03 backend hashes are preserved. T04 simplifies the GUI without changing media formats or dependency pins.
-- Next immediate action: hand off T04; do not start T05 under this authorization.
-- Next task when authorized: T05, five challenge workflows. Add dedicated wrong-key/wrong-start actions to the focused Attack Lab and reproducible matched robustness/steganalysis evaluation. Current Attack Lab exposes message/signature corruption and media-specific outside-payload edits. Keep experimental bulk work in scripts; do not restore cut GUI variants.
-- T06 measures size/properties, T07 regenerates sample bundles, T08 validates native GUI/playback/drop and release packaging, T09 replaces the historical demo draft and tracks actual rehearsal.
-- Native appearance/playback and rehearsal duration remain unverified. Offscreen screenshots lack readable font glyphs in this environment.
+- Current branch/workspace: `integration/acw1-consolidated` at `A:/Code/GUI-based-LSB-Replacement-steganography-program`.
+- Current state: T01-T05 DONE; T06-T09 TODO. Latest authorised scope: T05 only.
+- HEAD: `35b498a6a5becfdc9e0d6a0aa33591d1913cb34c` plus uncommitted T05 changes. No commit requested.
+- T05 adds verification-input demonstrations and reproducible challenge evaluation. See [guide](challenge_workflows.md) and [evidence](../evidence/t05/README.md).
+- Next task when authorised: T06, size/property preservation measurements and investigation of unexpected growth.
+- T07 prepares receiver bundles, T08 validates native GUI/playback/drop and packaging, T09 finalises demo/submission handoff.
+- Existing untracked samples/r11 remains untouched. Original branches remain untouched.
 - Human tasks: names/contributions/signatures, real transfer/rehearsal, notifications and submission remain open.

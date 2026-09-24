@@ -6,7 +6,8 @@ it. The expectation is recorded so the Attack Lab can show "expected: TAMPERED,
 observed: TAMPERED" side by side, and so the tests can assert on the pairing
 rather than on a hardcoded verdict list.
 
-The originals are never modified: every attack writes a new file. That matters for
+The originals are never modified: media attacks write a new file; verification
+input demonstrations reverify the original without writing a file. That matters for
 a demonstration where the same protected file is attacked several different ways.
 
 On "expected" verdicts
@@ -53,7 +54,7 @@ class AttackOutcome:
     """What an attack did."""
 
     name: str
-    #: The modified copy. The input file is never changed.
+    #: The modified copy, or original input for verification-only actions.
     output_path: str
     #: What was changed, in terms a demonstration audience can follow.
     description: str

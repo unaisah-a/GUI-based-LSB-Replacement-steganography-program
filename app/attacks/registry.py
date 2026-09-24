@@ -132,7 +132,25 @@ def _manifest_call(context: AttackContext) -> AttackOutcome:
     )
 
 
+def _verification_only(context: AttackContext) -> AttackOutcome:
+    return AttackOutcome(
+        name="verification input substitution", output_path=context.stego_path,
+        description="Reverify the original file with a substituted receiver input; no file written.",
+        expected_verdicts=frozenset(), target="verification",
+    )
+
+
 ATTACKS: Final[tuple[Attack, ...]] = (
+    Attack(
+        key="verification.wrong_key", label="Verify with the wrong public key",
+        media_types=ANY_MEDIA, invoke=_verification_only, target="verification",
+        summary="Use a fresh unrelated public key. The original file is unchanged.",
+    ),
+    Attack(
+        key="verification.wrong_start", label="Verify with the wrong start secret",
+        media_types=ANY_MEDIA, invoke=_verification_only, target="verification",
+        summary="Use a different HMAC start location. Requires a derived start; failure is not proof of tampering.",
+    ),
     # --- payload-targeted, media-agnostic ---------------------------------- #
     Attack(
         key="payload.record",
@@ -530,6 +548,47 @@ def run_attack(
         start_secret=start_secret,
         passphrase=passphrase,
     )
+
+    if attack.target == "verification":
+        from dataclasses import replace
+
+        from app.crypto import key_manager
+        from app.crypto import manifest as manifest_module
+
+        if before.verdict != constants.VERDICT_AUTHENTIC:
+            raise AttackError("verify successfully with the original inputs before substituting an input")
+        after_key, after_secret = public_key, start_secret
+        if key == "verification.wrong_key":
+            _, after_key = key_manager.generate_key_pair(constants.RSA_MIN_KEY_SIZE)
+            expected = frozenset({constants.VERDICT_SIGNATURE_INVALID})
+            description = "Used an unrelated public key; no file written."
+        else:
+            manifest = manifest_module.read_manifest(context.manifest_path)
+            if manifest.start_method != constants.START_METHOD_HMAC:
+                raise AttackError("wrong-secret demonstration requires an HMAC-derived start")
+            # A different secret can collide in the finite location space. Ensure
+            # the demonstration actually uses another location, or report failure.
+            for attempt in range(64):
+                candidate = f"attack-lab-wrong-start-{attempt}"
+                other = context_from_manifest(
+                    context.stego_path, context.manifest_path, context.output_path,
+                    start_secret=candidate,
+                )
+                if other.start_location != context.start_location:
+                    after_secret = candidate
+                    break
+            else:
+                raise AttackError("could not find a different derived location in 64 attempts")
+            expected = frozenset({constants.VERDICT_PAYLOAD_MISSING,
+                                  constants.VERDICT_CANNOT_VERIFY,
+                                  constants.VERDICT_SIGNATURE_INVALID})
+            description = ("Used a different derived start location; no file written. "
+                           "Wrong secrets, absent payloads and damaged framing can look alike.")
+        outcome = replace(attack.invoke(context), description=description,
+                          expected_verdicts=expected)
+        after = verify_media(context.stego_path, context.manifest_path, after_key,
+                             start_secret=after_secret, passphrase=passphrase)
+        return AttackRun(attack, outcome, before, after)
 
     outcome = attack.invoke(context)
 

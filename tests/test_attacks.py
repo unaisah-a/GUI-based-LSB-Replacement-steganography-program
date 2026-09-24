@@ -169,7 +169,7 @@ class TestImageAttacks:
         [
             attack.key
             for attack in registry.available_attacks(constants.MEDIA_IMAGE)
-            if attack.key != "payload.resign"
+            if attack.key not in {"payload.resign", "verification.wrong_start"}
         ],
     )
     def test_verdict_matches_the_declared_expectation(self, tmp_path, keys, key):
@@ -246,7 +246,7 @@ class TestAudioAttacks:
         [
             attack.key
             for attack in registry.available_attacks(constants.MEDIA_AUDIO)
-            if attack.key != "payload.resign"
+            if attack.key not in {"payload.resign", "verification.wrong_start"}
         ],
     )
     def test_verdict_matches_the_declared_expectation(self, tmp_path, keys, key):
@@ -716,3 +716,41 @@ class TestLengthHeaderAttack:
         assert int((before != after).sum()) == 1
         # Depth 1: the header's 32 bits sit in samples 0 to 31.
         assert run.outcome.details["sample"] == 31
+
+
+@pytest.mark.parametrize("attack", ["verification.wrong_key", "verification.wrong_start"])
+def test_verification_substitution_preserves_inputs(tmp_path, keys, attack):
+    result = protect_image(tmp_path, keys, start_method=constants.START_METHOD_HMAC,
+                           start_secret=START_SECRET)
+    context = registry.context_from_protect_result(result, str(tmp_path / "unused.png"))
+    original = {p: p.read_bytes() for p in tmp_path.iterdir() if p.is_file()}
+    run = registry.run_attack(attack, context, keys[1], start_secret=START_SECRET)
+    assert run.before.verdict == constants.VERDICT_AUTHENTIC
+    assert run.after.verdict != constants.VERDICT_AUTHENTIC
+    assert run.matched_expectation
+    assert run.outcome.target == "verification"
+    assert {p: p.read_bytes() for p in tmp_path.iterdir() if p.is_file()} == original
+    assert "no file written" in run.outcome.description
+
+
+def test_wrong_start_refuses_manual_start(tmp_path, keys):
+    result = protect_image(tmp_path, keys)
+    context = registry.context_from_protect_result(result, str(tmp_path / "unused.png"))
+    with pytest.raises(AttackError, match="HMAC-derived"):
+        registry.run_attack("verification.wrong_start", context, keys[1])
+
+
+def test_wrong_key_requires_authentic_baseline(tmp_path, keys, attacker_keys):
+    result = protect_image(tmp_path, keys)
+    context = registry.context_from_protect_result(result, str(tmp_path / "unused.png"))
+    with pytest.raises(AttackError, match="original inputs"):
+        registry.run_attack("verification.wrong_key", context, attacker_keys[1])
+
+
+def test_wrong_start_reports_exhausted_location_search(tmp_path, keys, monkeypatch):
+    result = protect_image(tmp_path, keys, start_method=constants.START_METHOD_HMAC,
+                           start_secret=START_SECRET)
+    context = registry.context_from_protect_result(result, str(tmp_path / "unused.png"))
+    monkeypatch.setattr(registry, "context_from_manifest", lambda *a, **kw: context)
+    with pytest.raises(AttackError, match="64 attempts"):
+        registry.run_attack("verification.wrong_start", context, keys[1], start_secret=START_SECRET)

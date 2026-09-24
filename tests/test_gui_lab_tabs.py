@@ -195,7 +195,8 @@ class TestAttackTabConstruction:
         load(attack_tab, protected_png)
         keys = listed_keys(attack_tab)
 
-        assert keys == {"payload.message", "payload.signature", "image.outside"}
+        assert keys == {"payload.message", "payload.signature", "image.outside",
+                        "verification.wrong_key", "verification.wrong_start"}
         assert "image.outside" in keys
         assert "audio.resample" not in keys
 
@@ -203,7 +204,8 @@ class TestAttackTabConstruction:
         load(attack_tab, protected_wav)
         keys = listed_keys(attack_tab)
 
-        assert keys == {"payload.message", "payload.signature", "audio.outside"}
+        assert keys == {"payload.message", "payload.signature", "audio.outside",
+                        "verification.wrong_key", "verification.wrong_start"}
         assert "image.blank" not in keys
 
     def test_payload_attacks_apply_to_both_media(
@@ -499,3 +501,16 @@ class TestSteganalysisTab:
     def test_a_failure_is_reported_without_raising(self, analysis_tab):
         analysis_tab._on_analysis_failed("could not decode the file", "traceback")
         # No exception is the assertion.
+
+
+@pytest.mark.parametrize("key", ["verification.wrong_key", "verification.wrong_start"])
+def test_verification_actions_report_input_without_writing(attack_tab, protected_png, key):
+    load(attack_tab, protected_png)
+    TestAttackTabRunning()._select(attack_tab, key)
+    run = attack_tab._run_one(attack_tab.selected_attack(), attack_tab._collect_inputs())
+    attack_tab._on_attack_finished(run)
+    assert run.before.verdict == verdicts.VERDICT_AUTHENTIC
+    assert run.after.verdict != verdicts.VERDICT_AUTHENTIC
+    assert run.matched_expectation
+    assert "no file written" in attack_tab.log_view.toPlainText()
+    assert "wrote:" not in attack_tab.log_view.toPlainText()
