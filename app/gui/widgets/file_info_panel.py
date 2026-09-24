@@ -27,6 +27,14 @@ from app.utils import constants, file_utils
 __all__ = ["FileInfoPanel"]
 
 
+class _WrappingValue(QLabel):
+    """Keep wrapped values readable inside nested form/splitter layouts."""
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self.setMinimumHeight(self.heightForWidth(max(1, self.width())))
+
+
 class FileInfoPanel(QGroupBox):
     """Shows what is known about the selected file."""
 
@@ -38,7 +46,7 @@ class FileInfoPanel(QGroupBox):
         self._form = QFormLayout()
         self._form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
         self._form.setFieldGrowthPolicy(
-            QFormLayout.FieldGrowthPolicy.ExpandingFieldsGrow
+            QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow
         )
         outer.addLayout(self._form)
 
@@ -74,7 +82,7 @@ class FileInfoPanel(QGroupBox):
 
         self._empty_label.setVisible(False)
         for label, value in collected:
-            field = QLabel(str(value), self)
+            field = _WrappingValue(str(value), self)
             field.setObjectName("fileInfoValue")
             field.setTextInteractionFlags(
                 Qt.TextInteractionFlag.TextSelectableByMouse

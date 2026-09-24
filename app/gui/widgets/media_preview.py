@@ -54,6 +54,7 @@ __all__ = ["MediaPreview"]
 _log = get_logger(__name__)
 
 _ffmpeg_directory_added = False
+_ffmpeg_directory_handle = None
 
 
 def _allow_bundled_ffmpeg() -> None:
@@ -61,13 +62,15 @@ def _allow_bundled_ffmpeg() -> None:
 
     A no-op except on Windows, and done at most once.
     """
-    global _ffmpeg_directory_added
+    global _ffmpeg_directory_added, _ffmpeg_directory_handle
     if _ffmpeg_directory_added or sys.platform != "win32":
         return
     import PySide6
 
     try:
-        os.add_dll_directory(os.path.dirname(os.path.abspath(PySide6.__file__)))
+        _ffmpeg_directory_handle = os.add_dll_directory(
+            os.path.dirname(os.path.abspath(PySide6.__file__))
+        )
     except OSError as exc:  # pragma: no cover - an unusual installation
         _log.warning("could not add the PySide6 DLL directory: %s", exc)
     _ffmpeg_directory_added = True
@@ -166,14 +169,29 @@ class MediaPreview(QWidget):
     def clear(self) -> None:
         self.stop()
         if self._player is not None:
-            # Release the file, so a temporary copy can be deleted on Windows.
+            from shiboken6 import delete
+
+            # Destroy the decoder while its video surface is still alive.
+            # setSource(empty) alone leaves asynchronous backend work pending.
             self._player.setSource(QUrl())
+            self._player.setVideoOutput(None)
+            self._player.setAudioOutput(None)
+            delete(self._player)
+            self._player = None
+            self._audio_output = None
+            self._playback_available = None
         self._pixmap = None
         self._path = None
         self._image_label.clear()
         self._caption.setText("")
         self._controls.setVisible(False)
         self._show_message("Nothing to preview.")
+
+    def closeEvent(self, event) -> None:
+        # Stop asynchronous decoding before QWidget destroys the video surface.
+        # Standalone previews do not have a parent tab's shutdown hook.
+        self.clear()
+        super().closeEvent(event)
 
     def _show_message(self, text: str) -> None:
         self._message_label.setText(text)
@@ -296,12 +314,13 @@ class MediaPreview(QWidget):
                 # No backend could be loaded. Qt does not raise for this; the
                 # player exists but can never play anything.
                 raise RuntimeError("no QtMultimedia backend is available")
-            self._audio_output = QAudioOutput(self)
+            self._audio_output = QAudioOutput(self._player)
             self._player.setAudioOutput(self._audio_output)
 
-            self._video_widget = QVideoWidget(self)
-            self._player_page = self._video_widget
-            self._stack.addWidget(self._player_page)
+            if self._video_widget is None:
+                self._video_widget = QVideoWidget(self)
+                self._player_page = self._video_widget
+                self._stack.addWidget(self._player_page)
             self._player.setVideoOutput(self._video_widget)
 
             self._player.positionChanged.connect(self._on_position_changed)
@@ -310,7 +329,9 @@ class MediaPreview(QWidget):
         except Exception as exc:
             _log.warning("media playback unavailable: %s", exc)
             if self._player is not None:
-                self._player.deleteLater()
+                from shiboken6 import delete
+
+                delete(self._player)
             self._player = None
             self._audio_output = None
             self._video_widget = None

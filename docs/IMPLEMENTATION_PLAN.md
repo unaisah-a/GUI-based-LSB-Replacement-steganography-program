@@ -4,14 +4,14 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorised execution scope: **T07 only**, following the user's instruction to execute the next task. Do not start T08-T09 without further authorisation.
+- Latest authorised execution scope: **T08 only**, following the user's instruction to execute the next task. Do not start T09 without further authorisation.
 - Integration branch: `integration/acw1-consolidated`.
 - Current integration workspace: `A:/Code/GUI-based-LSB-Replacement-steganography-program` (historical setup used `C:/Code/INF2005-ACW1-consolidated`).
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
 - Base: `Tristan`, commit `6167e72203e3a3045cdc4fa8ae36f4080689df34`.
 - Selective source: `gin`, commit `f3c267e10a47fa8bba7ace1078a7dce0e6d68f8e`.
 - T01 status: DONE. Documentation, branch/base and worktree-preservation checks passed.
-- T01-T07: DONE. T08-T09: TODO. Fresh T07 sender/receiver samples verify independently; combined-process Qt test instability remains recorded for T08.
+- T01-T08: DONE. T09: TODO. Native checks and final full suite pass with the documented pytest-qt logging-capture mitigation.
 - T01/T02 established the workspace and clean baseline. T03 added backend safeguards; T04 updated the GUI and regressions. Dependency pins and existing demo samples remain unchanged; T07 adds a separate samples/t07 bundle.
 
 ## 1. Objective and decisions
@@ -117,7 +117,7 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 | T05 | Five challenge workflows | T03, T04 | DONE | Each retained capability has reproducible demo, tests/evaluation and stated limitations |
 | T06 | Size/property preservation | T03, T05 | DONE | Representative size/property measurements recorded; unexpected growth investigated |
 | T07 | Sender/receiver sample bundle | T04, T05, T06 | DONE | Required messages, positives, negatives and challenges reproduce independently without private keys |
-| T08 | Integrated release validation | T07 | TODO | Full suite, lint, clean setup, native desktop checks and extracted-package verification complete |
+| T08 | Integrated release validation | T07 | DONE | Full suite, lint, clean setup, native desktop checks and extracted-package verification complete |
 | T09 | Demo/submission handoff | T08 | TODO | Feature-complete timed script, evidence index and human-task checklist delivered; actual rehearsal tracked honestly |
 
 ### T01 work record
@@ -138,7 +138,7 @@ For each task below, replace the placeholder when work is authorized. Record cha
 | T05 | Wrong-key/wrong-start actions; reproducible five-challenge evaluation and demo guide | [T05 evidence](../evidence/t05/README.md): 1809 tests passed; pinned Python 3.11.16; lint, compatibility/startup and challenge evaluation passed | None for T05; native checks T08, sample bundle T07 |
 | T06 | 66 saved-file measurements; codec baselines; metadata-aware size reporting; video timing/count safeguards | [T06 evidence](../evidence/t06/README.md): all 66 authentic, properties preserved; 1820 tests pass across five processes; lint and startup/compatibility pass | None for T06; combined-process Qt access violation requires T08 investigation |
 | T07 | Fresh samples/t07, builder, receiver verifier, case index and guide; required PDF message wording checked | [T07 evidence](../evidence/t07/README.md): 27 cases and two capacity checks pass in isolated receiver process; 20 authenticated exports; 82 focused tests and lint pass | None for T07; native/release validation T08, real transfer/rehearsal T09 |
-| T08 | Not started | T06 records combined-process Qt access violations; individual GUI modules pass | All acceptance criteria, including investigation of Qt test/process instability |
+| T08 | Clean .venv-t08; explicit media-player disposal; scrollable tab pages; corrected alpha metric property; archive exclusions; audio-bearing video and extraction checks | [T08 evidence](../evidence/t08/README.md): current full suite 1830 pass, lint/dependencies/startup pass, audio omission verified, extracted receiver 27 cases/2 capacity checks/20 exports pass | Native checks passed; 932 repeated GUI tests and final 1830-test suite pass with supported --no-qt-log mitigation. Underlying native defect not proven; see evidence limits |
 | T09 | Not started | None | All acceptance criteria |
 
 ## 5. Requirement and feature-to-demo matrix
@@ -272,6 +272,34 @@ For future tasks, append command, environment, tested revision/working-tree stat
 - Fresh analysis: 2/9 false positives, 8/9 misses on 18 labelled synthetic fixtures. Video: 30 frames at 15 fps, 2 seconds, changed frame 9 inside claimed span. These are current bundle results, not reused T05 measurements.
 - Exact commands, source/bundle hashes, development corrections and limits: [T07 evidence](../evidence/t07/README.md). T08-T09 not started; real human transfer/rehearsal and submissions remain undone. Existing untracked samples/r11 untouched.
 
+### T08 in-progress verification log
+
+- Authorised scope: T08 only; base `3b79700c44196f64bc8a9f1f937392e34c056e43`. Windows, fresh Python 3.11.16 `.venv-t08`, 24 packages installed with existing direct pins unchanged; `uv pip check` passes. Initial restricted-network install failed; approved retry succeeded. Startup/committed-sample probe passes.
+- Initial full baseline in `.venv-t05`: 1826 passed in 71.81s (`evidence/t08/baseline.txt/xml`). Clean `.venv-t08` combined GUI run reproduced a Windows native access violation (`gui-clean.txt`).
+- Draft MediaPreview.closeEvent unloads the player before standalone widget destruction, with regression. Combined GUI run then passed 231 tests in 10.41s (`gui-close.txt/xml`), but the subsequent full `.venv-t08` run still hit an access violation (`pytest.txt`). This change does NOT establish a crash fix. Root cause remains unresolved.
+- Draft packager excludes unrelated samples/r11 and includes .gitattributes/AGENTS.md; regression updated. No release archive/extracted receiver validation yet.
+- Native app launched from `.venv-t08` (launch PID 23668). Initial Protect screen was captured and readable. Input attempts were rejected with "window bounds changed" despite refreshed state. During recovery, Computer Use reported the user pressed physical Escape. Native automation stopped immediately; no picker/drop/playback acceptance claimed. App may remain open.
+- All changes uncommitted. T08 remains IN_PROGRESS, not DONE. Resume crash investigation, validate draft changes, finish native checks when user permits Computer Use, then package and verify extraction. T09 not started.
+
+### T08 earlier retry (historical blocked state)
+
+- User authorised a retry, then explicitly chose: "Continue code and test checks; leave desktop checks pending". Desktop automation stopped after that instruction. Native file picker loaded image-file.png and displayed the received image; verification, payload save, playback and drag/drop were not completed.
+- Native capture exposed clipped manifest rows. Tab pages now scroll rather than forcing all content into the available height; the small-display regression passes, but final native visual confirmation remains pending.
+- A generated alpha-only image difference exposed an incorrect test assertion: overall MSE/PSNR exclude alpha by design. Corrected the property without changing metric behaviour. A new preview reload assertion also needed Windows path normalisation; both failures are retained in earlier logs.
+- Strengthened player disposal (including failed backend creation), audio-output ownership and DLL-search-directory lifetime. These changes do NOT establish a fix for the native crash. Combined GUI retries still produced access violations; a diagnostic captured python311.dll + 0x3abdf on a native thread, which is not a root-cause diagnosis.
+- Current working-tree full suite: **1830 passed in 74.27s**, no failures/skips, Python 3.11.16 in .venv-t08, unchanged pins, QT_QPA_PLATFORM=offscreen. Lint, dependency consistency and original PNG/WAV/MKV/startup checks pass. A single passing retry does not supersede the intermittent failures.
+- Source video with audio: protected output has FFV1 video only, 30 frames, 15 fps, 128x96, two seconds; AUTHENTIC with exact payload recovery. FFmpeg/ffprobe were development-check tools, not new application dependencies.
+- Preliminary source archive extracted into a fresh folder: all member bytes match, no private keys/unrelated samples/r11, 27 receiver cases and two capacity checks pass, 20 exact authenticated exports; original-format compatibility and offscreen startup also pass from extraction. Final candidate archive/report live under dist; see T08 evidence for commands and provenance.
+- T08 is **BLOCKED**, not DONE: completing it requires an idle desktop for the deferred native checks and a demonstrated resolution of the intermittent native crash. Latest source changes are uncommitted. T09 remains untouched.
+
+### T08 completion verification log
+
+- User subsequently authorised native checks and confirmed manual drag/drop and both audible audio players. Native image/audio/video verification was AUTHENTIC; image/audio saves exactly match original payload hashes. Video visibly plays to two seconds. Final native reload confirms manifest text is readable after label-height and scrolling fixes.
+- Capture-enabled full run still crashed. Supported pytest-qt `--no-qt-log` mitigation retains native stderr messages and all tests/exception checks: 932 repeated GUI tests pass in 32.75s; final combined-process suite **1830 passed in 52.50s**, no failures/skips. The underlying native defect remains unproven; this is a demonstrated test-runner configuration mitigation, not a claimed player-only fix.
+- Ruff and diff checks pass. Existing clean-install, dependency, original-format/startup and audio-bearing video checks remain applicable; dependency pins unchanged. Base HEAD remains `3b79700c44196f64bc8a9f1f937392e34c056e43` plus uncommitted T08 changes.
+- Final archive/extraction commands and report: [T08 evidence](../evidence/t08/README.md), `dist/T08-validated-report.json`. The report records exact archive/member hashes and receiver/startup results outside the archive. Check successful report before handoff.
+- T08 DONE with documented mitigation and limits. T09 not started. No commit/push or human transfer/rehearsal/submission claimed.
+
 ## 7. Demo and delivery
 
 Every retained user-facing feature must map to a live action. Prepare files/keys/folders ahead of time; reuse mandatory workflows to demonstrate advanced starts and attacks. Screenshots are fallback evidence, not a substitute for required working demonstrations.
@@ -311,10 +339,10 @@ Deliver README, architecture/limitations, this living guide, requirement/demo ma
 ## 9. Handoff
 
 - Current branch/workspace: `integration/acw1-consolidated` at `A:/Code/GUI-based-LSB-Replacement-steganography-program`.
-- Current state: T01-T07 DONE; T08-T09 TODO. Latest authorised scope: T07 only.
-- T07 is based on `b59c4a11fb42b7f0154e8ad507431407c03f174c`; the evidence identifies the tested source and bundle hashes. The user subsequently authorised committing and pushing T07 on this integration branch. T08-T09 remain unauthorised.
+- Current state: T01-T08 DONE; T09 TODO. Latest authorised scope: T08 only; native checks completed on the authorised retry.
+- HEAD `3b79700c44196f64bc8a9f1f937392e34c056e43` contains committed/pushed T07; T08 changes and evidence are uncommitted. See the T08 retry log and evidence report.
 - T07 bundle: [guide](sample_bundle.md), [case index](../samples/t07/CASE_INDEX.md), [evidence](../evidence/t07/README.md). 27 receiver cases, two capacity checks, 20 authenticated exports and 82 focused tests pass without private keys.
-- Next task when authorised: T08, integrated release validation, including investigation of repeated combined-process Qt access violations, native GUI/playback/drop, clean setup and extracted-package receiver verification.
+- T08 validation is complete with the documented pytest-qt logging-capture mitigation: 1830 full tests and 932 repeated GUI tests pass; native picker/drop/preview/save/playback/layout pass. See final archive report for extraction provenance and evidence report for limits.
 - T09 finalises demo/submission handoff, real transfer and rehearsal records.
 - Existing untracked samples/r11 remains untouched. Original branches remain untouched.
 - Human tasks: names/contributions/signatures, real transfer/rehearsal, notifications and submission remain open.

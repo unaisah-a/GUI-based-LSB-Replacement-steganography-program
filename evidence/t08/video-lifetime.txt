@@ -1,0 +1,42 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.16, pytest-8.3.3, pluggy-1.6.0 -- A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase(WindowsPath('A:/Code/GUI-based-LSB-Replacement-steganography-program/.hypothesis/examples'))
+PySide6 6.8.0 -- Qt runtime 6.8.0 -- Qt compiled 6.8.0
+rootdir: A:\Code\GUI-based-LSB-Replacement-steganography-program
+configfile: pytest.ini
+plugins: hypothesis-6.115.5, cov-7.1.0, qt-4.4.0
+collecting ... collected 30 items
+
+tmp/test_t08_video_lifetime.py::test_video_lifetime[0] PASSED            [  3%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[1] PASSED            [  6%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[2] PASSED            [ 10%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[3] PASSED            [ 13%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[4] PASSED            [ 16%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[5] PASSED            [ 20%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[6] PASSED            [ 23%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[7] PASSED            [ 26%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[8] PASSED            [ 30%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[9] PASSED            [ 33%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[10] PASSED           [ 36%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[11] PASSED           [ 40%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[12] PASSED           [ 43%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[13] PASSED           [ 46%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[14] PASSED           [ 50%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[15] PASSED           [ 53%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[16] PASSED           [ 56%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[17] PASSED           [ 60%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[18] PASSED           [ 63%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[19] PASSED           [ 66%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[20] PASSED           [ 70%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[21] PASSED           [ 73%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[22] PASSED           [ 76%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[23] PASSED           [ 80%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[24] PASSED           [ 83%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[25] PASSED           [ 86%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[26] PASSED           [ 90%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[27] PASSED           [ 93%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[28] PASSED           [ 96%]
+tmp/test_t08_video_lifetime.py::test_video_lifetime[29] PASSED           [100%]
+
+============================= 30 passed in 1.81s ==============================

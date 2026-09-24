@@ -23,8 +23,10 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QAction, QCloseEvent
 from PySide6.QtWidgets import (
     QLabel,
+    QLayout,
     QMainWindow,
     QMessageBox,
+    QScrollArea,
     QStatusBar,
     QTabWidget,
     QWidget,
@@ -75,7 +77,13 @@ class MainWindow(QMainWindow):
             self.steganalysis_tab,
             self.video_tab,
         ):
-            self.tabs.addTab(tab, tab.TITLE)
+            # Loaded manifests/results need more height than an empty tab.
+            # Keep their minimum layout size and scroll on smaller displays.
+            tab.layout().setSizeConstraint(QLayout.SizeConstraint.SetMinAndMaxSize)
+            page = QScrollArea(self.tabs)
+            page.setWidgetResizable(True)
+            page.setWidget(tab)
+            self.tabs.addTab(page, tab.TITLE)
             # Tabs report progress through the shared status bar rather than each
             # holding a status area of its own. Every tab has the signal now; the
             # guard stays so that adding a tab without one cannot crash the window.

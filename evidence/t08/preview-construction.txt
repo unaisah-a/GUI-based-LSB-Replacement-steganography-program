@@ -1,0 +1,31 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.16, pytest-8.3.3, pluggy-1.6.0 -- A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'image-stego' -> deadline=None, suppress_health_check=[HealthCheck.too_slow], database=DirectoryBasedExampleDatabase(WindowsPath('A:/Code/GUI-based-LSB-Replacement-steganography-program/.hypothesis/examples'))
+PySide6 6.8.0 -- Qt runtime 6.8.0 -- Qt compiled 6.8.0
+rootdir: A:\Code\GUI-based-LSB-Replacement-steganography-program
+configfile: pytest.ini
+plugins: hypothesis-6.115.5, cov-7.1.0, qt-4.4.0
+collecting ... collected 19 items
+
+tests/test_gui_shell.py::TestMediaPreview::test_closing_unloads_the_player_before_widget_destruction PASSED [  5%]
+tests/test_gui_shell.py::TestMediaPreview::test_it_shows_an_image PASSED [ 10%]
+tests/test_gui_shell.py::TestMediaPreview::test_it_reports_an_unsupported_file PASSED [ 15%]
+tests/test_gui_shell.py::TestMediaPreview::test_it_reports_a_missing_file PASSED [ 21%]
+tests/test_gui_shell.py::TestMediaPreview::test_audio_either_plays_or_says_it_cannot PASSED [ 26%]
+tests/test_gui_shell.py::TestMediaPreview::test_a_missing_backend_is_reported_rather_than_a_dead_button PASSED [ 31%]
+tests/test_gui_shell.py::TestMediaPreview::test_the_bundled_ffmpeg_backend_loads_on_windows PASSED [ 36%]
+tests/test_gui_shell.py::TestMediaPreview::test_clearing_forgets_the_file PASSED [ 42%]
+tests/test_gui_shell.py::TestMediaPreview::test_stopping_without_a_player_is_safe PASSED [ 47%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_it_constructs PASSED [ 52%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_the_depth_control_covers_one_to_eight PASSED [ 57%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_the_depth_label_tracks_the_slider PASSED [ 63%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_both_start_methods_are_offered PASSED [ 68%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_the_drop_zone_accepts_every_registered_medium PASSED [ 73%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_the_drop_zone_still_refuses_an_unsupported_file PASSED [ 78%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_a_video_cover_is_offered_a_matroska_output_name PASSED [ 84%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_secret_and_location_controls_swap_with_the_mode PASSED [ 89%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_the_passphrase_field_follows_the_encryption_toggle PASSED [ 94%]
+tmp/test_t08_idle.py::test_backend_idle PASSED                           [100%]
+
+============================= 19 passed in 16.49s =============================

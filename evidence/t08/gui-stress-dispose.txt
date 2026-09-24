@@ -1,0 +1,207 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.16, pytest-8.3.3, pluggy-1.6.0 -- A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'image-stego' -> deadline=None, suppress_health_check=[HealthCheck.too_slow], database=DirectoryBasedExampleDatabase(WindowsPath('A:/Code/GUI-based-LSB-Replacement-steganography-program/.hypothesis/examples'))
+PySide6 6.8.0 -- Qt runtime 6.8.0 -- Qt compiled 6.8.0
+rootdir: A:\Code\GUI-based-LSB-Replacement-steganography-program
+configfile: pytest.ini
+plugins: hypothesis-6.115.5, cov-7.1.0, qt-4.4.0
+collecting ... collected 928 items
+
+tests/test_gui_consolidation.py::test_picker_and_drop_use_identical_validation[valid] PASSED [  0%]
+tests/test_gui_consolidation.py::test_picker_and_drop_use_identical_validation[missing] PASSED [  0%]
+tests/test_gui_consolidation.py::test_picker_and_drop_use_identical_validation[directory] PASSED [  0%]
+tests/test_gui_consolidation.py::test_picker_and_drop_use_identical_validation[unsupported] PASSED [  0%]
+tests/test_gui_consolidation.py::test_ambiguous_or_remote_drop_preserves_previous_selection[remote] PASSED [  0%]
+tests/test_gui_consolidation.py::test_ambiguous_or_remote_drop_preserves_previous_selection[mixed] PASSED [  0%]
+tests/test_gui_consolidation.py::test_ambiguous_or_remote_drop_preserves_previous_selection[multiple] PASSED [  0%]
+tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[TAMPERED] PASSED [  0%]
+tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[SIGNATURE_INVALID] PASSED [  0%]
+tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[PAYLOAD_MISSING] PASSED [  1%]
+tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[WRONG_START_LOCATION] PASSED [  1%]
+tests/test_gui_consolidation.py::test_failed_verdict_never_displays_or_saves_attached_plaintext[CANNOT_VERIFY] PASSED [  1%]
+tests/test_gui_consolidation.py::test_capacity_accounts_for_manual_offset PASSED [  1%]
+tests/test_gui_consolidation.py::test_capacity_worker_ignores_superseded_result PASSED [  1%]
+tests/test_gui_consolidation.py::test_clear_forgets_tab_input[ProtectTab-_cover_path] PASSED [  1%]
+tests/test_gui_consolidation.py::test_clear_forgets_tab_input[VerifyTab-_stego_path] PASSED [  1%]
+tests/test_gui_consolidation.py::test_clear_forgets_tab_input[AttackTab-_stego_path] PASSED [  1%]
+tests/test_gui_consolidation.py::test_clear_forgets_tab_input[SteganalysisTab-_path] PASSED [  1%]
+tests/test_gui_consolidation.py::test_verification_result_for_old_input_is_discarded PASSED [  2%]
+tests/test_gui_consolidation.py::test_sender_receiver_fingerprints_match PASSED [  2%]
+tests/test_gui_consolidation.py::test_cut_controls_are_absent PASSED     [  2%]
+tests/test_gui_lab_tabs.py::TestContextFromManifest::test_it_recovers_everything_the_attacks_need PASSED [  2%]
+tests/test_gui_lab_tabs.py::TestContextFromManifest::test_a_derived_location_needs_the_secret PASSED [  2%]
+tests/test_gui_lab_tabs.py::TestContextFromManifest::test_a_manual_location_needs_no_secret PASSED [  2%]
+tests/test_gui_lab_tabs.py::TestContextFromManifest::test_a_malformed_manifest_is_reported PASSED [  2%]
+tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_it_constructs PASSED [  2%]
+tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_the_list_is_empty_until_a_file_is_loaded PASSED [  2%]
+tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_loading_an_image_lists_the_image_attacks PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_loading_audio_lists_the_audio_attacks PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_payload_attacks_apply_to_both_media PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_the_manifest_is_found_automatically PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabConstruction::test_only_the_needed_secret_fields_are_enabled PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabValidation::test_no_file_is_refused PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabValidation::test_a_missing_key_is_refused PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabValidation::test_a_missing_manifest_is_refused PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabValidation::test_a_loaded_file_with_a_selection_passes PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_corrupting_the_signature_changes_the_verdict PASSED [  3%]
+tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_modifying_outside_the_payload_leaves_the_verdict_intact PASSED [  4%]
+tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_the_log_records_expected_and_observed PASSED [  4%]
+tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_an_audio_attack_runs PASSED [  4%]
+tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_the_log_can_be_cleared PASSED [  4%]
+tests/test_gui_lab_tabs.py::TestAttackTabRunning::test_a_failure_is_reported_without_raising PASSED [  4%]
+tests/test_gui_lab_tabs.py::TestArrayToPixmap::test_a_grayscale_plane PASSED [  4%]
+tests/test_gui_lab_tabs.py::TestArrayToPixmap::test_an_rgb_image PASSED  [  4%]
+tests/test_gui_lab_tabs.py::TestArrayToPixmap::test_an_rgba_image PASSED [  4%]
+tests/test_gui_lab_tabs.py::TestArrayToPixmap::test_a_single_channel_three_dimensional_array PASSED [  4%]
+tests/test_gui_lab_tabs.py::TestArrayToPixmap::test_an_unsupported_shape_is_refused PASSED [  5%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_it_constructs PASSED [  5%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_the_disclaimer_is_always_displayed PASSED [  5%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_no_file_is_refused PASSED [  5%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_a_missing_reference_is_refused PASSED [  5%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_it_proposes_the_likely_original PASSED [  5%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_it_analyses_an_image_without_a_reference PASSED [  5%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_it_analyses_an_image_with_a_reference PASSED [  5%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_bit_planes_are_rendered_for_the_selected_channel PASSED [  5%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_changing_the_channel_re_renders PASSED [  6%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_an_insufficient_sample_renders_as_words PASSED [  6%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_every_row_explains_what_it_measures PASSED [  6%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_every_row_carries_the_disclaimer_as_a_tooltip PASSED [  6%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_it_analyses_audio PASSED [  6%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_audio_shows_no_bit_plane_grid PASSED [  6%]
+tests/test_gui_lab_tabs.py::TestSteganalysisTab::test_a_failure_is_reported_without_raising PASSED [  6%]
+tests/test_gui_lab_tabs.py::test_verification_actions_report_input_without_writing[verification.wrong_key] PASSED [  6%]
+tests/test_gui_lab_tabs.py::test_verification_actions_report_input_without_writing[verification.wrong_start] PASSED [  6%]
+tests/test_gui_shell.py::TestEntryPoint::test_main_module_imports_without_starting_qt PASSED [  7%]
+tests/test_gui_shell.py::TestEntryPoint::test_the_stylesheet_is_present_and_loads PASSED [  7%]
+tests/test_gui_shell.py::TestEntryPoint::test_a_missing_stylesheet_is_not_fatal PASSED [  7%]
+tests/test_gui_shell.py::TestEntryPoint::test_the_stylesheet_covers_every_verdict_style PASSED [  7%]
+tests/test_gui_shell.py::TestMainWindow::test_it_constructs PASSED       [  7%]
+tests/test_gui_shell.py::TestMainWindow::test_it_has_the_five_tabs_from_the_plan PASSED [  7%]
+tests/test_gui_shell.py::TestMainWindow::test_every_tab_is_a_real_widget PASSED [  7%]
+tests/test_gui_shell.py::TestMainWindow::test_the_tab_widget_is_styleable PASSED [  7%]
+tests/test_gui_shell.py::TestMainWindow::test_the_status_bar_starts_ready PASSED [  7%]
+tests/test_gui_shell.py::TestMainWindow::test_status_can_be_updated PASSED [  7%]
+tests/test_gui_shell.py::TestMainWindow::test_the_key_and_help_menus_exist PASSED [  8%]
+tests/test_gui_shell.py::TestMainWindow::test_key_actions_are_present PASSED [  8%]
+tests/test_gui_shell.py::TestMainWindow::test_generated_keys_reach_the_tabs_without_a_restart PASSED [  8%]
+tests/test_gui_shell.py::TestMainWindow::test_generated_keys_do_not_replace_a_chosen_key PASSED [  8%]
+tests/test_gui_shell.py::TestMainWindow::test_generated_keys_replace_text_that_is_not_a_key_file PASSED [  8%]
+tests/test_gui_shell.py::TestMainWindow::test_closing_an_idle_window_does_not_block PASSED [  8%]
+tests/test_gui_shell.py::TestMainWindow::test_loaded_manifest_can_scroll_on_a_small_display PASSED [  8%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_declares_a_title[protect_tab] PASSED [  8%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_declares_a_title[verify_tab] PASSED [  8%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_declares_a_title[attack_tab] PASSED [  9%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_declares_a_title[steganalysis_tab] PASSED [  9%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_declares_a_title[video_tab] PASSED [  9%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_reports_progress_to_the_status_bar[protect_tab] PASSED [  9%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_reports_progress_to_the_status_bar[verify_tab] PASSED [  9%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_reports_progress_to_the_status_bar[attack_tab] PASSED [  9%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_reports_progress_to_the_status_bar[steganalysis_tab] PASSED [  9%]
+tests/test_gui_shell.py::TestTabs::test_each_tab_reports_progress_to_the_status_bar[video_tab] PASSED [  9%]
+tests/test_gui_shell.py::TestWorker::test_a_successful_call_emits_its_result PASSED [  9%]
+tests/test_gui_shell.py::TestWorker::test_a_failing_call_emits_a_message_and_a_traceback PASSED [ 10%]
+tests/test_gui_shell.py::TestWorker::test_finished_is_emitted_on_success_and_on_failure PASSED [ 10%]
+tests/test_gui_shell.py::TestWorker::test_an_exception_never_escapes_the_worker PASSED [ 10%]
+tests/test_gui_shell.py::TestWorker::test_keyword_arguments_are_passed_through PASSED [ 10%]
+tests/test_gui_shell.py::TestDescribeException::test_application_errors_are_used_as_written PASSED [ 10%]
+tests/test_gui_shell.py::TestDescribeException::test_manifest_errors_are_used_as_written PASSED [ 10%]
+tests/test_gui_shell.py::TestDescribeException::test_unexpected_errors_get_their_type_named PASSED [ 10%]
+tests/test_gui_shell.py::TestDescribeException::test_an_empty_message_still_names_the_type PASSED [ 10%]
+tests/test_gui_shell.py::TestBackgroundRunner::test_it_runs_a_task_and_reports_the_result PASSED [ 10%]
+tests/test_gui_shell.py::TestBackgroundRunner::test_it_reports_a_failure PASSED [ 10%]
+tests/test_gui_shell.py::TestBackgroundRunner::test_the_active_count_returns_to_zero PASSED [ 11%]
+tests/test_gui_shell.py::TestDropZone::test_it_accepts_a_supported_image PASSED [ 11%]
+tests/test_gui_shell.py::TestDropZone::test_it_accepts_a_supported_audio_file PASSED [ 11%]
+tests/test_gui_shell.py::TestDropZone::test_it_rejects_an_unsupported_file_with_a_reason PASSED [ 11%]
+tests/test_gui_shell.py::TestDropZone::test_it_names_a_lossy_format_and_says_why PASSED [ 11%]
+tests/test_gui_shell.py::TestDropZone::test_it_rejects_a_missing_file PASSED [ 11%]
+tests/test_gui_shell.py::TestDropZone::test_it_restricts_to_the_configured_media_types PASSED [ 11%]
+tests/test_gui_shell.py::TestDropZone::test_detection_is_by_content_not_extension PASSED [ 11%]
+tests/test_gui_shell.py::TestDropZone::test_clearing_forgets_the_selection PASSED [ 11%]
+tests/test_gui_shell.py::TestDropZone::test_it_accepts_drops PASSED      [ 12%]
+tests/test_gui_shell.py::TestDropZone::test_the_dialog_filter_lists_supported_extensions PASSED [ 12%]
+tests/test_gui_shell.py::TestDropZone::test_the_dialog_filter_can_be_restricted PASSED [ 12%]
+tests/test_gui_shell.py::TestFileInfoPanel::test_it_starts_empty PASSED  [ 12%]
+tests/test_gui_shell.py::TestFileInfoPanel::test_it_shows_a_description PASSED [ 12%]
+tests/test_gui_shell.py::TestFileInfoPanel::test_it_flags_an_extension_mismatch PASSED [ 12%]
+tests/test_gui_shell.py::TestFileInfoPanel::test_a_matching_extension_shows_no_notice PASSED [ 12%]
+tests/test_gui_shell.py::TestFileInfoPanel::test_it_shows_image_capacity_rows PASSED [ 12%]
+tests/test_gui_shell.py::TestFileInfoPanel::test_it_shows_audio_capacity_rows PASSED [ 12%]
+tests/test_gui_shell.py::TestFileInfoPanel::test_it_reports_a_payload_that_does_not_fit PASSED [ 13%]
+tests/test_gui_shell.py::TestFileInfoPanel::test_clearing_removes_every_row PASSED [ 13%]
+tests/test_gui_shell.py::TestMediaPreview::test_closing_unloads_the_player_before_widget_destruction PASSED [ 13%]
+tests/test_gui_shell.py::TestMediaPreview::test_it_shows_an_image PASSED [ 13%]
+tests/test_gui_shell.py::TestMediaPreview::test_it_reports_an_unsupported_file PASSED [ 13%]
+tests/test_gui_shell.py::TestMediaPreview::test_it_reports_a_missing_file PASSED [ 13%]
+tests/test_gui_shell.py::TestMediaPreview::test_audio_either_plays_or_says_it_cannot PASSED [ 13%]
+tests/test_gui_shell.py::TestMediaPreview::test_a_missing_backend_is_reported_rather_than_a_dead_button PASSED [ 13%]
+tests/test_gui_shell.py::TestMediaPreview::test_the_bundled_ffmpeg_backend_loads_on_windows PASSED [ 13%]
+tests/test_gui_shell.py::TestMediaPreview::test_clearing_forgets_the_file PASSED [ 14%]
+tests/test_gui_shell.py::TestMediaPreview::test_stopping_without_a_player_is_safe PASSED [ 14%]
+tests/test_gui_shell.py::TestResultPanel::test_it_starts_with_no_verdict PASSED [ 14%]
+tests/test_gui_shell.py::TestResultPanel::test_it_shows_the_verdict PASSED [ 14%]
+tests/test_gui_shell.py::TestResultPanel::test_every_verdict_renders[AUTHENTIC] PASSED [ 14%]
+tests/test_gui_shell.py::TestResultPanel::test_every_verdict_renders[TAMPERED] PASSED [ 14%]
+tests/test_gui_shell.py::TestResultPanel::test_every_verdict_renders[SIGNATURE_INVALID] PASSED [ 14%]
+tests/test_gui_shell.py::TestResultPanel::test_every_verdict_renders[PAYLOAD_MISSING] PASSED [ 14%]
+tests/test_gui_shell.py::TestResultPanel::test_every_verdict_renders[WRONG_START_LOCATION] PASSED [ 14%]
+tests/test_gui_shell.py::TestResultPanel::test_every_verdict_renders[CANNOT_VERIFY] PASSED [ 14%]
+tests/test_gui_shell.py::TestResultPanel::test_the_flags_are_shown_in_words PASSED [ 15%]
+tests/test_gui_shell.py::TestResultPanel::test_an_unestablished_flag_says_so_rather_than_no PASSED [ 15%]
+tests/test_gui_shell.py::TestResultPanel::test_notes_are_displayed PASSED [ 15%]
+tests/test_gui_shell.py::TestResultPanel::test_mismatched_fields_are_listed PASSED [ 15%]
+tests/test_gui_shell.py::TestResultPanel::test_an_error_can_be_shown_without_a_verdict PASSED [ 15%]
+tests/test_gui_shell.py::TestResultPanel::test_clearing_resets_everything PASSED [ 15%]
+tests/test_gui_shell.py::TestRecoveredContentIsInert::test_text_is_shown_as_plain_text PASSED [ 15%]
+tests/test_gui_shell.py::TestRecoveredContentIsInert::test_markup_is_not_rendered PASSED [ 15%]
+tests/test_gui_shell.py::TestRecoveredContentIsInert::test_the_payload_view_is_read_only PASSED [ 15%]
+tests/test_gui_shell.py::TestRecoveredContentIsInert::test_binary_content_falls_back_to_a_hex_dump PASSED [ 16%]
+tests/test_gui_shell.py::TestRecoveredContentIsInert::test_the_inert_notice_is_displayed PASSED [ 16%]
+tests/test_gui_shell.py::TestRecoveredContentIsInert::test_no_message_leaves_the_view_empty PASSED [ 16%]
+tests/test_gui_shell.py::TestRecoveredContentIsInert::test_switching_to_hex_and_back_works PASSED [ 16%]
+tests/test_gui_shell.py::TestHexDump::test_offsets_and_ascii_columns PASSED [ 16%]
+tests/test_gui_shell.py::TestHexDump::test_unprintable_bytes_become_dots PASSED [ 16%]
+tests/test_gui_shell.py::TestHexDump::test_empty_input PASSED            [ 16%]
+tests/test_gui_shell.py::TestHexDump::test_long_input_is_truncated_with_a_note PASSED [ 16%]
+tests/test_gui_shell.py::TestHexDump::test_rows_use_the_configured_width PASSED [ 16%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_it_constructs PASSED [ 17%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_the_depth_control_covers_one_to_eight PASSED [ 17%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_the_depth_label_tracks_the_slider PASSED [ 17%]
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_both_start_methods_are_offered PASSED [ 17%]
+Windows fatal exception: access violation
+
+Current thread 0x0000223c (most recent call first):
+  <no Python frame>
+
+Thread 0x00007108 (most recent call first):
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\_io\terminalwriter.py", line 184 in flush
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\_io\terminalwriter.py", line 177 in write
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\terminal.py", line 494 in write
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\terminal.py", line 721 in _write_progress_information_filling_space
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\terminal.py", line 651 in pytest_runtest_logreport
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\runner.py", line 246 in call_and_report
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\runner.py", line 132 in runtestprotocol
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\runner.py", line 113 in pytest_runtest_protocol
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\main.py", line 362 in pytest_runtestloop
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\main.py", line 337 in _main
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\main.py", line 283 in wrap_session
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\main.py", line 330 in pytest_cmdline_main
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\config\__init__.py", line 175 in main
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\_pytest\config\__init__.py", line 201 in console_main
+  File "A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Lib\site-packages\pytest\__main__.py", line 9 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 198 in _run_module_as_main
+tests/test_gui_tabs.py::TestProtectTabConstruction::test_the_drop_zone_accepts_every_registered_medium PASSED [ 17%]

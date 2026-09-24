@@ -45,6 +45,8 @@ INCLUDED: tuple[str, ...] = (
     "pytest.ini",
     "README.md",
     ".gitignore",
+    ".gitattributes",
+    "AGENTS.md",
 )
 
 #: Any path component with one of these names is skipped wherever it appears.
@@ -71,6 +73,8 @@ EXCLUDED_PATHS: frozenset[str] = frozenset(
         # packaged, so it could verify nothing and would only pre-fill the Verify tab
         # with a key the marker does not hold.
         "keys/public/demo_public.pem",
+        # Unrelated pre-existing work, explicitly outside the integration release.
+        "samples/r11",
     }
 )
 

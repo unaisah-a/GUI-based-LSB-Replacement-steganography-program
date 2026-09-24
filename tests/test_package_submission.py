@@ -24,7 +24,8 @@ def _write(root: Path, relative: str, data: bytes = b"x") -> None:
 def repository(tmp_path):
     """A small tree with every included root, plus everything that must stay out."""
     root = tmp_path / "repo"
-    files = {"main.py", "requirements.txt", "pyproject.toml", "pytest.ini", "README.md", ".gitignore"}
+    files = {"main.py", "requirements.txt", "pyproject.toml", "pytest.ini", "README.md",
+             ".gitignore", ".gitattributes", "AGENTS.md"}
     for entry in package_submission.INCLUDED:
         _write(root, entry if entry in files else f"{entry}/placeholder.txt")
     _write(root, "keys/public/samples_public.pem", PUBLIC_PEM)
@@ -36,6 +37,8 @@ def repository(tmp_path):
     _write(root, ".pytest_out.txt")
     _write(root, "evidence/logs/application.log")
     _write(root, "evidence/results/e2e_results.md")
+    _write(root, "samples/r11/unrelated.txt")
+    _write(root, "samples/t07/party-b/sender-public.pem", PUBLIC_PEM)
     return root
 
 
@@ -49,6 +52,8 @@ class TestCollect:
         assert "main.py" in names
         assert "keys/public/samples_public.pem" in names
         assert "evidence/results/e2e_results.md" in names
+        assert "samples/t07/party-b/sender-public.pem" in names
+        assert ".gitattributes" in names
 
     @pytest.mark.parametrize(
         "excluded",
@@ -60,6 +65,7 @@ class TestCollect:
             "tests/.hypothesis/examples/a",
             ".pytest_out.txt",
             "evidence/logs/application.log",
+            "samples/r11/unrelated.txt",
         ],
     )
     def test_everything_else_stays_out(self, repository, excluded):

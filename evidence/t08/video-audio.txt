@@ -1,0 +1,35 @@
+{
+  "ffmpeg": "ffmpeg version 2026-02-26-git-6695528af6-full_build-www.gyan.dev Copyright (c) 2000-2026 the FFmpeg developers",
+  "source_streams": [
+    "video",
+    "audio"
+  ],
+  "output_streams": [
+    "video"
+  ],
+  "source_decoded": {
+    "frames": 30,
+    "fps": 15.0,
+    "shape": [
+      96,
+      128,
+      3
+    ],
+    "duration": 2.0
+  },
+  "output_decoded": {
+    "frames": 30,
+    "fps": 15.0,
+    "shape": [
+      96,
+      128,
+      3
+    ],
+    "duration": 2.0
+  },
+  "verdict": "AUTHENTIC",
+  "exact_message": true,
+  "source_sha256": "79fbe239db5dcf73f450f99aa3596dca1e08bcebd35a7ac2a23d44dbe4a8ad92",
+  "output_sha256": "a4f0cce974622a225e0115ed0907cc96d5bf1303e0d28c2c51ea28fc5ddbd183",
+  "private_key_saved": false
+}

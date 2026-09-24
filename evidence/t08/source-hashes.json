@@ -1,0 +1,22 @@
+{
+  "base": "3b79700c44196f64bc8a9f1f937392e34c056e43",
+  "state": "uncommitted T08 final working tree; stable-full 1830 pass; repeated GUI 932 pass; native checks passed; supported no-qt-log mitigation",
+  "sha256": {
+    "AGENTS.md": "8248a7904c232523ad57938a7ff0e8f7182906f3f4920a95ec3a3f81fec93da2",
+    "app/gui/main_window.py": "c564b9469f0e80f79ec2b7e6a06ecd5783d745bc3a46920f417950fd09904ae2",
+    "app/gui/widgets/file_info_panel.py": "23a8ebba045d452513b4c81817b79e9f73396d435f882ab08970a35d2699b085",
+    "app/gui/widgets/media_preview.py": "bc2f6f4bdd80ed920476952cf9cdbd37a91896f9c43beffaf0a8aeb2fc780165",
+    "docs/IMPLEMENTATION_PLAN.md": "fa7deefe35d4ecb08199f440fd5976deb655b2338885a9f2a027549c0511a250",
+    "evidence/t08/README.md": "2fd56ebc79a72280ec26e33f775b7960052ef3ab873321c346102fc210385c51",
+    "evidence/t08/check_package.py": "df4795898819ba600c6f22bf0751471fdf771d4cf29b7b3c575dc48232701964",
+    "evidence/t08/check_video_audio.py": "09c5333617f908b78ad94eb2497d6eb3419af81c8e8052024065ca381839c0c2",
+    "evidence/t08/native_fault_probe.py": "eff3be5419514d2b015d336fe63caebd53d76b1fdc4fd693d97f358997169035",
+    "pyproject.toml": "03249656c456b9e63c3975351a046e568074327adfbb4ae1971c01364c788788",
+    "pytest.ini": "b8ac53be53f43fa77445c41f4d0ece409a74593245e618c70e16776bb7665330",
+    "requirements.txt": "1e591094574f9a94508f82e152afb0b443980ce6f3204974b821f95340d81987",
+    "scripts/package_submission.py": "c0ccac40b5330c5f617d87cb972b6ded90f6a2a360e64d37f1037394b66faaf8",
+    "tests/test_gui_shell.py": "f7a3942efabd708d540adb3ebd19f6cc9dc8478aa8494d13e24e856e83372f55",
+    "tests/test_image_analysis.py": "effce8531c3545239fc8107dc72a76d304ae26e0d831e4415117d78ef39eab8a",
+    "tests/test_package_submission.py": "614de1f65c5b27f1ac071917ba86d619a65a3cca40f81cd1158b26c9e0536217"
+  }
+}

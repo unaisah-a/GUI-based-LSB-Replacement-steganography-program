@@ -193,6 +193,28 @@ class TestMainWindow:
         window.close()
         assert not window.isVisible()
 
+    def test_loaded_manifest_can_scroll_on_a_small_display(self, qtbot):
+        from PySide6.QtWidgets import QScrollArea
+
+        from main import load_stylesheet
+
+        window = MainWindow()
+        qtbot.addWidget(window)
+        window.setStyleSheet(load_stylesheet())
+        window.resize(1000, 700)
+        window.tabs.setCurrentIndex(1)
+        window.verify_tab.manifest_panel.set_rows(
+            [(f"Property {index}", "Manifest value") for index in range(11)]
+            + [("Start location", "derived from the secret")]
+        )
+        window.show()
+        page = window.tabs.widget(1)
+        assert isinstance(page, QScrollArea)
+        qtbot.waitUntil(lambda: page.verticalScrollBar().maximum() > 0)
+        for field in window.verify_tab.manifest_panel._rows.values():
+            assert field.height() >= field.fontMetrics().height()
+            assert field.height() >= field.heightForWidth(field.width())
+
 
 class TestTabs:
     """Every tab is now a real one; nothing in the window is a placeholder."""
@@ -509,6 +531,30 @@ class TestFileInfoPanel:
 
 
 class TestMediaPreview:
+    def test_closing_unloads_the_player_before_widget_destruction(self, qtbot, wav_file):
+        from shiboken6 import isValid
+
+        preview = MediaPreview()
+        qtbot.addWidget(preview)
+        preview.show_file(wav_file)
+        player = preview._player
+        preview.close()
+        assert preview.path is None
+        assert preview._player is None
+        if player is not None:
+            assert not isValid(player)
+
+    def test_playback_can_be_loaded_again_after_clear(self, qtbot, wav_file):
+        preview = MediaPreview()
+        qtbot.addWidget(preview)
+        available = preview.show_file(wav_file)
+        surface = preview._video_widget
+        preview.clear()
+        assert preview.show_file(wav_file) is available
+        if available:
+            assert preview._video_widget is surface
+            assert os.path.normpath(preview._player.source().toLocalFile()) == os.path.normpath(wav_file)
+
     def test_it_shows_an_image(self, qtbot, png_file):
         preview = MediaPreview()
         qtbot.addWidget(preview)
@@ -556,6 +602,7 @@ class TestMediaPreview:
         assert preview.show_file(wav_file) is False
         assert preview.playback_available is False
         assert "Playback is not available" in preview._message_label.text()
+        assert not preview.findChildren(QMediaPlayer)
 
     @pytest.mark.skipif(sys.platform != "win32", reason="the DLL search path is Windows-only")
     def test_the_bundled_ffmpeg_backend_loads_on_windows(self, qtbot, wav_file):

@@ -34,13 +34,15 @@ class TestMetricCorrectness:
     """Requirement 8.5 to 8.7 and 15.5."""
 
     @given(image_pair())
-    def test_zero_error_exactly_when_identical(self, pair):
+    def test_zero_error_exactly_when_colour_channels_identical(self, pair):
         first, second = pair
         result = analysis.compare_quality(first, second)
         identical = np.array_equal(first, second)
 
         assert result.pixel_identical is identical
-        if identical:
+        # Overall metrics exclude RGBA alpha; pixel equality includes it.
+        colour_identical = np.array_equal(first[..., :3], second[..., :3])
+        if colour_identical:
             assert result.overall_mse == 0.0
             assert result.overall_psnr_db == math.inf
             assert result.overall_psnr_unbounded is True

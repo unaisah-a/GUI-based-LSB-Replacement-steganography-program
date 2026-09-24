@@ -1,0 +1,22 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.16, pytest-8.3.3, pluggy-1.6.0 -- A:\Code\GUI-based-LSB-Replacement-steganography-program\.venv-t08\Scripts\python.exe
+cachedir: .pytest_cache
+hypothesis profile 'image-stego' -> deadline=None, suppress_health_check=[HealthCheck.too_slow], database=DirectoryBasedExampleDatabase(WindowsPath('A:/Code/GUI-based-LSB-Replacement-steganography-program/.hypothesis/examples'))
+PySide6 6.8.0 -- Qt runtime 6.8.0 -- Qt compiled 6.8.0
+rootdir: A:\Code\GUI-based-LSB-Replacement-steganography-program
+configfile: pytest.ini
+plugins: hypothesis-6.115.5, cov-7.1.0, qt-4.4.0
+collecting ... collected 10 items
+
+tests/test_gui_shell.py::TestMediaPreview::test_closing_unloads_the_player_before_widget_destruction PASSED [ 10%]
+tests/test_gui_shell.py::TestMediaPreview::test_it_shows_an_image PASSED [ 20%]
+tests/test_gui_shell.py::TestMediaPreview::test_it_reports_an_unsupported_file PASSED [ 30%]
+tests/test_gui_shell.py::TestMediaPreview::test_it_reports_a_missing_file PASSED [ 40%]
+tests/test_gui_shell.py::TestMediaPreview::test_audio_either_plays_or_says_it_cannot PASSED [ 50%]
+tests/test_gui_shell.py::TestMediaPreview::test_a_missing_backend_is_reported_rather_than_a_dead_button PASSED [ 60%]
+tests/test_gui_shell.py::TestMediaPreview::test_the_bundled_ffmpeg_backend_loads_on_windows PASSED [ 70%]
+tests/test_gui_shell.py::TestMediaPreview::test_clearing_forgets_the_file PASSED [ 80%]
+tests/test_gui_shell.py::TestMediaPreview::test_stopping_without_a_player_is_safe PASSED [ 90%]
+tmp/test_t08_idle.py::test_backend_idle PASSED                           [100%]
+
+============================= 10 passed in 16.40s =============================
