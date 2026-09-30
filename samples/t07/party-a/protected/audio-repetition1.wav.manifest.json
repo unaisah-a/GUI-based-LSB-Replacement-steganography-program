@@ -1,0 +1,19 @@
+{
+  "container_format": "WAV",
+  "created": "2026-09-30T06:46:38+00:00",
+  "ecc": null,
+  "encrypted": false,
+  "encryption": null,
+  "envelope_length": 904,
+  "format_version": 1,
+  "lsb_depth": 2,
+  "media_id": "AUDIO-MONO",
+  "media_type": "audio",
+  "message_length": 105,
+  "nonce": "0527f09131c1512d5b8f3afe95ecd78b",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": null,
+  "start_method": "hmac_prf",
+  "stego_file": "audio-repetition1.wav",
+  "stego_sha256": "fd05d6f441e255113cee69abc8b99faffbf1900dbec2ce2baa248425f91bdb69"
+}
