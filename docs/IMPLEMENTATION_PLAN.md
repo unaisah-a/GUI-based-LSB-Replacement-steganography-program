@@ -136,10 +136,11 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 
 ### P01 publication record
 
-- Status: IN_PROGRESS. User authorised commit and push on 1 October 2026.
+- Status: DONE. User authorised commit and push on 1 October 2026; implementation and documentation commit `7fbc15d` was successfully pushed to `origin/integration/acw1-consolidated`.
 - Scope: README, Attack Lab fix, regression tests, implementation ledger, beginner study guide and Gin's demo script. Generated practice media/manifests are excluded and left untouched.
 - Preparation: `git fetch origin` succeeded; `git merge --ff-only origin/integration/acw1-consolidated` advanced the branch from `8922a74` to `025a3ca`, preserving three remote commits whose net change adds `samples/t07/party-a/messages/huge.txt`. No original branches changed.
-- Validation: F01's recorded 47-test run and Ruff result apply to the unchanged application/test patch. These are prior working-tree results, not a new test run after the fast-forward. Staged diff checks and publication confirmation remain pending.
+- Validation: F01's recorded 47-test run and Ruff result apply to the unchanged application/test patch. These are prior working-tree results, not a new test run after the fast-forward. `git diff --cached --check` passed for the six staged files. `git push origin integration/acw1-consolidated` succeeded, advancing the remote from `025a3ca` to `7fbc15d`.
+- Remaining: no implementation publication work. This ledger completion is a separate documentation follow-up; generated practice outputs remain untracked and the existing app process still requires a restart to load F01.
 
 ### F01 work record
 
