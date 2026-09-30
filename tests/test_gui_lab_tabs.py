@@ -211,10 +211,49 @@ class TestAttackTabConstruction:
         load(attack_tab, protected_png)
         assert attack_tab.manifest_edit.text() == result.manifest_path
 
-    def test_only_the_needed_secret_fields_are_enabled(self, attack_tab, protected_png):
+    def test_secret_fields_remain_editable(self, attack_tab, protected_png):
         load(attack_tab, protected_png)
         assert attack_tab.start_secret_edit.isEnabled() is True
-        assert attack_tab.passphrase_edit.isEnabled() is False
+        assert attack_tab.passphrase_edit.isEnabled() is True
+
+    @pytest.mark.parametrize("start_method", [constants.START_METHOD_MANUAL,
+                                             constants.START_METHOD_HMAC])
+    @pytest.mark.parametrize("encrypted", [False, True])
+    def test_secrets_can_be_edited_after_manifest_changes_and_clear(
+        self, attack_tab, qtbot, tmp_path, keys, start_method, encrypted
+    ):
+        private, _ = keys
+        cover = write_cover(str(tmp_path), make_cover(128, 128, 3), image_io.PNG, "c")
+        result = protect_media(
+            cover, str(tmp_path / "editable.png"), MESSAGE, private,
+            media_id="EDITABLE", lsb_depth=2, start_method=start_method,
+            manual_start_location=37 if start_method == constants.START_METHOD_MANUAL else None,
+            start_secret=START_SECRET, passphrase="test passphrase" if encrypted else None,
+            scrypt_n=MIN_SCRYPT_N,
+        )
+        broken = tmp_path / "broken.json"
+        broken.write_text("{invalid", encoding="utf-8")
+        attack_tab.drop_zone.accept_path(result.stego_path)
+        for path in (result.manifest_path, "", str(broken), result.manifest_path):
+            attack_tab.manifest_edit.setText(path)
+            for field in (attack_tab.start_secret_edit, attack_tab.passphrase_edit):
+                assert field.isEnabled()
+                field.clear()
+                qtbot.keyClicks(field, "replacement")
+                assert field.text() == "replacement"
+        assert ("required" if start_method == constants.START_METHOD_HMAC else "not used") in (
+            attack_tab.start_secret_edit.placeholderText().lower()
+        )
+        assert ("required" if encrypted else "not used") in (
+            attack_tab.passphrase_edit.placeholderText().lower()
+        )
+        attack_tab.drop_zone.clear()
+        assert not attack_tab.manifest_edit.text()
+        for field in (attack_tab.start_secret_edit, attack_tab.passphrase_edit):
+            assert field.isEnabled()
+            field.clear()
+            qtbot.keyClicks(field, "after clear")
+            assert field.text() == "after clear"
 
 
 class TestAttackTabValidation:
@@ -334,7 +373,7 @@ class TestAttackTabRunning:
 
 
 @pytest.mark.parametrize("key", ["verification.wrong_key", "verification.wrong_start"])
-def test_verification_actions_report_input_without_writing(attack_tab, protected_png, key):
+def test_verification_actions_report_input_without_writing(attack_tab, protected_png, key, qtbot):
     load(attack_tab, protected_png)
     TestAttackTabRunning()._select(attack_tab, key)
     run = attack_tab._run_one(attack_tab.selected_attack(), attack_tab._collect_inputs())
@@ -344,3 +383,8 @@ def test_verification_actions_report_input_without_writing(attack_tab, protected
     assert run.matched_expectation
     assert "no file written" in attack_tab.log_view.toPlainText()
     assert "wrote:" not in attack_tab.log_view.toPlainText()
+    for field in (attack_tab.start_secret_edit, attack_tab.passphrase_edit):
+        assert field.isEnabled()
+        field.clear()
+        qtbot.keyClicks(field, "next demo input")
+        assert field.text() == "next demo input"

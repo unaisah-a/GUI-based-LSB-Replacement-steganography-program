@@ -115,6 +115,8 @@ class AttackTab(QWidget):
 
         for field in (self.manifest_edit, self.key_edit, self.start_secret_edit, self.passphrase_edit):
             field.textChanged.connect(self._invalidate_operation)
+        self.manifest_edit.textChanged.connect(self._apply_manifest_hints)
+        self._apply_manifest_hints()
         self._load_default_key()
         self._refresh_attack_list()
 
@@ -158,6 +160,10 @@ class AttackTab(QWidget):
         self.passphrase_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self.passphrase_edit.setPlaceholderText("only for an encrypted message")
         form.addRow("Passphrase:", self.passphrase_edit)
+
+        self.secret_hint = QLabel(inputs)
+        self.secret_hint.setWordWrap(True)
+        form.addRow(self.secret_hint)
 
         layout.addWidget(inputs)
 
@@ -253,6 +259,8 @@ class AttackTab(QWidget):
         self._generation += 1
         self._stego_path = None
         self._media_type = None
+        self.manifest_edit.clear()
+        self._apply_manifest_hints()
         self._refresh_attack_list()
         self.clear_log()
 
@@ -282,7 +290,10 @@ class AttackTab(QWidget):
         self._refresh_attack_list()
 
     def _apply_manifest_hints(self) -> None:
-        """Enable only the secret fields this file actually needs."""
+        """Explain required inputs without preventing edits between demonstrations."""
+        self.start_secret_edit.setPlaceholderText("only for a derived start location")
+        self.passphrase_edit.setPlaceholderText("only for an encrypted message")
+        self.secret_hint.setText("Select a valid manifest to see which secrets are required.")
         path = self.manifest_edit.text().strip()
         if not path or not os.path.isfile(path):
             return
@@ -291,10 +302,20 @@ class AttackTab(QWidget):
         except Exception:
             return
 
-        self.start_secret_edit.setEnabled(
-            manifest.start_method == constants.START_METHOD_HMAC
+        needs_start = manifest.start_method == constants.START_METHOD_HMAC
+        self.start_secret_edit.setPlaceholderText(
+            "required: correct baseline start secret" if needs_start
+            else "not used: this file has a manual start"
         )
-        self.passphrase_edit.setEnabled(manifest.encrypted)
+        self.passphrase_edit.setPlaceholderText(
+            "required: correct baseline passphrase" if manifest.encrypted
+            else "not used: this file is not encrypted"
+        )
+        self.secret_hint.setText(
+            f"Start secret: {'required' if needs_start else 'not used (manual start)'}. "
+            f"Passphrase: {'required' if manifest.encrypted else 'not used (unencrypted)'}. "
+            "Both fields remain editable. Wrong-input actions substitute inputs after the baseline."
+        )
 
     def _refresh_attack_list(self) -> None:
         self.attack_list.clear()

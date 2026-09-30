@@ -4,7 +4,7 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorised execution scope: **S01: full steganalysis removal only**, following the user's instruction to execute the next task. Prepare the handoff; do not submit or send messages.
+- Latest authorised execution scope: **P01: commit and push the completed F01 fix and demo documentation**, explicitly requested by the user. Preserve generated practice outputs locally. S01 remains complete and S02 remains unauthorised.
 - Integration branch: `integration/acw1-consolidated`.
 - Current integration workspace: `A:/Code/GUI-based-LSB-Replacement-steganography-program` (historical setup used `C:/Code/INF2005-ACW1-consolidated`).
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
@@ -125,6 +125,78 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 | T07 | Sender/receiver sample bundle | T04, T05, T06 | DONE | Required messages, positives, negatives and challenges reproduce independently without private keys |
 | T08 | Integrated release validation | T07 | DONE | Full suite, lint, clean setup, native desktop checks and extracted-package verification complete |
 | T09 | Demo/submission handoff | T08 | DONE | Feature-complete timed script, evidence index and human-task checklist delivered; actual rehearsal tracked honestly |
+| D01 | Standalone beginner demo study guide | S01 and current demo script | DONE | Self-contained theory, accurate current workflows/limits, lecture-versus-extra mapping, practice cases and answers, member preparation and quick revision; local links and factual examples checked |
+| D02 | Review adopted teammate PDF and align study guide | D01 and teammate PDF | DONE | All PDF pages reviewed; named speaking allocation/timings reflected; gaps and corrections grounded in current app/brief; documentation checks recorded |
+| D03 | Detailed script for Gin's attack and video segment | D02 and current app workflows | DONE | Complete actions and speaking lines, correct live/fixture input handling, all five attacks and video protect/verify/playback/frame lookup, honest timing/fallbacks and documentation checks |
+| D04 | Expand Gin's spoken demo narration | D03 | DONE | Expanded narration for all attacks and video stages, cues tied to actual results, preserved operational steps, checked word count and honest timing estimate |
+| D05 | Interleave actions and speech in Gin's script | D04 | DONE | Each live action immediately followed by its speech; all attacks and video stages preserved; result waits explicit; references and updated word count checked |
+| V01 | Prepare forest video cover | User-supplied MP4 and retained video workflow | DONE | New short lossless MKV without modifying source; valid dimensions/timing, successful signed text round trip, exact recovery and frame-location check; actual evidence and GUI limits recorded |
+| D06 | Diagnose disabled Attack Lab secret fields | User's open app and current manifest | DONE | Inspect current native state and manifest; explain expected disabling or identify a reproducible defect |
+| F01 | Keep Attack Lab secret fields editable | User correction after D06 | DONE | No manifest-based locking; hints follow typed/picked manifests and clear; keyboard editing survives all manifest types and wrong-input actions; focused tests and lint pass |
+
+### P01 publication record
+
+- Status: IN_PROGRESS. User authorised commit and push on 1 October 2026.
+- Scope: README, Attack Lab fix, regression tests, implementation ledger, beginner study guide and Gin's demo script. Generated practice media/manifests are excluded and left untouched.
+- Preparation: `git fetch origin` succeeded; `git merge --ff-only origin/integration/acw1-consolidated` advanced the branch from `8922a74` to `025a3ca`, preserving three remote commits whose net change adds `samples/t07/party-a/messages/huge.txt`. No original branches changed.
+- Validation: F01's recorded 47-test run and Ruff result apply to the unchanged application/test patch. These are prior working-tree results, not a new test run after the fast-forward. Staged diff checks and publication confirmation remain pending.
+
+### F01 work record
+
+- Diagnosis: D06 explained the current manual/unencrypted selection but did not address the reported workflow problem. User explicitly requested removing the disabling behaviour itself. The old `_apply_manifest_hints` called `setEnabled` based on manifest flags, skipped state refresh for missing/invalid manifests, and was not connected to manual manifest-path edits; clearing the file also retained the old manifest.
+- Changes: removed manifest-based enable/disable calls from Attack Lab. Both fields stay editable, with visible required/unused hints and corresponding placeholders. Hints update when the manifest path changes; clearing the selected file resets its manifest/hints. Existing secret contents remain user-editable. Wrong-start backend still requires HMAC and an authentic baseline. Updated Gin's script to match.
+- Evidence so far: regression `test_secret_fields_remain_editable` failed on the old implementation as expected (passphrase disabled). After changes, focused GUI suites passed 47 tests in 2.42 seconds; Ruff passed. Final run adds keyboard-entry assertions after both wrong-input actions. Windows PowerShell, `.venv-t08` Python 3.11.16, offscreen Qt with `--no-qt-log`; base HEAD `8922a743c86cb7bf6d86cd68d09fe60dba34e349` plus existing uncommitted documentation/demo outputs and this fix.
+- Final executed checks: `.venv-t08/Scripts/python.exe -m pytest tests/test_gui_lab_tabs.py tests/test_gui_consolidation.py --no-qt-log -q`: 47 passed in 2.32 seconds, including keyboard editing after wrong-key and wrong-start actions and transitions through manual/HMAC, encrypted/unencrypted and invalid/cleared manifests. `.venv-t08/Scripts/python.exe -m ruff check app/gui/attack_tab.py tests/test_gui_lab_tabs.py` and `git diff --check`: PASS.
+- Remaining: none for F01 code/test acceptance. The user's existing process still contains old imported code; its inputs/logs were left intact and a restart is required to load the fix. No claim of native validation of the new build or a fresh full-suite run.
+
+### D06 work record
+
+- Evidence: Windows Computer Use `@oai/sky` through `mcp__node_repl__js` inspected the running Media Integrity & Steganography Tool. Native accessibility and foreground screenshot showed `image-short.png` with its matching Party B manifest; both secret fields disabled. Read manifest confirms manual start 37 and `encrypted: false`. Status bar still showed the earlier wrong-start result `AUTHENTIC -> PAYLOAD_MISSING`; this is observed existing UI state, not a newly executed attack.
+- Diagnosis: expected state for the selected image. `_apply_manifest_hints` enables start-secret input only for HMAC and passphrase input only for encrypted payloads. The prepared `audio-long.wav` manifest is HMAC and unencrypted, so selecting that file should enable start secret while leaving passphrase disabled. No defect established for the reported state.
+- Changes/limits: activated and inspected the existing app window; no field values changed, attacks run, logs cleared or app restarted. No source code change/test run. Base HEAD `8922a743c86cb7bf6d86cd68d09fe60dba34e349` plus existing working-tree changes. Remaining: none for diagnosis; user can proceed with the image outside-payload action without clearing disabled fields.
+
+### V01 work record
+
+- Changes: created `C:/Users/ginli/OneDrive/SIT/Year 2 Tri 1/Cyber Security Fundamentals/Project/forest-cover.mkv` from the first five seconds of `2187-155747497_tiny.mp4` in the same folder; linked it as the selected cover in Gin's script. Original MP4 and bundled samples were not changed. New cover: FFV1/bgr0, 640 × 360, constant 25 fps, 125 frames, no audio, 10,545,753 bytes. Source was 30.08 seconds, H.264/AAC, 640 × 360, 25 fps.
+- Environment: Windows PowerShell, Python 3.11.16 `.venv-t08`, OpenCV 4.10.0; existing FFmpeg executable at `A:/Tools and Utilities/ffmpeg-2026-02-26-git-6695528af6-full_build/bin/ffmpeg.exe`. This is a cover-preparation tool, not a new app dependency. Base app revision remains `8922a743c86cb7bf6d86cd68d09fe60dba34e349` with the existing documentation/demo working-tree outputs.
+- Executed conversion: `ffmpeg -hide_banner -loglevel error -n -i <source> -map 0:v:0 -t 5 -vf fps=25 -c:v ffv1 -level 3 -pix_fmt bgr0 -an <cover>` using the absolute source/output paths above. `ffprobe` checked codec, stream count, dimensions, rate, duration and size. PowerShell here-string via `.venv-t08/Scripts/python.exe -` decoded all 125 cover/output frames and ran `protect_media` then `verify_media` at depth 1/HMAC with public demo inputs and an ephemeral in-memory key pair: AUTHENTIC, exact recovery of `Gin video demonstration`, valid frame span. Backend protect/verify/span/output-decode sequence took 1.62 seconds on this run; not a GUI rehearsal time. Temporary verification outputs were cleaned up and no test private key was saved.
+- Provenance: source SHA-256 `d1f10878c9cd8792e76a84522018d16865918e664332757698e86ab757f9a311`; new cover SHA-256 `f03684e3c5a8a45387cb2419f697c26e993b5ae9727f596937a1b3061a330928`. User supplied the download selected from `https://pixabay.com/videos/forest-trees-wind-weather-2187/`; the conversion is cover preparation before embedding.
+- Remaining: none for cover preparation/backend acceptance. Native GUI playback and the actual timed team handover still need human rehearsal; neither is claimed here. Live protection will create a new stego output/manifest and requires the team's chosen signing key pair and start secret.
+
+### D05 work record
+
+- Changes: rewrote script sections 3–6 into chronological italic actions followed immediately by quoted speech. Preserved all five attacks, evidence export and full video protect/verify/playback/location workflow. Moved supporting explanations to rehearsal notes; updated opening/closing cues and the narration estimate.
+- Evidence context: documentation-only edit in Windows PowerShell. Main live-route speech is 448 words plus 38 closing words, excluding alternate prepared-sample opening and fallback speech. Numbered actions keep exact input names and separate each result explanation from the preceding wait.
+- Executed checks: base HEAD `8922a743c86cb7bf6d86cd68d09fe60dba34e349` with prior documentation/demo outputs still in the working tree. PowerShell here-string via `.venv-t08/Scripts/python.exe -` checked 10 sections, all 32 numbered actions immediately paired with speech, five attack waits/verdicts, video success cues, 448+38 spoken words, fixture paths, links, table widths, whitespace and unchecked checklist: PASS. Initial audit incorrectly expected 34 pairs; corrected the audit to check every numbered action and the actual 32-pair count. `git diff --check`: PASS.
+- Remaining: none for D05. Timing remains an estimate, with actual rehearsal for the user. No application tests or native demonstration were run, and existing demo outputs were left untouched.
+
+### D04 work record
+
+- Changes: expanded the five attack explanations, evidence transition and video narration in [Gin's script](gin_demo_script.md); added before-action/after-result cues and delivery instructions. Kept operational steps, sample choices and scope intact. The timing paragraph separates estimated speech duration from an actual rehearsal.
+- Evidence context: Windows PowerShell; current documentation builds on D03. Quoted speech was counted using a PowerShell here-string piped to `.venv-t08/Scripts/python.exe -`: live route 475 words plus 38 closing words; prepared-sample alternative and fallback sentence excluded from that route count.
+- Executed checks: base HEAD `8922a743c86cb7bf6d86cd68d09fe60dba34e349` plus existing working-tree documentation/demo outputs. PowerShell here-string via `.venv-t08/Scripts/python.exe -` checked 10 sections, local links/fixture paths, tables/whitespace, all five attack action/verdict blocks and before/after speech, all three video stages/result cues, 475+38 spoken words and unchecked checklist: PASS. `git diff --check`: PASS.
+- Remaining: none for D04. Actual delivery speed and end-to-end timing require the user's rehearsal; no application tests or human rehearsal claimed. Existing demo outputs were not changed.
+
+### D03 work record
+
+- Changes: created [Gin's detailed script](gin_demo_script.md) and linked it from study-guide section 17. Includes handover inputs, fixture paths, preflight, five attacks, evidence export, complete video workflow, speaking lines, questions, changed payloads, troubleshooting and unchecked rehearsal checklist. Suggested timing shifts the video transition within Gin's existing six-minute slot; it is not recorded as team agreement or a successful rehearsal.
+- Evidence context: Windows PowerShell; base HEAD `8922a743c86cb7bf6d86cd68d09fe60dba34e349` plus existing D01/D02 documentation changes. Existing untracked user demo video/manifest and attacked PNG/WAV outputs were observed and left untouched; no claim about who ran them or whether they passed. Current GUI labels and attack behaviour checked against source, including wrong-input baselines and logical-envelope corruption.
+- Executed checks: PowerShell here-string piped to `.venv-t08/Scripts/python.exe -` checked all 10 script sections; script/study-guide links, anchors, table widths, fences and whitespace; eight existing fixture paths; five exact attack labels and six workflow labels against source; continuous proposed 360-second schedule and unchecked rehearsal checklist: PASS. `git diff --check`: PASS. No application suite or native rehearsal was run for this documentation task.
+- Remaining: none for D03. Actual live handover, timed rehearsal and any team agreement on the internal timing adjustment remain human actions. No source-PDF edits or application changes were made.
+
+### D02 work record
+
+- Changes: aligned study-guide section 17 with the user-selected teammate PDF's named presenters and schedule; added operational corrections and Gin's sequence. Section 15 clarifies fixture/fresh key switching and Verify versus Attack Lab wrong-input demonstrations. Source references distinguish the adopted PDF from the earlier repository script. Names describe speaking roles only, not authorship.
+- Evidence: reviewed all eight PDF pages as extracted text and four rendered page pairs; checked assignment brief pages 2–4 and implementation behaviour, including authentic-baseline enforcement and demo-key reuse. Windows PowerShell; base HEAD `8922a743c86cb7bf6d86cd68d09fe60dba34e349` plus prior D01 and current D02 documentation edits. Source PDF SHA-256: `5242b230885d4db7b7c49d86ef0e0eaa6ed7c2995827b9dfdbe0a0f791b145f9`.
+- Executed checks: PowerShell here-string piped to `.venv-t08/Scripts/python.exe -` audited 20 numbered sections, 37 local links/anchors, balanced fences/table widths, all five presenter names and nine PDF schedule rows, trailing whitespace and unchanged source-PDF SHA-256: PASS. `git diff --check`: PASS. No application tests or native rehearsal were run for this documentation-only review.
+- Remaining: none for D02. The source PDF is not edited; applying the corrections to the team's speaking script, actual transfer and timed rehearsal remain team actions.
+
+### D01 work record
+
+- Changes: added [the beginner guide](demo_study_guide.md) and a README discovery link. Twenty numbered sections explain foundations, current workflows, design choices and limits, all retained extras, fixture-based practice, presenter preparation, 18 model answers and a final revision sheet. Terminology is introduced for a reader with no lecture background.
+- Evidence: checked current implementation, GUI labels and sample index against the guide, using the lecture/brief review from this task as teaching context. Base HEAD `8922a743c86cb7bf6d86cd68d09fe60dba34e349` plus these uncommitted documentation changes; initial working tree clean; Windows PowerShell, `.venv-t08/Scripts/python.exe --version` returned Python 3.11.16.
+- Executed checks: PowerShell here-string piped to `.venv-t08/Scripts/python.exe -` audited all 20 sections, 37 local links/anchors, balanced code fences/table columns, binary/capacity calculations, current bundle counts and 14 practice rows against actual media/manifest paths and indexed expected verdict sets: PASS. `git diff --check`: PASS. No fresh application test suite or native playback run was needed or claimed for this documentation task.
+- Remaining: none for D01. Reader practice and the team's actual transfer/rehearsal remain human actions. Application behaviour, dependency pins and fixture bytes were not changed.
 
 ### T01 work record
 
@@ -316,6 +388,8 @@ For future tasks, append command, environment, tested revision/working-tree stat
 ## 7. Demo and delivery
 
 Every retained user-facing feature must map to a live action. Prepare files/keys/folders ahead of time; reuse mandatory workflows to demonstrate advanced starts and attacks. Screenshots are fallback evidence, not a substitute for required working demonstrations.
+
+**D02 update:** the user has adopted `INF2005_ACW1_Demo_Script_and_Presentation_Split_.pdf`. Its named allocation and timings, plus necessary action corrections, are in [study-guide section 17](demo_study_guide.md#17-what-each-presenter-should-prepare). The numbered-member schedule below records the earlier T09 plan; it is no longer the team's selected speaking allocation. Required feature coverage still applies.
 
 | Time | Presenter | Content |
 | --- | --- | --- |

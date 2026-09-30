@@ -5,6 +5,10 @@
 The [T07 sender/receiver bundle guide](docs/sample_bundle.md) covers fresh required
 messages, positive/negative cases, the four retained challenges and independent verification.
 
+Preparing for the demo with no lecture background? Read the
+[standalone beginner study guide](docs/demo_study_guide.md) for the theory, current
+app workflow, design decisions, practice cases and question-and-answer revision.
+
 INF2005 Assignment 1 — a desktop application that hides a **signed** message inside an
 image, audio or video file using LSB replacement, and lets a receiver prove whether that
 message is authentic.
