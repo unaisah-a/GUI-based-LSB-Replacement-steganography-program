@@ -50,6 +50,7 @@ from app.crypto import key_manager
 from app.crypto import manifest as manifest_module
 from app.gui.widgets.drop_zone import DropZone
 from app.gui.widgets.file_info_panel import FileInfoPanel
+from app.gui.widgets.hash_evidence_panel import HashEvidencePanel
 from app.gui.workers import BackgroundRunner
 from app.utils import constants, file_utils
 from app.utils.logging_utils import get_logger
@@ -199,6 +200,9 @@ class AttackTab(QWidget):
         self.summary_panel = FileInfoPanel(container, title="Latest Attack")
         layout.addWidget(self.summary_panel)
 
+        self.hash_panel = HashEvidencePanel(container, title="Latest attack: payload hashes after verification")
+        layout.addWidget(self.hash_panel)
+
         log_box = QGroupBox("Attack log", container)
         log_layout = QVBoxLayout(log_box)
         self.log_view = QPlainTextEdit(log_box)
@@ -254,6 +258,8 @@ class AttackTab(QWidget):
 
     def _invalidate_operation(self):
         self._generation += 1
+        self.summary_panel.clear()
+        self.hash_panel.clear()
 
     def _clear_selection(self):
         self._generation += 1
@@ -275,7 +281,7 @@ class AttackTab(QWidget):
     # -- reactions --------------------------------------------------------- #
 
     def _on_stego_selected(self, path: str) -> None:
-        self._generation += 1
+        self._invalidate_operation()
         self._stego_path = path
         try:
             self._media_type = file_utils.detect_media_type(path)
@@ -450,6 +456,7 @@ class AttackTab(QWidget):
         attack = self.selected_attack()
         assert attack is not None
 
+        self._invalidate_operation()
         self._set_running(True)
         self.statusMessage.emit(f"Running: {attack.label}...")
 
@@ -507,6 +514,7 @@ class AttackTab(QWidget):
             ]
         )
         self.summary_panel.set_notice(run.outcome.description)
+        self.hash_panel.show_evidence(run.after.hash_evidence)
 
     @staticmethod
     def _describe(run: AttackRun) -> str:
@@ -520,6 +528,10 @@ class AttackTab(QWidget):
             f"  expected: {', '.join(sorted(run.outcome.expected_verdicts))}",
             f"  matched:  {'yes' if run.matched_expectation else 'no'}",
             f"  reason:   {run.after.reason}",
+            "Payload hash evidence before:",
+            run.before.hash_evidence.as_text(),
+            "Payload hash evidence after:",
+            run.after.hash_evidence.as_text(),
         ]
         if not run.verdict_changed and run.after.verdict == constants.VERDICT_AUTHENTIC:
             lines.append(
@@ -536,6 +548,7 @@ class AttackTab(QWidget):
         self._runs.clear()
         self.log_view.setPlainText("")
         self.summary_panel.clear()
+        self.hash_panel.clear()
 
     def _save_log(self) -> None:
         if not self.log_view.toPlainText().strip():

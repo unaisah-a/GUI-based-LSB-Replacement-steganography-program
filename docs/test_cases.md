@@ -1,21 +1,28 @@
-> Current test inventory and counts: [S01 evidence](../evidence/s01/README.md).
+> Current H05 results: [1,832 passing tests and release evidence](../evidence/h05/README.md). Earlier inventory: [S01 evidence](../evidence/s01/README.md).
 > Counts below are historical; retired feature rows have been removed.
 
 # Test Cases
 
 The assignment requires at least **two positive** and **three negative**
 verification cases, with at least one of each for image and for audio. This document
-records implemented cases and, in the explicitly labelled section below, future
-acceptance scenarios. Planned scenarios are not executed tests or evidence.
+records implemented cases and the external-hash acceptance scenarios validated
+in H02-H05. Historical totals below retain their original dates.
 
-## Planned external payload hash acceptance (not executed)
+<a id="planned-external-payload-hash-acceptance-not-executed"></a>
+
+## External payload hash acceptance: H02-H05 tested
 
 H02-H05 in the [implementation plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
-will introduce mandatory manifest version 2 `message_hash` and visible comparison.
-No schema, tests, GUI or new sample bundle have been implemented for this change.
-Version 1 manifests remain usable in the current app.
+introduce mandatory manifest version 2 `message_hash` and visible comparison.
+H02 implements and tests the schema, real publication across all three media with
+text/file bytes, encryption/repetition, uppercase normalisation and early rejection.
+Version 1 manifests are rejected. H03 tests comparisons, failure precedence,
+trusted preview/save, GUI resets, stale workers and evidence export. H04 delivered
+the independently verified version 2 bundle, including plaintext/encrypted manifest
+hash mismatches. H05 passed the final full suite, native hash inspection and extracted-package
+receiver/startup checks; see [release evidence](../evidence/h05/README.md).
 
-| Planned scenario | Required result after implementation |
+| Scenario | Required result |
 | --- | --- |
 | Protect text/file payloads in image, audio and video | Manifest contains SHA-256 of exact original bytes, equal to the signed record |
 | Encrypt and/or apply repetition coding | Same plaintext-hash meaning; not a ciphertext or repeated-envelope digest |
@@ -43,7 +50,7 @@ produces a verdict.
 Run everything with:
 
 ```powershell
-.venv\Scripts\python -m pytest -q
+.venv\Scripts\python -m pytest --no-qt-log -q
 ```
 
 Total: **1,729 tests**, all passing, as of 19 September 2026. Suite runtime is about a minute.
@@ -234,7 +241,7 @@ Bounds are kept small — images to 64×64, payloads to 256 bytes — so the pro
 finishes inside its time budget. A faster profile is available for iteration:
 
 ```powershell
-$env:HYPOTHESIS_PROFILE="fast"; .venv\Scripts\python -m pytest -q
+$env:HYPOTHESIS_PROFILE="fast"; .venv\Scripts\python -m pytest --no-qt-log -q
 ```
 
 ---

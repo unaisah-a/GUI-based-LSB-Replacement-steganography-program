@@ -39,6 +39,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from app.gui.widgets.hash_evidence_panel import HashEvidencePanel
 from app.utils import constants, file_utils, payload_files
 from app.verification.verdicts import VERDICT_DESCRIPTIONS, VerificationResult
 
@@ -127,6 +128,9 @@ class ResultPanel(QGroupBox):
         self._flags_form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
         outer.addWidget(self._flags_box)
         self._flag_widgets: dict[str, QLabel] = {}
+
+        self.hash_panel = HashEvidencePanel(self)
+        outer.addWidget(self.hash_panel)
 
         self._notes_label = QLabel("", self)
         self._notes_label.setObjectName("verdictNotes")
@@ -230,6 +234,7 @@ class ResultPanel(QGroupBox):
         while self._flags_form.rowCount():
             self._flags_form.removeRow(0)
         self._flag_widgets.clear()
+        self.hash_panel.clear()
 
     # -- rendering --------------------------------------------------------- #
 
@@ -272,6 +277,7 @@ class ResultPanel(QGroupBox):
             self._flags_form.addRow("Start location used:", widget)
 
         self.set_notes(result.notes)
+        self.hash_panel.show_evidence(result.hash_evidence)
         self.show_message(result.message if result.verdict == constants.VERDICT_AUTHENTIC else None)
 
     def set_notes(self, notes: Iterable[str]) -> None:

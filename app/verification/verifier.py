@@ -63,7 +63,7 @@ from app.stego.errors import LengthHeaderError, StegoError
 from app.utils import constants, file_utils
 from app.utils.logging_utils import get_logger
 from app.verification import verdicts
-from app.verification.verdicts import VerificationResult
+from app.verification.verdicts import HashEvidence, VerificationResult
 
 __all__ = ["verify_extracted_payload", "verify_media"]
 
@@ -158,6 +158,13 @@ def verify_media(
 
     result = _verify_with_manifest(
         stego_path, manifest, key, name, start_secret, passphrase
+    )
+    # Preserve the external claim even when extraction never reaches the record.
+    result = dataclasses.replace(
+        result,
+        hash_evidence=dataclasses.replace(
+            result.hash_evidence, manifest_hash=manifest.message_hash
+        ),
     )
     if digest_matches is None:
         return result
@@ -345,6 +352,9 @@ def verify_extracted_payload(
         "payload_found": True,
         "start_location_valid": True,
         "start_location": start_location_used,
+        "hash_evidence": HashEvidence(
+            manifest_hash=None if manifest is None else manifest.message_hash
+        ),
     }
     correction_details = (
         {} if correction is None else {"error_correction": correction.as_dict()}
@@ -364,6 +374,7 @@ def verify_extracted_payload(
             start_location=start_location_used,
             notes=(constants.AMBIGUOUS_FAILURE_NOTICE,),
             details={"stage": "envelope"},
+            hash_evidence=shared["hash_evidence"],
         )
     except RecordError as exc:
         # The framing was valid but the record was not decodable. Something is
@@ -407,6 +418,10 @@ def verify_extracted_payload(
             **shared,
         )
 
+    shared["hash_evidence"] = dataclasses.replace(
+        shared["hash_evidence"], signed_record_hash=record.message_hash
+    )
+
     # --- 8 and 9. Decrypt, then compare digests --------------------------- #
     try:
         recovered = payload_module.recover_message(
@@ -429,6 +444,10 @@ def verify_extracted_payload(
             **shared,
         )
 
+    evidence = dataclasses.replace(
+        shared["hash_evidence"], computed_hash=recovered.computed_hash
+    )
+    shared["hash_evidence"] = evidence
     if not recovered.hash_matches:
         return VerificationResult(
             verdict=verdicts.VERDICT_TAMPERED,
@@ -452,6 +471,8 @@ def verify_extracted_payload(
         mismatched = manifest_module.cross_check(
             manifest, record, envelope_length=expected_length
         )
+        if evidence.payload_matches_manifest is False and "message_hash" not in mismatched:
+            mismatched = (*mismatched, "message_hash")
         if mismatched:
             return VerificationResult(
                 verdict=verdicts.VERDICT_TAMPERED,

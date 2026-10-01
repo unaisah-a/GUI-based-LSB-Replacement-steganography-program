@@ -39,6 +39,7 @@ def repository(tmp_path):
     _write(root, "evidence/results/e2e_results.md")
     _write(root, "samples/r11/unrelated.txt")
     _write(root, "samples/t07/party-b/sender-public.pem", PUBLIC_PEM)
+    _write(root, "scripts/release_samples.txt", b"samples/t07/party-b/sender-public.pem\n")
     return root
 
 
@@ -73,6 +74,19 @@ class TestCollect:
 
     def test_logs_only_on_request(self, repository):
         assert "evidence/logs/application.log" in _names(repository, include_logs=True)
+
+    def test_local_practice_output_stays_out(self, repository):
+        _write(repository, "samples/t07/party-b/protected/attacked_payload.png")
+        _write(repository, "samples/hash-manifest-v2/personal-output.png")
+        assert "samples/t07/party-b/protected/attacked_payload.png" not in _names(repository)
+        assert "samples/hash-manifest-v2/personal-output.png" not in _names(repository)
+
+    @pytest.mark.parametrize("entry", ["samples/missing.png", "samples/../main.py", "main.py",
+                                       "samples/C:/private.pem", "samples\\file.png"])
+    def test_bad_sample_inventory_is_rejected(self, repository, entry):
+        _write(repository, "scripts/release_samples.txt", entry.encode())
+        with pytest.raises(PackagingError, match="sample inventory"):
+            collect(repository)
 
     def test_a_missing_root_is_an_error(self, repository):
         (repository / "pytest.ini").unlink()

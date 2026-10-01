@@ -9,14 +9,18 @@ do cannot disagree.
 from __future__ import annotations
 
 from collections.abc import Iterable
+from math import ceil
+from re import fullmatch
 from typing import Any
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QSize, Qt
+from PySide6.QtGui import QTextDocument, QTextOption
 from PySide6.QtWidgets import (
     QFormLayout,
     QGroupBox,
     QLabel,
     QSizePolicy,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -35,6 +39,51 @@ class _WrappingValue(QLabel):
         self.setMinimumHeight(self.heightForWidth(max(1, self.width())))
 
 
+class _DigestValue(QTextEdit):
+    """Wrap an unbroken digest without inserting characters into copied text."""
+
+    def __init__(self, text: str, parent: QWidget):
+        super().__init__(parent)
+        self.setReadOnly(True)
+        self.setPlainText(text)
+        self.setWordWrapMode(QTextOption.WrapMode.WrapAnywhere)
+        self.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setStyleSheet("background: transparent; border: none; padding: 0px;")
+        self.document().setDocumentMargin(0)
+        policy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        policy.setHeightForWidth(True)
+        self.setSizePolicy(policy)
+
+    def text(self) -> str:
+        return self.toPlainText()
+
+    def wordWrap(self) -> bool:
+        return True
+
+    def minimumSizeHint(self) -> QSize:
+        return QSize(40, self.fontMetrics().height())
+
+    def sizeHint(self) -> QSize:
+        return QSize(360, self.heightForWidth(360))
+
+    def heightForWidth(self, width: int) -> int:
+        document = QTextDocument()
+        document.setDefaultFont(self.font())
+        document.setDocumentMargin(0)
+        option = QTextOption()
+        option.setWrapMode(QTextOption.WrapMode.WrapAnywhere)
+        document.setDefaultTextOption(option)
+        document.setPlainText(self.text())
+        document.setTextWidth(max(1, width))
+        return ceil(document.size().height()) + 2
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self.setMinimumHeight(self.heightForWidth(self.viewport().width()))
+
+
 class FileInfoPanel(QGroupBox):
     """Shows what is known about the selected file."""
 
@@ -44,6 +93,7 @@ class FileInfoPanel(QGroupBox):
 
         outer = QVBoxLayout(self)
         self._form = QFormLayout()
+        self._form.setRowWrapPolicy(QFormLayout.RowWrapPolicy.WrapLongRows)
         self._form.setLabelAlignment(Qt.AlignmentFlag.AlignRight)
         self._form.setFieldGrowthPolicy(
             QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow
@@ -62,7 +112,7 @@ class FileInfoPanel(QGroupBox):
 
         outer.addStretch(1)
         self.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        self._rows: dict[str, QLabel] = {}
+        self._rows: dict[str, QLabel | _DigestValue] = {}
 
     # -- rendering --------------------------------------------------------- #
 
@@ -82,12 +132,15 @@ class FileInfoPanel(QGroupBox):
 
         self._empty_label.setVisible(False)
         for label, value in collected:
-            field = _WrappingValue(str(value), self)
+            if fullmatch(r"[0-9a-fA-F]{64}", str(value)):
+                field = _DigestValue(str(value), self)
+            else:
+                field = _WrappingValue(str(value), self)
+                field.setWordWrap(True)
             field.setObjectName("fileInfoValue")
             field.setTextInteractionFlags(
                 Qt.TextInteractionFlag.TextSelectableByMouse
             )
-            field.setWordWrap(True)
             self._form.addRow(f"{label}:", field)
             self._rows[label] = field
 

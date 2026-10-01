@@ -5,27 +5,28 @@ are target timings, not a completed rehearsal. Every member must speak. Member
 numbers allocate presentation time; they do not establish authorship. Replace each
 contribution cue with an accurate account of that person's work and checking.
 
-Use the [case index](../samples/t07/CASE_INDEX.md), [evidence index](evidence_index.md)
+Use the [case index](../samples/hash-manifest-v2/CASE_INDEX.md), [evidence index](evidence_index.md)
 and [delivery checklist](submission_handoff.md).
 
-## Future hash-comparison demonstration (not available yet)
+## Hash-comparison demonstration (H03-H04 implemented)
 
 The [external-hash plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
-is documented but not implemented. Keep the current instructions and version 1
-sample paths below until the new build and fresh bundle are validated.
+has its H02 manifest contract and H03 comparison display implemented.
+The paths below use H04's independently verified version 2 bundle and matching public key.
+Preserve old samples separately; H05 release validation remains pending.
 
-In a future version 2 receiver demonstration, show the manifest's `message_hash`
+With freshly protected version 2 files, show the manifest's `message_hash`
 as the original plaintext/file SHA-256, then the GUI's recomputed hash after
 successful extraction, signature verification and any decryption. Explain both
 comparisons: recovered payload versus manifest, and manifest versus authenticated
 signed record. Show the signature result as well; matching unsigned hashes alone
 do not establish authenticity. Earlier failures must display **Not performed**.
 
-Proposed speaking line for that future build: "The manifest gives us the expected
+Proposed speaking line: "The manifest gives us the expected
 payload hash. We recompute the recovered payload's hash, compare them, and check
 that the manifest value agrees with the signed record."
 
-Do not claim this display exists or count this extra explanation as rehearsed time.
+The display is implemented; do not count this extra explanation as rehearsed time.
 All five attacks and the adopted presenter allocation remain unchanged.
 
 ## Prepare before starting the timer
@@ -36,7 +37,7 @@ All five attacks and the adopted presenter allocation remain unchanged.
 2. Open the app, input folders and empty output folders `tmp/demo-a/`,
    `tmp/demo-b/` and `tmp/demo-evidence/`. Use fresh filenames for every run.
    Do not overwrite supplied fixtures or source covers.
-3. Below, A means `samples/t07/party-a/`; B means `samples/t07/party-b/`.
+3. Below, A means `samples/hash-manifest-v2/party-a/`; B means `samples/hash-manifest-v2/party-b/`.
    Have A's `messages/short.txt`, `long.txt` and `custom.txt` ready. They contain
    Learning Outcome 1, the Project Overview paragraphs and fictional custom text.
    Attribution is in `messages/sources.json`.
@@ -122,7 +123,7 @@ select it explicitly. Read observed outcomes alongside expectations.
   codec-driven size changes. Prepared `video-positive` is the labelled fallback:
   30 frames, 15 fps, two seconds.
 - 21:00–22:00: Show the actual exported attack log and the current receiver report
-  (18 cases, two capacity checks, 11 recovered files). Explain preservation metrics,
+  (20 cases, two capacity checks, 11 recovered files). Explain preservation metrics,
   actual contribution and AI checking. Recap key trust, replay, payload scope,
   fragile LSBs and omitted source audio. Member 5 retains their three-minute slot.
 

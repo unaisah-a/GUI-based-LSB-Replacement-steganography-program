@@ -1,6 +1,6 @@
-"""Verify a transferred T07 Party B folder without sender files or private keys.
+"""Verify a transferred Party B folder without sender files or private keys.
 
-python -m scripts.verify_sample_bundle samples/t07/party-b --report tmp/receiver.json
+python -m scripts.verify_sample_bundle samples/hash-manifest-v2/party-b --report tmp/receiver.json
 """
 from __future__ import annotations
 
@@ -65,6 +65,9 @@ def verify_bundle(root, recovered=None):
             passphrase=demo.get(case.get("passphrase")),
         )
         good = result.verdict in case["expected_verdicts"]
+        hash_evidence = result.hash_evidence.as_dict()
+        good &= all(hash_evidence.get(name) == value
+                    for name, value in case.get("expected_hash_checks", {}).items())
         actual_hash = None
         saved = None
         if result.verdict == constants.VERDICT_AUTHENTIC:
@@ -75,6 +78,9 @@ def verify_bundle(root, recovered=None):
             if case.get("expected_filename"):
                 good &= payload_files.suggested_filename(result.record.metadata, result.message) == case["expected_filename"]
             good &= result.signature_valid is True and result.hash_valid is True
+            good &= result.hash_evidence.payload_matches_manifest is True
+            good &= result.hash_evidence.manifest_matches_record is True
+            good &= result.hash_evidence.computed_hash == actual_hash
             corrected = result.details.get("error_correction", {}).get("bits_corrected", 0)
             good &= corrected >= case.get("minimum_corrections", 0)
             if good and recovered is not None:

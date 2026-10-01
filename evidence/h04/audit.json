@@ -1,0 +1,17 @@
+{
+  "base_head": "32b4125b29a70c3f31827acac6d5a1efb9cc0c9f",
+  "state": "Uncommitted H02-H04 working tree",
+  "python": "3.11.16",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "bundle_files": 78,
+  "bundle_bytes": 6101340,
+  "preserved_files_checked": 232,
+  "preserved_files_unchanged": true,
+  "private_keys_found": 0,
+  "public_keys_visible_to_git": true,
+  "sender_fingerprint": "26073b97554fd7e9611f01401fcfc38cf2ecf01e587a3dc6620bb790a92a902f",
+  "cases": 20,
+  "capacity_checks": 2,
+  "exact_exports_checked": 11,
+  "passed": true
+}

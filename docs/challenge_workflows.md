@@ -1,22 +1,23 @@
 # T05 challenge workflows
 
-## Planned external hash evidence (not implemented)
+## External hash evidence (H03 implemented)
 
-The current workflows below still use version 1 manifests. The
+H02 requires version 2 manifests. Use the verified `samples/hash-manifest-v2` bundle
+or generate fresh outputs for practice; preserved version 1 fixtures are rejected. The
 [version 2 plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
-will require an external `message_hash` and show/export its comparison with recovered
-plaintext and the signed record. This documentation update does not change an attack.
+requires an external `message_hash`; H03 shows/exports its comparison with recovered
+plaintext and the signed record. The five attack implementations are unchanged.
 
-Future acceptance must retain the five focused outcomes: message corruption,
+H03 regressions retain the five focused outcomes: message corruption,
 signature corruption and wrong-key checks fail at signature verification; the
 wrong-secret action fails according to extraction/verification evidence; outside-payload
 image edits can remain `AUTHENTIC`. Earlier failures show **Not performed** for the
 plaintext-hash comparison, not an invented mismatch. A separate manifest-hash edit
-is a planned validation case, not a sixth GUI attack.
+is a tested validation case, not a sixth GUI attack.
 
 Repetition still acts on the signed envelope. Targeted message/signature attacks
 reapply coding after modification, so external hashing does not change their
-majority-vote behaviour. Future exported evidence must distinguish expected,
+majority-vote behaviour. Exported evidence distinguishes expected,
 computed and authenticated hashes without recording plaintext or secrets.
 
 ## Current reproduction instructions

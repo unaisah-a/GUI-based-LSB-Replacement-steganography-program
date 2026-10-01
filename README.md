@@ -2,8 +2,8 @@
 
 > Consolidation work: read the [implementation plan and task tracker](docs/IMPLEMENTATION_PLAN.md) for agreed scope, task status, verification evidence and handoff notes.
 
-The [T07 sender/receiver bundle guide](docs/sample_bundle.md) covers fresh required
-messages, positive/negative cases, the four retained challenges and independent verification.
+The [sender/receiver bundle guide](docs/sample_bundle.md) covers the verified version 2
+samples: 20 cases, two capacity checks and all four retained challenges.
 
 Preparing for the demo with no lecture background? Read the
 [standalone beginner study guide](docs/demo_study_guide.md) for the theory, current
@@ -26,22 +26,25 @@ Design and limits are documented in [`docs/`](docs/): start with
 Responsible use, originality and AI use are covered in
 [`ethics_and_ai_use.md`](docs/ethics_and_ai_use.md).
 
-## Planned external payload hash (not implemented)
+## External payload hash: version 2 implemented and validated
 
-The current app uses manifest version 1: the original message/file SHA-256 is stored
-as `message_hash` in the embedded signed record. The manifest's `stego_sha256`
+The current app requires manifest version 2: the original message/file SHA-256 is
+copied from the embedded signed record into the required external `message_hash`.
+The manifest's `stego_sha256`
 instead hashes the entire output media file and is an informational transport check.
 The digital signature authenticates the record and stored message; it is not a hash file.
 
-The agreed version 2 design will also require `message_hash` in the external
-manifest, compare it with the recovered plaintext and authenticated record, and
-show expected/recomputed hashes and comparison results in Verify. Signature checks
-will still precede decryption; checks not reached will say **Not performed**.
-Version 1 manifests will be rejected only after that implementation is introduced.
-Existing samples and commands below still describe the current version 1 app.
+Verification compares the external hash with the recovered plaintext and authenticated
+record. Verify and Attack Lab show complete selectable hashes and comparison results;
+attack exports include before/after evidence. Signature checks precede decryption;
+checks not reached say **Not performed**. A manifest-hash mismatch withholds recovered content.
+Version 1 and missing/malformed hashes are now rejected with regeneration instructions.
+Preserved version 1 samples are historical and will not verify with this build.
 
-Only documentation has been authorised in this phase. The proposed
-`samples/hash-manifest-v2` bundle has not been generated. See
+The fresh [version 2 bundle](samples/hash-manifest-v2/README.md) passed independent
+receiver verification with 11 exact payload exports and no private keys.
+H05 passed 1,832 tests, Ruff, native hash-display checks and extracted-package
+receiver validation. See [release evidence](evidence/h05/README.md) and
 [H01-H05 in the implementation plan](docs/IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
 for the contract, security limits, dependencies and acceptance criteria.
 

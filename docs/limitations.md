@@ -236,10 +236,13 @@ verifies.
   *verifying* media, not for hiding that a message exists: the steganography conceals
   where the payload sits, but not that there is one.
 
-### Planned external message hash (not implemented)
+<a id="planned-external-message-hash-not-implemented"></a>
 
-Version 2 will publish the original plaintext/file SHA-256 as `message_hash` and
-require agreement with both the recovered payload and authenticated signed record.
+### External message hash: published and cross-checked
+
+H02 publishes the original plaintext/file SHA-256 as required `message_hash` in
+version 2 manifests. H03 requires agreement
+with both the recovered payload and authenticated signed record.
 The external hash alone is not proof of authenticity: an attacker could replace an
 unsigned message/hash pair. The signature and cross-check provide the authentication.
 The existing `stego_sha256` remains an informational whole-file digest.
@@ -249,10 +252,10 @@ without first extracting the hidden record. This exposes equality and allows tes
 guesses of short or predictable messages even when AES encryption is enabled. It
 does not reveal an encryption key; do not describe it as preserving all message privacy.
 
-The planned UI will show **Not performed** when extraction, signature verification
+The UI shows **Not performed** when extraction, signature verification
 or decryption prevents the plaintext hash check. An external hash does not make
-damaged content recoverable or prove the cause of failure. The future verifier will
-reject old manifests; the current version 1 verifier remains unchanged. See the
+damaged content recoverable or prove the cause of failure. This build now rejects
+old/missing-hash manifests with instructions to regenerate the output pair. See the
 [agreed plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented).
 
 ---

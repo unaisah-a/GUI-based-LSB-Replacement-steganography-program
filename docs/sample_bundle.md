@@ -1,33 +1,23 @@
-# Current sender/receiver sample bundle (S01)
+# Current sender/receiver sample bundle (manifest version 2)
 
+H04 generated and independently verified `samples/hash-manifest-v2`: **20 verification
+cases, two capacity checks and 11 exact authenticated payload exports**. See the
+[case index](../samples/hash-manifest-v2/CASE_INDEX.md) and [H04 evidence](../evidence/h04/README.md).
+Party A and Party B are separate folders. Signing keys were generated in memory
+and discarded; only matching public keys are saved. [H05 release validation](../evidence/h05/README.md) passed.
 
-This is a local demonstration bundle, not a submitted release. Party A and Party B
-are separate folders. No private signing key is saved in either folder. The signing
-key is generated in memory and discarded; the corresponding public key travels
-with Party B. The unchanged application uses the Tristan envelope/manifest format.
+The preserved `samples/t07` bundle uses version 1 manifests and is rejected by this
+build. It and user practice outputs were not modified. New manifests contain the
+original plaintext/file SHA-256 as `message_hash`; the embedded envelope format is
+unchanged. Regenerate output and manifest together, never edit a legacy version
+number to claim an upgrade. Missing hashes have no inferred fallback.
 
-## Planned version 2 bundle (not generated)
-
-The agreed external-hash feature is documentation only at present. Existing
-`samples/t07` paths and commands below remain for the current version 1 application.
-Do not describe those manifests as containing an external `message_hash`.
-
-After H02-H03 are implemented, H04 will generate a fresh complete bundle at
-`samples/hash-manifest-v2` using the existing bundle generator. That directory and
-its evidence are planned, not delivered by this update. Retain original covers,
-existing fixtures, historical reports and user outputs; do not overwrite them.
-
-The future verifier will require version 2 manifests containing the original
-plaintext/file SHA-256. Regenerate outputs and companion manifests together; merely
-renaming a manifest or changing its version number is not an upgrade. Generated
-public keys must travel with their matching outputs; use the actual matching key
-and separately shared secrets for teammate outputs. Damaged cases must retain their
-appropriate baseline manifests, as specified by the new case index.
-
-Verify the new Party B folder in a fresh process without private keys and record all
-expected cases before changing current demo paths or packaging a new release.
-Missing-hash legacy files will not have a silent fallback in the future app. See
-[H01-H05](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented).
+The bundle retains all previous image/audio/video and robustness cases, plus two
+manifest-only hash mismatches: `image-manifest-hash-mismatch` and
+`encrypted-manifest-hash-mismatch`. Select their listed modified manifests with
+unchanged protected media. Both yield TAMPERED, valid signature and signed-message
+checks, No for the two manifest comparisons, and no preview/save. Earlier failures
+show Not performed for unavailable hash comparisons.
 
 ## Reproduce or verify
 
@@ -35,13 +25,13 @@ From the repository root, using Python 3.11 with `requirements.txt` installed:
 
 ```powershell
 # Existing bundle: receiver verification and optional authenticated payload export.
-.venv-t05/Scripts/python.exe -m scripts.verify_sample_bundle samples/t07/party-b --report tmp/t07-receiver.json --recovered tmp/t07-recovered
+.venv-t08/Scripts/python.exe -m scripts.verify_sample_bundle samples/hash-manifest-v2/party-b --report tmp/hash-v2-receiver.json --recovered tmp/hash-v2-recovered
 
 # New bundle: the destination must not already exist.
-.venv-t05/Scripts/python.exe -m scripts.build_sample_bundle --output tmp/t07-new
+.venv-t08/Scripts/python.exe -m scripts.build_sample_bundle --output tmp/hash-v2-new
 
 # Open the application for the live steps below.
-.venv-t05/Scripts/python.exe main.py
+.venv-t08/Scripts/python.exe main.py
 ```
 
 Use your own environment path if it is named `.venv`. Reports and recovered folders
@@ -110,6 +100,8 @@ manifest: select that path explicitly. Use **Save recovered payload...** for aut
 | Wrong public key | `audio-wrong-key` | SIGNATURE_INVALID; use unrelated-public.pem |
 | Wrong advanced start | `audio-wrong-start` | Rejected at a different derived location; use wrong_start from demo-only-secrets.json |
 | Wrong passphrase | `image-wrong-passphrase` | CANNOT_VERIFY; signature may verify but plaintext is withheld |
+| Plaintext manifest hash changed | `image-manifest-hash-mismatch` | TAMPERED; signature/signed payload pass; manifest comparisons fail; no recovery |
+| Encrypted manifest hash changed | `encrypted-manifest-hash-mismatch` | TAMPERED with the correct demo passphrase; no recovery |
 | Outside-payload attack | `image-outside-payload` | AUTHENTIC despite changed cover samples; signature covers the payload |
 | Video challenge | `video-positive`, then Video tab | AUTHENTIC; preview cover/stego and locate the manifest-claimed affected frames |
 
@@ -120,7 +112,7 @@ or resistance to lossy compression. Repetition consumes about three times the sp
 
 Video output is **video-only FFV1/MKV**: source audio is omitted. This bundle's
 synthetic source has no audio track. Timing uses constant-rate frames; native
-playback and source-audio omission were checked in [T08](../evidence/t08/README.md).
+playback and source-audio omission were checked on the earlier build in [T08](../evidence/t08/README.md); H05 inspected the current hash interface, not native playback.
 The Video tab's frame span is untrusted until verification succeeds.
 
 ## Sender actions and retained extras
@@ -163,7 +155,8 @@ AUTHENTIC concerns the signed payload and settings, not every cover byte. Timest
 and nonce alone do not reject replay. No email, submission or real transfer is made
 by these commands.
 
-S01 pruned the nine analysis-only cases without re-signing retained fixtures.
-The v2 index has 18 verification cases, two capacity checks and 11 authenticated
-exports. The verifier accepts v1 indexes for payload verification only; retired
-analysis fields are ignored and v2 reports contain no statistical analysis.
+The current bundle has 20 verification cases, two capacity checks and 11 authenticated
+exports. Its `t07-v2` case-index schema is separate from the application's manifest
+version 2. The verifier accepts older case-index schemas for payload cases only;
+that does not permit old version 1 manifests. Retired analysis fields are ignored.
+The old S01 bundle and its 18-case results remain historical evidence.

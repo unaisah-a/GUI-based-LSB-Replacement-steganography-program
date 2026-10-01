@@ -199,7 +199,7 @@ ECC_REPETITION_DEFAULT_FACTOR: Final[int] = 3
 # Companion manifest
 # --------------------------------------------------------------------------- #
 
-MANIFEST_VERSION: Final[int] = 1
+MANIFEST_VERSION: Final[int] = 2
 MANIFEST_SUFFIX: Final[str] = ".manifest.json"
 
 

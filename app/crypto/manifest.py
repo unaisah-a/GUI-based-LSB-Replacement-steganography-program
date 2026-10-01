@@ -33,8 +33,10 @@ authenticates it on its own. Two separate mechanisms handle that:
    the values that matter are all present in the signed record, so a modified
    manifest either fails extraction outright or is caught by the comparison.
 
-Tampering with the manifest therefore produces a clear failure, not a false
-``AUTHENTIC``. It does not, however, always reveal *which* field was changed: a
+Tampering with cross-checked fields can produce a failure. Informational fields
+are not authenticated. The required original plaintext ``message_hash`` is
+compared with the authenticated signed record and recovered content.
+Rejection does not always reveal *which* field was changed: a
 modified depth or length usually makes extraction fail with no payload found,
 which is indistinguishable from several other causes.
 
@@ -51,6 +53,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from functools import partial
@@ -60,6 +63,7 @@ from app.crypto import envelope as envelope_module
 from app.crypto import fields
 from app.crypto.envelope import EncryptionParameters, ErrorCorrectionParameters
 from app.crypto.errors import ManifestError
+from app.crypto.hashing import hashes_equal
 from app.utils import constants, file_utils
 
 __all__ = [
@@ -89,6 +93,17 @@ _require_bounded_int = partial(
 _require_hex = partial(fields.require_hex, error=ManifestError)
 
 
+def _validate_message_hash(value: Any) -> str:
+    """Require a plaintext SHA-256 digest, without accepting hex whitespace."""
+    if not isinstance(value, str) or re.fullmatch(r"[0-9a-fA-F]{64}", value) is None:
+        raise ManifestError(
+            "manifest.message_hash is required and must be a 64-character "
+            "hexadecimal SHA-256 digest. Regenerate the protected output and "
+            "matching manifest with this version of the app"
+        )
+    return value.lower()
+
+
 # --------------------------------------------------------------------------- #
 # Manifest
 # --------------------------------------------------------------------------- #
@@ -106,6 +121,7 @@ class Manifest:
     start_method: str
     envelope_length: int
     message_length: int
+    message_hash: str
     encrypted: bool
     start_location: int | None = None
     encryption: EncryptionParameters | None = None
@@ -114,6 +130,11 @@ class Manifest:
     stego_sha256: str | None = None
     created: str | None = None
     format_version: int = constants.MANIFEST_VERSION
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self, "message_hash", _validate_message_hash(self.message_hash)
+        )
 
     # -- construction ----------------------------------------------------- #
 
@@ -153,6 +174,7 @@ class Manifest:
             start_method=record.start_method,
             envelope_length=envelope_length,
             message_length=record.message_length,
+            message_hash=record.message_hash,
             encrypted=record.encrypted,
             start_location=publish_start,
             encryption=record.encryption,
@@ -177,6 +199,7 @@ class Manifest:
             "start_location": self.start_location,
             "envelope_length": self.envelope_length,
             "message_length": self.message_length,
+            "message_hash": self.message_hash,
             "encrypted": self.encrypted,
             "encryption": self.encryption.as_dict() if self.encryption else None,
             "ecc": self.ecc.as_dict() if self.ecc else None,
@@ -203,8 +226,11 @@ class Manifest:
         if version not in SUPPORTED_MANIFEST_VERSIONS:
             raise ManifestError(
                 f"manifest format version {version} is not supported; this build "
-                f"understands {SUPPORTED_MANIFEST_VERSIONS}"
+                f"understands {SUPPORTED_MANIFEST_VERSIONS}. Regenerate the "
+                "protected output and matching manifest with this version of the app"
             )
+
+        message_hash = _validate_message_hash(data.get("message_hash"))
 
         media_type = _require(data, "media_type", str)
         if media_type not in constants.MEDIA_TYPES:
@@ -336,6 +362,7 @@ class Manifest:
             start_method=start_method,
             envelope_length=envelope_length,
             message_length=message_length,
+            message_hash=message_hash,
             encrypted=encrypted,
             start_location=(
                 start_location
@@ -454,8 +481,9 @@ def cross_check(
     Call this only after the envelope signature has verified. Before that the
     record is as untrusted as the manifest and comparing them establishes nothing.
 
-    An empty result means every parameter the manifest published matches what the
-    sender signed. Pass *envelope_length* — recomputed from the parsed envelope —
+    An empty result means the checked extraction parameters match what the
+    sender signed, including the external message hash.
+    Pass *envelope_length* — recomputed from the parsed envelope —
     to also confirm the published length, which is how a manifest length claim
     gets checked against the signed bytes without being inside the signature.
     """
@@ -482,6 +510,8 @@ def cross_check(
         mismatches.append("start_method")
     if manifest.message_length != record.message_length:
         mismatches.append("message_length")
+    if not hashes_equal(manifest.message_hash, record.message_hash):
+        mismatches.append("message_hash")
     if manifest.encrypted != record.encrypted:
         mismatches.append("encrypted")
     if manifest.encryption != record.encryption:

@@ -1,0 +1,17 @@
+{
+  "base_head": "32b4125b29a70c3f31827acac6d5a1efb9cc0c9f",
+  "state": "uncommitted H02-H05 working tree; source-hashes.json identifies validated bytes",
+  "python": "3.11.16",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "preexisting_files_checked": 232,
+  "unchanged_files": 231,
+  "appended_runtime_logs": [
+    "evidence\\logs\\application.log"
+  ],
+  "bundle_files_unchanged": 78,
+  "candidate_exports_exact": 11,
+  "documentation_links_checked": 201,
+  "source_files_hashed": 117,
+  "human_transfer_performed": false,
+  "native_playback_repeated": false
+}

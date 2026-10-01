@@ -1,12 +1,13 @@
-"""Build fresh T07 samples; refuses existing destinations and never saves private keys.
+"""Build fresh version 2 samples; refuse existing destinations and save no private keys.
 
-python -m scripts.build_sample_bundle --output samples/t07
+python -m scripts.build_sample_bundle --output samples/hash-manifest-v2
 """
 from __future__ import annotations
 
 import argparse
 import json
 import shutil
+from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
@@ -17,6 +18,7 @@ from app.analysis import quality_metrics
 from app.analysis.size_preservation import size_outcome
 from app.attacks import registry
 from app.crypto import key_manager
+from app.crypto import manifest as manifest_module
 from app.crypto.envelope import ErrorCorrectionParameters
 from app.stego import image_io, media, video_stego
 from app.stego.errors import CapacityError
@@ -101,10 +103,20 @@ def build(output):
         return relative.as_posix()
 
     def add_case(identifier, result, message, *, expected=("AUTHENTIC",), path=None,
+                 manifest_path=None, hash_checks=None,
                  start="start", passphrase=None, key="sender-public.pem", corrections=0, purpose=""):
+        default_check = "Yes" if tuple(expected) == ("AUTHENTIC",) else "Not performed"
+        expected_hash_checks = dict(
+            payload_matches_manifest=default_check,
+            manifest_matches_record=default_check,
+            payload_matches_record=default_check,
+        )
+        if hash_checks:
+            expected_hash_checks.update(hash_checks)
         row = dict(id=identifier, media=transfer(path or result.stego_path),
-                   manifest=transfer(result.manifest_path), public_key=key,
+                   manifest=transfer(manifest_path or result.manifest_path), public_key=key,
                    expected_verdicts=list(expected), start_secret=start, passphrase=passphrase,
+                   expected_hash_checks=expected_hash_checks,
                    message_sha256=sha256(message), message_bytes=len(message),
                    payload_kind=payload_files.detect_payload_type(message).kind,
                    expected_filename=result.record.metadata.get(payload_files.METADATA_FILENAME),
@@ -202,7 +214,22 @@ def build(output):
              expected=("PAYLOAD_MISSING", "CANNOT_VERIFY", "SIGNATURE_INVALID"),
              purpose="Different derived location; failure cause alone remains ambiguous")
     add_case("image-wrong-passphrase", encrypted, custom, passphrase="wrong_passphrase",
+             hash_checks=dict(manifest_matches_record="Yes"),
              expected=("CANNOT_VERIFY",), purpose="Signature can verify but decryption fails")
+
+    for identifier, result, message, start, passphrase in (
+        ("image-manifest-hash-mismatch", image_short, short, None, None),
+        ("encrypted-manifest-hash-mismatch", encrypted, custom, "start", "passphrase"),
+    ):
+        changed = sender / "tampered" / (identifier + ".manifest.json")
+        # Change only the unsigned reference digest, preserving authentic media.
+        wrong_hash = "00" * 32 if result.manifest.message_hash != "00" * 32 else "11" * 32
+        manifest_module.write_manifest(replace(result.manifest, message_hash=wrong_hash), changed)
+        add_case(identifier, result, message, manifest_path=changed, start=start,
+                 passphrase=passphrase, expected=("TAMPERED",),
+                 hash_checks=dict(payload_matches_manifest="No", manifest_matches_record="No",
+                                  payload_matches_record="Yes"),
+                 purpose="Only manifest message_hash changed; signature and signed payload remain valid; recovery withheld")
 
     for cover in (image, audio):
         maximum = media.measure(cover, 1, 37).report.max_payload_length
@@ -224,20 +251,20 @@ def build(output):
         if sha256(path.read_bytes()) != original_hash:
             raise RuntimeError("Original cover modified")
     write_json(receiver / "demo-only-secrets.json", DEMO)
-    write_json(receiver / "case-index.json", dict(schema="t07-v2", cases=cases,
+    write_json(receiver / "case-index.json", dict(schema="t07-v2", manifest_version=constants.MANIFEST_VERSION, cases=cases,
                                                    capacity_cases=capacities))
     write_json(sender / "generation-report.json", dict(cases=sender_rows, attacks=attacks,
                                                         capacity=capacities, video=video_evidence,
                                                         private_keys_saved=0))
-    lines = ["# T07 case index", "", "Paths are relative to party-b. Explicitly select each listed manifest.",
+    lines = ["# Version 2 sample case index", "", "Paths are relative to party-b. Explicitly select each listed manifest.",
              "", "| Case | Media | Manifest | Expected |", "| --- | --- | --- | --- |"]
     lines += [f"| {c['id']} | {c['media']} | {c['manifest']} | {', '.join(c['expected_verdicts'])} |"
               for c in cases]
     (output / "CASE_INDEX.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     # Self-contained instructions travel with Party B as well as with the whole bundle.
-    guide = Path(__file__).resolve().parents[1] / "docs" / "sample_bundle.md"
-    shutil.copy2(guide, output / "README.md")
-    shutil.copy2(guide, receiver / "README.md")
+    guide = receiver_guide(len(cases), len(capacities))
+    (output / "README.md").write_text(guide, encoding="utf-8")
+    (receiver / "README.md").write_text(guide, encoding="utf-8")
     inventory = {p.relative_to(receiver).as_posix(): sha256(p.read_bytes())
                  for p in sorted(receiver.rglob("*")) if p.is_file()}
     write_json(receiver / "checksums.json", inventory)
@@ -248,6 +275,64 @@ def build(output):
         raise RuntimeError("Receiver cases did not match their expectations")
     write_json(output / "generation-verification.json", report)
     return report
+
+
+def receiver_guide(case_count, capacity_count):
+    """Portable instructions with no links back to the sender's workspace."""
+    return f"""# Version 2 sender/receiver demonstration bundle
+
+This bundle has {case_count} verification cases and {capacity_count} capacity checks.
+Use the app built with H02-H03 manifest version 2 support and Python 3.11 with the
+repository's pinned requirements. This is local demo material, not a submitted release.
+
+## Verify independently
+
+Copy only party-b, the app directory and scripts/verify_sample_bundle.py to the
+receiver's machine. No party-a folder or private key is needed. From the copied
+runtime's parent directory, replacing RECEIVED with the copied party-b path:
+
+```powershell
+python -I scripts/verify_sample_bundle.py RECEIVED --report receiver-report.json --recovered recovered
+```
+
+The report and recovered directory must not already exist. Exit code 0 means all
+indexed verdicts, hash-comparison expectations, exact recovered hashes/lengths and
+capacity checks passed. Only authenticated successful cases are exported (11 files).
+This command does not establish a real human transfer or rehearsal.
+
+## GUI inputs
+
+Paths in case-index.json are relative to the receiver folder. Select each case's
+media, listed manifest and public key in Verify. Damaged media may reuse a baseline
+manifest, so select the listed manifest explicitly. sender-public.pem matches this
+bundle; unrelated-public.pem is intentionally wrong. A newly generated local key
+does not match these fixtures. Confirm the sender fingerprint independently.
+
+demo-only-secrets.json contains PUBLIC DEMONSTRATION VALUES ONLY, including wrong
+inputs for negative cases. Case fields start_secret/passphrase name entries in that
+file; null means unused. These values protect no real information. No private key
+is saved in either Party A or Party B.
+
+The two manifest-hash-mismatch cases use unchanged signed media with a modified
+manifest. Expect TAMPERED, valid signature and signed-message check, No for the two
+manifest comparisons, and no payload preview/save. Earlier extraction/signature
+failures show Not performed for unavailable comparisons. Wrong passphrase permits
+the signed-record comparison but prevents recomputing the plaintext hash.
+
+AUTHENTIC concerns the payload and signed settings, not every cover sample.
+Outside-payload edits can remain AUTHENTIC; stego_sha256 is only an unsigned
+whole-file transport check. The checksum inventory detects transfer damage, not
+malicious replacement. Publishing plaintext hashes allows predictable-message
+guessing even when encryption is used. Repetition recovery does not establish
+resistance to arbitrary lossy transforms. Video output is FFV1/MKV without audio.
+
+## Sender material
+
+The complete bundle also has party-a/original covers, party-a/messages inputs,
+protected/tampered outputs, a generation report and CASE_INDEX.md. Use fresh local
+keys only for newly protected outputs; keep private keys outside shared folders.
+The existing historical samples remain separate and are not upgraded in place.
+"""
 
 
 if __name__ == "__main__":

@@ -1,0 +1,924 @@
+{
+  "schema": "t07-receiver-report-v2",
+  "python": "3.11.16",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "private_key_files": 0,
+  "sender_fingerprint": "26073b97554fd7e9611f01401fcfc38cf2ecf01e587a3dc6620bb790a92a902f",
+  "passed": true,
+  "cases": [
+    {
+      "id": "image-short",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 105-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 37,
+        "message_length": 105,
+        "media_id": "image-short",
+        "media_type": "image",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 927,
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "saved": "image-short.txt"
+    },
+    {
+      "id": "audio-long",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 673-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+          "signed_record_hash": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+          "computed_hash": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 26604,
+        "message_length": 673,
+        "media_id": "audio-long",
+        "media_type": "audio",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open.",
+          "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 1498,
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+      "saved": "audio-long.txt"
+    },
+    {
+      "id": "image-confidential",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 325-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+          "signed_record_hash": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+          "computed_hash": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 180735,
+        "message_length": 325,
+        "media_id": "image-confidential",
+        "media_type": "image",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": true,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open.",
+          "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": true,
+          "envelope_length": 1285,
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+      "saved": "image-confidential.txt"
+    },
+    {
+      "id": "image-file",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 1644-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "0f02cfabf22a629bb41c2973231db07cf5b68b1f537301827bd95166de8d73c0",
+          "signed_record_hash": "0f02cfabf22a629bb41c2973231db07cf5b68b1f537301827bd95166de8d73c0",
+          "computed_hash": "0f02cfabf22a629bb41c2973231db07cf5b68b1f537301827bd95166de8d73c0",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 206643,
+        "message_length": 1644,
+        "media_id": "image-file",
+        "media_type": "image",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open.",
+          "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 2522,
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": "0f02cfabf22a629bb41c2973231db07cf5b68b1f537301827bd95166de8d73c0",
+      "saved": "image-file.png"
+    },
+    {
+      "id": "audio-file",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 4454-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "44e05eb1cad5637ac44a0f0eeb8fbf8a170d3f10718d487589585a8296d32506",
+          "signed_record_hash": "44e05eb1cad5637ac44a0f0eeb8fbf8a170d3f10718d487589585a8296d32506",
+          "computed_hash": "44e05eb1cad5637ac44a0f0eeb8fbf8a170d3f10718d487589585a8296d32506",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 70937,
+        "message_length": 4454,
+        "media_id": "audio-file",
+        "media_type": "audio",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open.",
+          "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 5332,
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": "44e05eb1cad5637ac44a0f0eeb8fbf8a170d3f10718d487589585a8296d32506",
+      "saved": "audio-file.wav"
+    },
+    {
+      "id": "bmp-manual",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 105-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 37,
+        "message_length": 105,
+        "media_id": "bmp-manual",
+        "media_type": "image",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 926,
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "saved": "bmp-manual.txt"
+    },
+    {
+      "id": "video-positive",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 105-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 461727,
+        "message_length": 105,
+        "media_id": "video-positive",
+        "media_type": "video",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open.",
+          "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 934,
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "saved": "video-positive.txt"
+    },
+    {
+      "id": "audio-uncoded",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 105-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 37,
+        "message_length": 105,
+        "media_id": "audio-uncoded",
+        "media_type": "audio",
+        "timestamp": "2026-10-01T11:51:16+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 929,
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "saved": "audio-uncoded.txt"
+    },
+    {
+      "id": "audio-robust",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 105-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 37,
+        "message_length": 105,
+        "media_id": "audio-robust",
+        "media_type": "audio",
+        "timestamp": "2026-10-01T11:51:16+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 958,
+          "error_correction": {
+            "scheme": "repetition",
+            "factor": 3,
+            "bits_examined": 7664,
+            "bits_corrected": 0,
+            "corrected_proportion": 0.0,
+            "raw_length": 958,
+            "encoded_length": 2874
+          },
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "saved": "audio-robust.txt"
+    },
+    {
+      "id": "image-payload-corruption",
+      "passed": true,
+      "expected": [
+        "SIGNATURE_INVALID"
+      ],
+      "actual": {
+        "verdict": "SIGNATURE_INVALID",
+        "reason": "the payload signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified",
+        "description": "A payload was found and read, but its signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified.",
+        "payload_found": true,
+        "signature_valid": false,
+        "hash_valid": null,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": null,
+          "computed_hash": null,
+          "payload_matches_manifest": "Not performed",
+          "manifest_matches_record": "Not performed",
+          "payload_matches_record": "Not performed"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": null,
+        "mismatched_fields": [],
+        "start_location": 37,
+        "message_length": null,
+        "media_id": null,
+        "media_type": null,
+        "timestamp": null,
+        "encrypted": null,
+        "notes": [
+          "This file is not byte-for-byte the one that was protected: its SHA-256 differs from the digest in the manifest. The verdict concerns the embedded payload only, and a change outside the payload region does not affect it. The manifest is unsigned, so this is a transport check, not proof of tampering."
+        ],
+        "details": {
+          "stage": "signature",
+          "file_digest_matches": false
+        }
+      },
+      "message_sha256": null,
+      "saved": null
+    },
+    {
+      "id": "audio-signature-corruption",
+      "passed": true,
+      "expected": [
+        "SIGNATURE_INVALID"
+      ],
+      "actual": {
+        "verdict": "SIGNATURE_INVALID",
+        "reason": "the payload signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified",
+        "description": "A payload was found and read, but its signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified.",
+        "payload_found": true,
+        "signature_valid": false,
+        "hash_valid": null,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+          "signed_record_hash": null,
+          "computed_hash": null,
+          "payload_matches_manifest": "Not performed",
+          "manifest_matches_record": "Not performed",
+          "payload_matches_record": "Not performed"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": null,
+        "mismatched_fields": [],
+        "start_location": 26604,
+        "message_length": null,
+        "media_id": null,
+        "media_type": null,
+        "timestamp": null,
+        "encrypted": null,
+        "notes": [
+          "This file is not byte-for-byte the one that was protected: its SHA-256 differs from the digest in the manifest. The verdict concerns the embedded payload only, and a change outside the payload region does not affect it. The manifest is unsigned, so this is a transport check, not proof of tampering."
+        ],
+        "details": {
+          "stage": "signature",
+          "file_digest_matches": false
+        }
+      },
+      "message_sha256": null,
+      "saved": null
+    },
+    {
+      "id": "image-outside-payload",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 105-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 37,
+        "message_length": 105,
+        "media_id": "image-short",
+        "media_type": "image",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open.",
+          "This file is not byte-for-byte the one that was protected: its SHA-256 differs from the digest in the manifest. The verdict concerns the embedded payload only, and a change outside the payload region does not affect it. The manifest is unsigned, so this is a transport check, not proof of tampering."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 927,
+          "file_digest_matches": false
+        }
+      },
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "saved": "image-outside-payload.txt"
+    },
+    {
+      "id": "audio-repetition1-damage1",
+      "passed": true,
+      "expected": [
+        "SIGNATURE_INVALID"
+      ],
+      "actual": {
+        "verdict": "SIGNATURE_INVALID",
+        "reason": "the payload signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified",
+        "description": "A payload was found and read, but its signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified.",
+        "payload_found": true,
+        "signature_valid": false,
+        "hash_valid": null,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": null,
+          "computed_hash": null,
+          "payload_matches_manifest": "Not performed",
+          "manifest_matches_record": "Not performed",
+          "payload_matches_record": "Not performed"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": null,
+        "mismatched_fields": [],
+        "start_location": 37,
+        "message_length": null,
+        "media_id": null,
+        "media_type": null,
+        "timestamp": null,
+        "encrypted": null,
+        "notes": [
+          "This file is not byte-for-byte the one that was protected: its SHA-256 differs from the digest in the manifest. The verdict concerns the embedded payload only, and a change outside the payload region does not affect it. The manifest is unsigned, so this is a transport check, not proof of tampering."
+        ],
+        "details": {
+          "stage": "signature",
+          "file_digest_matches": false
+        }
+      },
+      "message_sha256": null,
+      "saved": null
+    },
+    {
+      "id": "audio-repetition3-damage1",
+      "passed": true,
+      "expected": [
+        "AUTHENTIC"
+      ],
+      "actual": {
+        "verdict": "AUTHENTIC",
+        "reason": "the signature verified against the supplied public key and the recovered 105-byte message matches the digest that was signed",
+        "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "payload_matches_manifest": "Yes",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": true,
+        "mismatched_fields": [],
+        "start_location": 37,
+        "message_length": 105,
+        "media_id": "audio-robust",
+        "media_type": "audio",
+        "timestamp": "2026-10-01T11:51:16+00:00",
+        "encrypted": false,
+        "notes": [
+          "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
+          "Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open.",
+          "repetition coding at factor 3 repaired 1 of 7664 bits (0.0130%) by majority vote.",
+          "This file is not byte-for-byte the one that was protected: its SHA-256 differs from the digest in the manifest. The verdict concerns the embedded payload only, and a change outside the payload region does not affect it. The manifest is unsigned, so this is a transport check, not proof of tampering."
+        ],
+        "details": {
+          "stage": "complete",
+          "was_encrypted": false,
+          "envelope_length": 958,
+          "error_correction": {
+            "scheme": "repetition",
+            "factor": 3,
+            "bits_examined": 7664,
+            "bits_corrected": 1,
+            "corrected_proportion": 0.00013048016701461377,
+            "raw_length": 958,
+            "encoded_length": 2874
+          },
+          "file_digest_matches": false
+        }
+      },
+      "message_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "saved": "audio-repetition3-damage1.txt"
+    },
+    {
+      "id": "audio-repetition3-damage2",
+      "passed": true,
+      "expected": [
+        "SIGNATURE_INVALID"
+      ],
+      "actual": {
+        "verdict": "SIGNATURE_INVALID",
+        "reason": "the payload signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified",
+        "description": "A payload was found and read, but its signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified.",
+        "payload_found": true,
+        "signature_valid": false,
+        "hash_valid": null,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "signed_record_hash": null,
+          "computed_hash": null,
+          "payload_matches_manifest": "Not performed",
+          "manifest_matches_record": "Not performed",
+          "payload_matches_record": "Not performed"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": null,
+        "mismatched_fields": [],
+        "start_location": 37,
+        "message_length": null,
+        "media_id": null,
+        "media_type": null,
+        "timestamp": null,
+        "encrypted": null,
+        "notes": [
+          "This file is not byte-for-byte the one that was protected: its SHA-256 differs from the digest in the manifest. The verdict concerns the embedded payload only, and a change outside the payload region does not affect it. The manifest is unsigned, so this is a transport check, not proof of tampering."
+        ],
+        "details": {
+          "stage": "signature",
+          "file_digest_matches": false
+        }
+      },
+      "message_sha256": null,
+      "saved": null
+    },
+    {
+      "id": "audio-wrong-key",
+      "passed": true,
+      "expected": [
+        "SIGNATURE_INVALID"
+      ],
+      "actual": {
+        "verdict": "SIGNATURE_INVALID",
+        "reason": "the payload signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified",
+        "description": "A payload was found and read, but its signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified.",
+        "payload_found": true,
+        "signature_valid": false,
+        "hash_valid": null,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+          "signed_record_hash": null,
+          "computed_hash": null,
+          "payload_matches_manifest": "Not performed",
+          "manifest_matches_record": "Not performed",
+          "payload_matches_record": "Not performed"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": null,
+        "mismatched_fields": [],
+        "start_location": 26604,
+        "message_length": null,
+        "media_id": null,
+        "media_type": null,
+        "timestamp": null,
+        "encrypted": null,
+        "notes": [],
+        "details": {
+          "stage": "signature",
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": null,
+      "saved": null
+    },
+    {
+      "id": "audio-wrong-start",
+      "passed": true,
+      "expected": [
+        "PAYLOAD_MISSING",
+        "CANNOT_VERIFY",
+        "SIGNATURE_INVALID"
+      ],
+      "actual": {
+        "verdict": "PAYLOAD_MISSING",
+        "reason": "the manifest declares a 1,498-byte payload at start location 3,407, but the 4-byte length field read there decodes to 968,733,882, which cannot be used. It differs from the declared length in 16 of 32 bits. The length field is not covered by the signature, so this cannot say why: it is consistent with the file having been modified at that location, and also with a wrong start secret or depth, or with no payload having been embedded.",
+        "description": "No payload envelope was found at the location and settings given. This is equally consistent with an unprotected file, incorrect settings, an incorrect secret, and modified media.",
+        "payload_found": false,
+        "signature_valid": null,
+        "hash_valid": null,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+          "signed_record_hash": null,
+          "computed_hash": null,
+          "payload_matches_manifest": "Not performed",
+          "manifest_matches_record": "Not performed",
+          "payload_matches_record": "Not performed"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": null,
+        "mismatched_fields": [],
+        "start_location": 3407,
+        "message_length": null,
+        "media_id": null,
+        "media_type": null,
+        "timestamp": null,
+        "encrypted": null,
+        "notes": [
+          "An extraction failure does not identify its cause. A wrong LSB depth, a wrong start location or secret, an absent payload and sample corruption produce indistinguishable bit streams."
+        ],
+        "details": {
+          "stage": "length_header",
+          "stego_file": "audio-long.wav",
+          "decoded_length": 968733882,
+          "expected_length": 1498,
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": null,
+      "saved": null
+    },
+    {
+      "id": "image-wrong-passphrase",
+      "passed": true,
+      "expected": [
+        "CANNOT_VERIFY"
+      ],
+      "actual": {
+        "verdict": "CANNOT_VERIFY",
+        "reason": "the signature verified, so the record is genuine, but the message could not be decrypted: the message could not be decrypted: the authentication tag did not validate. This is consistent with an incorrect passphrase or with modified ciphertext, and does not distinguish between them",
+        "description": "Verification could not be completed, and the cause cannot be determined from the evidence available.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": null,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+          "signed_record_hash": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+          "computed_hash": null,
+          "payload_matches_manifest": "Not performed",
+          "manifest_matches_record": "Yes",
+          "payload_matches_record": "Not performed"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": null,
+        "mismatched_fields": [],
+        "start_location": 180735,
+        "message_length": null,
+        "media_id": "image-confidential",
+        "media_type": "image",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": true,
+        "notes": [],
+        "details": {
+          "stage": "decryption",
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": null,
+      "saved": null
+    },
+    {
+      "id": "image-manifest-hash-mismatch",
+      "passed": true,
+      "expected": [
+        "TAMPERED"
+      ],
+      "actual": {
+        "verdict": "TAMPERED",
+        "reason": "the signature verified and the message is intact, but the companion manifest disagrees with the signed record on: message_hash",
+        "description": "The signature verified, so the record is genuine, but the recovered message does not match the digest it was signed with, or the published parameters disagree with the signed ones.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+          "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+          "payload_matches_manifest": "No",
+          "manifest_matches_record": "No",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": false,
+        "mismatched_fields": [
+          "message_hash"
+        ],
+        "start_location": 37,
+        "message_length": null,
+        "media_id": "image-short",
+        "media_type": "image",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": false,
+        "notes": [],
+        "details": {
+          "stage": "manifest_cross_check",
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": null,
+      "saved": null
+    },
+    {
+      "id": "encrypted-manifest-hash-mismatch",
+      "passed": true,
+      "expected": [
+        "TAMPERED"
+      ],
+      "actual": {
+        "verdict": "TAMPERED",
+        "reason": "the signature verified and the message is intact, but the companion manifest disagrees with the signed record on: message_hash",
+        "description": "The signature verified, so the record is genuine, but the recovered message does not match the digest it was signed with, or the published parameters disagree with the signed ones.",
+        "payload_found": true,
+        "signature_valid": true,
+        "hash_valid": true,
+        "hash_evidence": {
+          "algorithm": "SHA-256",
+          "manifest_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+          "signed_record_hash": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+          "computed_hash": "f5cfa5e875b85bd23ca860c373c437c6ef82f16dd0aa8018ca3277f0d1101f38",
+          "payload_matches_manifest": "No",
+          "manifest_matches_record": "No",
+          "payload_matches_record": "Yes"
+        },
+        "start_location_valid": true,
+        "manifest_consistent": false,
+        "mismatched_fields": [
+          "message_hash"
+        ],
+        "start_location": 180735,
+        "message_length": null,
+        "media_id": "image-confidential",
+        "media_type": "image",
+        "timestamp": "2026-10-01T11:51:15+00:00",
+        "encrypted": true,
+        "notes": [],
+        "details": {
+          "stage": "manifest_cross_check",
+          "file_digest_matches": true
+        }
+      },
+      "message_sha256": null,
+      "saved": null
+    }
+  ],
+  "capacity_checks": [
+    {
+      "id": "capacity-png",
+      "passed": true,
+      "requested_message_bytes": 28792,
+      "maximum_raw_payload_bytes": 28791
+    },
+    {
+      "id": "capacity-wav",
+      "passed": true,
+      "requested_message_bytes": 5504,
+      "maximum_raw_payload_bytes": 5503
+    }
+  ]
+}

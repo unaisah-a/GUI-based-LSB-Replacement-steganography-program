@@ -221,6 +221,7 @@ class RecoveredMessage:
     #: Whether the recovered plaintext's digest matched the signed record.
     hash_matches: bool
     was_encrypted: bool
+    computed_hash: str
 
 
 def recover_message(
@@ -267,11 +268,13 @@ def recover_message(
         plaintext = parsed.message
         was_encrypted = False
 
+    computed_hash = sha256_hex(plaintext)
     return RecoveredMessage(
         message=plaintext,
         hash_matches=(
             len(plaintext) == record.message_length
-            and hashes_equal(sha256_hex(plaintext), record.message_hash)
+            and hashes_equal(computed_hash, record.message_hash)
         ),
         was_encrypted=was_encrypted,
+        computed_hash=computed_hash,
     )

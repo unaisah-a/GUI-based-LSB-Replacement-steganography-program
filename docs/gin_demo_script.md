@@ -6,15 +6,17 @@ Use this for your part of the team demonstration. It includes what to prepare, t
 
 The main route uses your teammates' freshly protected image and audio. The prepared-sample route is provided for practice or a clearly announced fallback. All results below are expected outcomes, not a record of a completed rehearsal.
 
-## Future external-hash explanation (not implemented)
+## External-hash explanation (H03-H04 implemented)
 
-This is a future-only supplement, not an instruction for the current app. The
+This supplement applies to freshly generated version 2 outputs. The
 [version 2 plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
-will add the original message/file SHA-256 to the manifest and show expected versus
-recomputed hashes, with a cross-check against the signed record. Current version 1
-sample paths and actions below remain valid with the unchanged build.
+now adds the original message/file SHA-256 to the manifest through H02. H03 shows
+expected versus recomputed hashes, with a cross-check against the signed record.
+The practice paths below use H04's verified version 2 bundle. The live route still
+requires your teammates' freshly protected outputs and matching manifests/keys.
+Old version 1 practice outputs remain preserved but are rejected by this build.
 
-After implementation and fresh-sample validation, the proposed receiver explanation is:
+The proposed receiver explanation is:
 
 > "The expected payload hash is in the manifest. The app hashes the recovered message and compares the values, then checks their agreement with the authenticated signed record. The signature is what prevents someone from passing verification by replacing both the message and its expected hash."
 
@@ -24,8 +26,8 @@ wrong-secret extraction can fail earlier. Their plaintext-hash comparison will s
 **Not performed** when it was not reached. Outside-payload edits can still preserve
 both payload-hash agreement and `AUTHENTIC`. Explain the actual displayed result.
 
-Use new output/manifest/public-key pairs after the version 2 rollout. The proposed
-`samples/hash-manifest-v2` bundle has not been generated. This supplement is excluded
+Use matching output/manifest/public-key pairs from the verified
+`samples/hash-manifest-v2` bundle for practice. This supplement is excluded
 from the existing narration counts and timing estimates; it has not been rehearsed.
 
 ## 1. Your role and timing
@@ -91,18 +93,18 @@ Repository root: `A:/Code/GUI-based-LSB-Replacement-steganography-program`.
 
 | Script name | Prepared value relative to the repository root |
 | --- | --- |
-| `IMAGE` | `samples/t07/party-b/protected/image-short.png` |
-| `IMAGE_MANIFEST` | `samples/t07/party-b/protected/image-short.png.manifest.json` |
-| `AUDIO` | `samples/t07/party-b/protected/audio-long.wav` |
-| `AUDIO_MANIFEST` | `samples/t07/party-b/protected/audio-long.wav.manifest.json` |
-| Both public keys | `samples/t07/party-b/sender-public.pem` |
+| `IMAGE` | `samples/hash-manifest-v2/party-b/protected/image-short.png` |
+| `IMAGE_MANIFEST` | `samples/hash-manifest-v2/party-b/protected/image-short.png.manifest.json` |
+| `AUDIO` | `samples/hash-manifest-v2/party-b/protected/audio-long.wav` |
+| `AUDIO_MANIFEST` | `samples/hash-manifest-v2/party-b/protected/audio-long.wav.manifest.json` |
+| Both public keys | `samples/hash-manifest-v2/party-b/sender-public.pem` |
 | Image start secret | None; this fixture uses a manual start |
 | Audio start secret | `t07-public-demo-start` |
 | Image/audio passphrase | None; both are unencrypted |
-| Original video cover | `samples/t07/party-a/original/video.mkv` |
-| Prepared video fallback | `samples/t07/party-b/protected/video-positive.mkv` |
-| Prepared video manifest | `samples/t07/party-b/protected/video-positive.mkv.manifest.json` |
-| Prepared video public key | `samples/t07/party-b/sender-public.pem` |
+| Original video cover | `samples/hash-manifest-v2/party-a/original/video.mkv` |
+| Prepared video fallback | `samples/hash-manifest-v2/party-b/protected/video-positive.mkv` |
+| Prepared video manifest | `samples/hash-manifest-v2/party-b/protected/video-positive.mkv.manifest.json` |
+| Prepared video public key | `samples/hash-manifest-v2/party-b/sender-public.pem` |
 | Prepared video start secret | `t07-public-demo-start` |
 
 The printed secret is public demonstration data. It is not necessarily the secret your teammates choose for fresh outputs. A locally generated key pair does not automatically match these prepared fixtures.
@@ -253,7 +255,7 @@ Attack Lab keeps both secret fields editable. The hint below them says whether e
 
 ### A Protect the video
 
-Your selected forest cover is [forest-cover.mkv](<C:/Users/ginli/OneDrive/SIT/Year 2 Tri 1/Cyber Security Fundamentals/Project/forest-cover.mkv>): five seconds, 640 × 360, 25 fps, FFV1, no audio. It was converted from your supplied MP4 and passed a backend protect/verify check with exact text recovery; native GUI playback still needs rehearsal. Copy this MKV to the presentation machine if needed. The original bundled `samples/t07/party-a/original/video.mkv` remains a fallback cover.
+Your selected forest cover is [forest-cover.mkv](<C:/Users/ginli/OneDrive/SIT/Year 2 Tri 1/Cyber Security Fundamentals/Project/forest-cover.mkv>): five seconds, 640 × 360, 25 fps, FFV1, no audio. It was converted from your supplied MP4 and passed a backend protect/verify check with exact text recovery; native GUI playback still needs rehearsal. Copy this MKV to the presentation machine if needed. The original bundled `samples/hash-manifest-v2/party-a/original/video.mkv` remains a fallback cover.
 
 1. *In **Protect**, load your `forest-cover.mkv`. Use this cover, not an already protected output. The MP4 download itself is not the app input.*
 

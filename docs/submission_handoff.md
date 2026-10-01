@@ -4,25 +4,21 @@ The technical handoff is prepared. **No submission, full timed team rehearsal or
 real A-to-B transfer is claimed.** T09 DONE means the script, evidence index and
 handoff are delivered; human obligations below remain open.
 
-## Planned external-hash follow-up (not implemented)
+## Version 2 release validated: H02-H05 complete
 
-H01 updates documentation only. Historical release checks below do not establish
-that manifest version 2, its hash display or its sample bundle works. Current version
-1 files remain usable with the unchanged application. The
-[implementation plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
-records H02-H05 as TODO, requiring later implementation authorisation.
+The current build requires version 2 manifests and compares external, authenticated
+and recomputed payload hashes. The new bundle and release pass the checks recorded
+in [H05 evidence](../evidence/h05/README.md): 1,832 tests, Ruff, native hash display,
+independent receiver verification and extracted application startup. Original
+version 1 fixtures remain for regression tests and are rejected by this build.
 
-Before delivering the future version 2 build:
-
-- [ ] Implement required external `message_hash`, signed-record cross-checking and visible expected/computed comparisons.
-- [ ] Confirm old/missing-hash manifests are rejected with a clear regeneration instruction.
-- [ ] Generate the fresh `samples/hash-manifest-v2` bundle; preserve historical samples and user outputs.
-- [ ] Verify receiver cases with matching manifests, public keys and actual secrets, without private keys.
-- [ ] Record focused/full tests, lint, GUI hash readability and independent receiver results for the actual revision.
-- [ ] Update live demo paths, exported evidence and release-package instructions only after validation.
-
-These are future acceptance items, not new human declarations or completed checks.
-No code changes, sample generation, commits, pushes or submissions are part of H01.
+All technical rollout items are complete. The native check covers the changed
+hash interface; it does not claim a repeat of historical playback or drag/drop.
+Human obligations below remain open. The user subsequently authorised committing
+and pushing H02-H05 on 1 October 2026; see the integration branch's Git history.
+The validated ZIP and H05 evidence retain their pre-publication snapshot; later
+publication notes and sample byte-preservation attributes do not change the tested
+application. No submission was performed.
 
 ## Requirements checked against the brief
 
@@ -49,26 +45,33 @@ No email has been sent by this task.
 | Confirm dates/portal, fill placeholders and rebuild personalised archive | Designated member | OPEN |
 | Submit documents/project files and retain receipts | Designated member | OPEN |
 
-## Package and receiver commands
+## Current receiver and release-package commands
 
 From the repository root with Python 3.11 and pinned requirements installed:
 
 ```powershell
-.venv/Scripts/python.exe -m scripts.verify_sample_bundle samples/t07/party-b --report tmp/receiver-final.json --recovered tmp/receiver-final-files
-.venv/Scripts/python.exe -m scripts.package_submission --output dist/INF2005_ACW1_S01.zip
-.venv/Scripts/python.exe evidence/t08/check_package.py --archive dist/INF2005_ACW1_S01.zip --extract tmp/s01-package-audit --report dist/S01-audit-package-report.json
+.venv/Scripts/python.exe -m scripts.verify_sample_bundle samples/hash-manifest-v2/party-b --report tmp/receiver-final.json --recovered tmp/receiver-final-files
+.venv/Scripts/python.exe -m scripts.check_receiver_isolation --bundle samples/hash-manifest-v2/party-b --output tmp/hash-v2-isolated-final
+.venv/Scripts/python.exe -m scripts.package_submission --output dist/H05-validated.zip
+.venv/Scripts/python.exe -m scripts.check_release_package --archive dist/H05-validated.zip --output tmp/h05/package-final
 ```
 
 Use fresh report/recovered/extraction paths on repeat. The validation machine uses
-`.venv-t08` instead of `.venv`. Expected receiver result: 18 cases and two capacity
-checks pass, with 11 exact authenticated exports. The archive check compares every
-member to source, rejects private keys, extracts to a fresh folder and runs isolated
-receiver plus original-format/startup checks. Its report records archive/member
-hashes outside the ZIP. See [current S01 evidence](../evidence/s01/README.md).
+`.venv-t08` instead of `.venv`. Expected receiver result: 20 cases and two capacity
+checks pass, with 11 exact authenticated exports. See [H04 evidence](../evidence/h04/README.md).
+The final archive is `dist/H05-validated.zip`; its exact SHA-256 and member hashes
+are recorded in `tmp/h05/package-final/package-report.json` (also copied beside
+the archive as `dist/H05-validated-report.json`). Keep this report outside the ZIP.
+The check runs only extracted/copied application files in fresh `python -I`
+processes, verifies current fixtures and probes startup and legacy rejection.
+It reuses the installed pinned dependencies; it is not a fresh dependency install
+or an OS access sandbox. Historical [S01 evidence](../evidence/s01/README.md)
+does not certify the current source tree or a later archive.
 
 Included: source, pinned requirements, tests, docs, evidence, public keys and
 original/protected/tampered samples. Excluded: private demo keys, environments,
-caches, local app logs and unrelated `samples/r11`. After filling declarations or
+caches, local app logs, unrelated `samples/r11` and all samples absent from
+`scripts/release_samples.txt` (including local practice outputs). After filling declarations or
 changing files, rebuild/recheck and use the real team number for the required name.
 Earlier hashes do not certify later changes. Do not submit private keys.
 

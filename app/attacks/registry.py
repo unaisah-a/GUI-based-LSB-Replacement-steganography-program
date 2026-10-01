@@ -511,6 +511,8 @@ class AttackRun:
             "verdict_changed": self.verdict_changed,
             "matched_expectation": self.matched_expectation,
             "reason_after": self.after.reason,
+            "hash_evidence_before": self.before.hash_evidence.as_dict(),
+            "hash_evidence_after": self.after.hash_evidence.as_dict(),
         }
 
     def as_text(self) -> str:
@@ -518,7 +520,9 @@ class AttackRun:
             f"{self.attack.label}\n"
             f"  {self.outcome.description}\n"
             f"  before: {self.before.verdict}\n"
-            f"  after:  {self.after.verdict} ({self.after.reason})"
+            f"  after:  {self.after.verdict} ({self.after.reason})\n"
+            f"Payload hash evidence before:\n{self.before.hash_evidence.as_text()}\n"
+            f"Payload hash evidence after:\n{self.after.hash_evidence.as_text()}"
         )
 
 

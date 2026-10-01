@@ -1,7 +1,7 @@
 # Architecture
 
-How the application is put together, and why. Except for the explicitly labelled
-planned version 2 section, this describes what the code does now; where a design choice had a plausible alternative, the alternative and the
+How the application is put together, and why. This describes what the code does
+now; where a design choice had a plausible alternative, the alternative and the
 reason for rejecting it are recorded next to it.
 
 ---
@@ -249,27 +249,27 @@ The recorded digest lets a receiver notice a truncated download before spending 
 on extraction. It is *not* an integrity guarantee — anyone who modifies the file can
 recompute it. The signature is the guarantee.
 
-### Planned version 2: external payload hash (not implemented)
+### Version 2: payload hash contract and comparisons
 
-Current version 1 has no external `message_hash`. The agreed version 2 will require
-that field and copy the SHA-256 of the original plaintext/file bytes from the signed
-record. The embedded record and envelope format will remain unchanged. Distinguish:
+H02 requires external `message_hash` and copies the SHA-256 of the original
+plaintext/file bytes from the signed record. The embedded record and envelope
+format are unchanged. H03 adds comparisons, shared GUI display and export evidence. Distinguish:
 
 | Value | Meaning | Trust |
 | --- | --- | --- |
-| `message_hash` | Original payload bytes before encryption | Currently embedded and signed; planned external copy must agree with that record |
+| `message_hash` | Original payload bytes before encryption | Embedded and signed; external copy must agree with the authenticated record and recovered payload |
 | `stego_sha256` | Complete output media file | Unsigned informational check |
 | Digital signature | RSA-PSS authentication of record, stored message and framing | Checked against the receiver's trusted public key |
 
-Planned flow: Protect computes the message hash, includes it in the signed record
-and copies it to the version 2 manifest. Verify validates the manifest, extracts
+Protect computes the message hash, includes it in the signed record and copies it
+to the version 2 manifest. Verify validates the manifest, extracts
 the envelope, verifies the signature, decrypts if needed, recomputes the plaintext
-hash and compares all three values. A manifest-only hash discrepancy will be
+hash and compares all three values. A manifest-only hash discrepancy is
 `TAMPERED`; an earlier failure leaves the comparison **Not performed**. Hash evidence
-will be carried in result summaries and shown as full selectable values in the GUI.
+is carried in result summaries and shown as full selectable values in the GUI.
 
-Version 1 manifests will be rejected by the future implementation, not the current
-app. No automatic missing-hash fallback or detached signature is planned. See the
+Version 1 and missing/malformed hashes are now rejected with regeneration instructions.
+No automatic missing-hash fallback or detached signature is provided. See the
 [implementation contract](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
 and [privacy limits](limitations.md#planned-external-message-hash-not-implemented).
 

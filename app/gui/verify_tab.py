@@ -133,6 +133,7 @@ class VerifyTab(QWidget):
         self._fingerprint_timer.timeout.connect(self._show_fingerprint)
         for field in (self.key_edit, self.manifest_edit, self.start_secret_edit, self.passphrase_edit):
             field.textChanged.connect(self._invalidate_result)
+        self.manifest_edit.textChanged.connect(self._show_manifest_summary)
         self.key_edit.textChanged.connect(lambda: self._fingerprint_timer.start())
         self._load_default_key()
 
@@ -358,6 +359,7 @@ class VerifyTab(QWidget):
                 ),
                 ("Payload length", f"{manifest.envelope_length:,} B"),
                 ("Message length", f"{manifest.message_length:,} B"),
+                ("Payload SHA-256 (unverified)", manifest.message_hash),
                 ("Encrypted", "yes" if manifest.encrypted else "no"),
             ]
         )
@@ -424,6 +426,7 @@ class VerifyTab(QWidget):
             QMessageBox.warning(self, "Verify", problem)
             return
 
+        self._invalidate_result()
         self.verify_button.setEnabled(False)
         self.statusMessage.emit("Verifying...")
 
@@ -557,6 +560,8 @@ class VerifyTab(QWidget):
 
     def _on_verify_failed(self, message: str, detail: str) -> None:
         """Only genuinely exceptional failures reach here, such as an unusable key."""
+        self._result = None
+        self.comparison_view.clear()
         self.result_panel.show_error(message)
         self._clear_payload_preview()
         self.statusMessage.emit(message)

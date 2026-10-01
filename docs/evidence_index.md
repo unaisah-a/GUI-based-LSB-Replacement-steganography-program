@@ -1,5 +1,5 @@
-> Current scope: S01 removed steganalysis. [Current validation](../evidence/s01/README.md)
-> supersedes historical suite totals and bundle counts below.
+> H02-H04 add the version 2 contract, hash evidence and verified bundle; see [H04 evidence](../evidence/h04/README.md).
+> [S01 validation](../evidence/s01/README.md) applies to the earlier build and preserved version 1 bundle.
 
 # Consolidated evidence index
 
@@ -7,19 +7,18 @@ Application/test baseline: T08 commit `2aa68adf83f0e57cefa8cff10b4a78f3ac4c4f41`
 T09 changes documentation and delivery records. Historical reports apply to their
 recorded revisions, not separate current-suite totals. A live demo is still required.
 
-## Planned external-hash evidence (not executed)
+## External-hash evidence: H02-H05 complete
 
-The [H01-H05 work plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
-adds an external payload-hash design. H01 is documentation only; none of the reports
-below proves version 2 manifest support or the new GUI comparison.
+[H05 release evidence](../evidence/h05/README.md) identifies the final working tree:
+1,832 passing tests, Ruff, unchanged dependency pins, native Verify/Attack Lab hash
+inspection and an extracted package with all 20 cases, two capacity checks and
+11 authenticated exports. Source hashes and native screenshots accompany it.
 
-Future evidence must include schema-validation results, expected/computed/signed
-hash comparisons, manifest-only hash modification, accurate Not performed states,
-GUI readability and input-reset checks, secret-free evidence exports, the full suite
-and independent verification of the proposed `samples/hash-manifest-v2` bundle.
-No new test report, screenshot, release archive or version 2 bundle is claimed here.
-H01's actual documentation checks belong in its ledger record, separate from
-application acceptance evidence. Existing records and counts remain historical.
+[H04 evidence](../evidence/h04/README.md) records fresh sample generation and
+preservation. H02-H03 schema/comparison checks remain in the
+[work plan](IMPLEMENTATION_PLAN.md#h03-work-record). Historical evidence below
+applies to its recorded revision. No actual human transfer, rehearsal or submission
+is claimed. Use [the handoff](submission_handoff.md) for current release commands.
 
 ## Recorded implementation evidence
 
@@ -29,7 +28,7 @@ application acceptance evidence. Existing records and counts remain historical.
 | FR3–FR4 record/signature, FR9 hash, FR10 verdicts | [T03 safeguards](../evidence/t03/README.md), [T08 suite](../evidence/t08/stable-full.txt) | 00–02, receiver/attacks | Payload scope and external key trust |
 | FR5–FR8 embedding, starts, extraction, depths/capacity | [T07 isolation](../evidence/t07/README.md), [cases](../samples/t07/CASE_INDEX.md), T08 suite | 02–12 | Envelope overhead; HMAC is not encryption |
 | FR11 positive/negative cases | T07 image-short, audio-long, image-payload-corruption, audio-signature-corruption, audio-repetition3-damage2 | 02–12, 15–19 | Capacity rejection/video do not replace mandatory-media negatives |
-| FR12 reproducibility | [Bundle guide](sample_bundle.md), [Current package](../evidence/s01/README.md) | Transfer, 21–22 | Local isolation is not actual human transfer |
+| FR12 reproducibility | [Bundle guide](sample_bundle.md), [Current package](../evidence/h05/README.md) | Transfer, 21–22 | Local isolation is not actual human transfer |
 | FR13/four retained challenges | [T05](../evidence/t05/README.md), T07, [challenge guide](challenge_workflows.md) | 07–12, 15–22 | No universal robustness/detection claim |
 | AES, trusted file preview/save | T03/T04 tests, T07 confidential/file cases, T08 native exact saves | 12–15 | Wrong passphrase withholds recovery |
 | Size/properties | [T06 measurements](../evidence/t06/README.md) | 02–12, 19–20 | 66 cases; PNG matching 6/9; headers/codecs matter |

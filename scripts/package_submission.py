@@ -5,15 +5,18 @@ Run from the repository root::
     python scripts/package_submission.py
     python scripts/package_submission.py --output dist/P1-1_ACW1.zip
 
-Only the paths in :data:`INCLUDED` are packaged. Within them, anything matching
+Only the paths in :data:`INCLUDED` are packaged. Samples must also appear in
+``scripts/release_samples.txt``; local practice outputs are not shipped. Within
+the included paths, anything matching
 :data:`EXCLUDED_NAMES` or :data:`EXCLUDED_PATHS` is left out: the virtual
 environment, caches, the local demo key pair, and the local application logs. The
 logs hold tracebacks from development runs with local paths in them; they are not
 evidence. Pass ``--include-logs`` to package them anyway.
 
 As a last check, the build refuses to finish if any packaged file contains a PEM
-private key. The committed samples need only ``keys/public/samples_public.pem``, and
-a marker creates their own key pair from *Keys → Generate demo key pair*.
+private key. Current samples use ``samples/hash-manifest-v2/party-b/sender-public.pem``;
+historical samples and keys are retained for regression tests. A marker creates
+their own key pair from *Keys → Generate demo key pair*.
 """
 
 from __future__ import annotations
@@ -109,6 +112,18 @@ def collect(root: Path, *, include_logs: bool = False) -> list[PurePosixPath]:
     if missing:
         raise PackagingError(f"missing from the repository: {', '.join(missing)}")
 
+    inventory = root / "scripts/release_samples.txt"
+    if not inventory.is_file():
+        raise PackagingError("missing sample inventory: scripts/release_samples.txt")
+    samples = set(inventory.read_text(encoding="utf-8").splitlines())
+    for name in samples:
+        path = PurePosixPath(name)
+        if (not name.startswith("samples/") or ".." in path.parts or "\\" in name
+                or ":" in name or path.as_posix() != name
+                or not (root / path).is_file()
+                or not (root / path).resolve().is_relative_to((root / "samples").resolve())):
+            raise PackagingError(f"invalid or missing sample inventory entry: {name}")
+
     found: set[PurePosixPath] = set()
     for entry in INCLUDED:
         path = root / entry
@@ -117,6 +132,8 @@ def collect(root: Path, *, include_logs: bool = False) -> list[PurePosixPath]:
         )
         for candidate in candidates:
             relative = PurePosixPath(candidate.relative_to(root).as_posix())
+            if relative.parts[0] == "samples" and relative.as_posix() not in samples:
+                continue
             if not _excluded(relative, excluded_paths):
                 found.add(relative)
     return sorted(found)

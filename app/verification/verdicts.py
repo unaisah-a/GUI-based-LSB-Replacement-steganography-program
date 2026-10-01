@@ -32,6 +32,7 @@ from dataclasses import dataclass, field
 from typing import Any, Final
 
 from app.crypto.envelope import VerificationRecord
+from app.crypto.hashing import hashes_equal
 from app.utils import constants
 
 __all__ = [
@@ -44,6 +45,7 @@ __all__ = [
     "VERDICT_WRONG_START_LOCATION",
     "VERDICT_DESCRIPTIONS",
     "VerificationResult",
+    "HashEvidence",
     "is_success",
 ]
 
@@ -95,6 +97,63 @@ def is_success(verdict: str) -> bool:
 
 
 @dataclass(frozen=True)
+class HashEvidence:
+    """Digests available at the reached verification stage.
+
+    The manifest is an unverified claim. Only set signed_record_hash after the
+    signature and record validation pass, and computed_hash after recovery.
+    """
+
+    manifest_hash: str | None = None
+    signed_record_hash: str | None = None
+    computed_hash: str | None = None
+
+    @staticmethod
+    def _compare(left: str | None, right: str | None) -> bool | None:
+        return None if left is None or right is None else hashes_equal(left, right)
+
+    @property
+    def payload_matches_manifest(self) -> bool | None:
+        return self._compare(self.computed_hash, self.manifest_hash)
+
+    @property
+    def manifest_matches_record(self) -> bool | None:
+        return self._compare(self.manifest_hash, self.signed_record_hash)
+
+    @property
+    def payload_matches_record(self) -> bool | None:
+        return self._compare(self.computed_hash, self.signed_record_hash)
+
+    @staticmethod
+    def status(value: bool | None) -> str:
+        return "Not performed" if value is None else ("Yes" if value else "No")
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "algorithm": "SHA-256",
+            "manifest_hash": self.manifest_hash,
+            "signed_record_hash": self.signed_record_hash,
+            "computed_hash": self.computed_hash,
+            "payload_matches_manifest": self.status(self.payload_matches_manifest),
+            "manifest_matches_record": self.status(self.manifest_matches_record),
+            "payload_matches_record": self.status(self.payload_matches_record),
+        }
+
+    def display_rows(self) -> tuple[tuple[str, str], ...]:
+        return (
+            ("Expected payload SHA-256 - manifest", self.manifest_hash or "Unavailable"),
+            ("Authenticated record SHA-256", self.signed_record_hash or "Unavailable"),
+            ("Recomputed payload SHA-256", self.computed_hash or "Unavailable"),
+            ("Payload matches manifest", self.status(self.payload_matches_manifest)),
+            ("Manifest hash matches signed record", self.status(self.manifest_matches_record)),
+            ("Payload hash matches signed record", self.status(self.payload_matches_record)),
+        )
+
+    def as_text(self) -> str:
+        return "\n".join(f"{label}: {value}" for label, value in self.display_rows())
+
+
+@dataclass(frozen=True)
 class VerificationResult:
     """The outcome of verifying one file.
 
@@ -131,6 +190,7 @@ class VerificationResult:
     notes: tuple[str, ...] = ()
     #: Extra facts for the GUI and the evidence log.
     details: dict[str, Any] = field(default_factory=dict)
+    hash_evidence: HashEvidence = field(default_factory=HashEvidence)
 
     def __post_init__(self) -> None:
         if self.verdict not in VERDICTS:
@@ -164,6 +224,7 @@ class VerificationResult:
             "payload_found": self.payload_found,
             "signature_valid": self.signature_valid,
             "hash_valid": self.hash_valid,
+            "hash_evidence": self.hash_evidence.as_dict(),
             "start_location_valid": self.start_location_valid,
             "manifest_consistent": self.manifest_consistent,
             "mismatched_fields": list(self.mismatched_fields),

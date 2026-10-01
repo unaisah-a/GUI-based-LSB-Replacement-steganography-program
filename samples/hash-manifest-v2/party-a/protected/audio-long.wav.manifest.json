@@ -1,0 +1,20 @@
+{
+  "container_format": "WAV",
+  "created": "2026-10-01T11:51:15+00:00",
+  "ecc": null,
+  "encrypted": false,
+  "encryption": null,
+  "envelope_length": 1498,
+  "format_version": 2,
+  "lsb_depth": 2,
+  "media_id": "audio-long",
+  "media_type": "audio",
+  "message_hash": "b597e56e9e70f3bc87403900836641178ceb010de3d8b693e2b1923295371f54",
+  "message_length": 673,
+  "nonce": "76401b14af37fae7b6ab6a4e07cc87fb",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": null,
+  "start_method": "hmac_prf",
+  "stego_file": "audio-long.wav",
+  "stego_sha256": "ada83a543bed30e8e1eefc263b1b6d322e71a03d992e4fd36f92170d55bbbeb3"
+}

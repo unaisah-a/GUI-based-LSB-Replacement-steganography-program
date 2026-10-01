@@ -6,19 +6,20 @@ This guide assumes no knowledge of the lecture materials. It teaches the concept
 
 Checked against application revision `8922a743c86cb7bf6d86cd68d09fe60dba34e349`. Presenter preparation follows your team's adopted `INF2005_ACW1_Demo_Script_and_Presentation_Split_.pdf`, with the operational corrections in section 17. Examples marked **expected** describe intended results, not a claim that you or your team have rehearsed them.
 
-## Planned external payload hash (not implemented)
+## External payload hash: contract and comparisons implemented
 
-The current app still uses version 1 manifests. Its message hash is inside the
-embedded signed record; the manifest's `stego_sha256` describes the entire output
-media file. These are different hashes. Current walkthroughs and fixtures below
-remain applicable; the new schema and GUI have not been implemented.
+H02 now requires version 2 manifests. The original plaintext/file hash is copied
+from the embedded signed record into external `message_hash`; `stego_sha256`
+describes the entire output media file. These are different hashes. H03 implements
+the comparisons and GUI. Practice paths below use H04's verified version 2 bundle;
+old version 1 fixtures are preserved separately. H05 release validation remains.
 
-The agreed version 2 will also put `message_hash` in the external manifest. Here,
+The external `message_hash` is checked against the authenticated record and recovered bytes. Here,
 "payload hash" means SHA-256 of the original text/file bytes before encryption,
 not the complete envelope. After signature verification and any decryption, Verify
-will show the expected manifest hash and the recomputed plaintext hash, plus whether
+shows the expected manifest hash and the recomputed plaintext hash, plus whether
 the manifest value agrees with the authenticated signed record. A mismatch in the
-manifest hash will reject verification. Checks not reached will say **Not performed**.
+manifest hash rejects verification. Checks not reached say **Not performed**.
 
 Keeping a hash outside the media makes the reference easier to inspect; location
 alone does not authenticate it. The signature and cross-check prevent acceptance
@@ -26,11 +27,11 @@ of an attacker-replaced message/hash pair. The new public plaintext digest also
 allows candidate-message guessing without extracting the hidden record, even when
 the message is encrypted. It does not protect every cover pixel or audio sample.
 
-The future verifier will reject old manifests and require fresh output/manifest
-pairs. The proposed `samples/hash-manifest-v2` bundle is not yet generated. See the
+The verifier now rejects old manifests and requires fresh output/manifest
+pairs. The `samples/hash-manifest-v2` bundle passed independent receiver checks. See the
 [implementation plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
-for acceptance criteria. For the future demo, explain the expected-versus-recomputed
-comparison and signature separately; do not claim those new rows exist today.
+for acceptance criteria. Explain the expected-versus-recomputed comparison and
+signature separately. These rows are implemented; rehearsal and release validation remain pending.
 
 ## How to use this guide
 
@@ -580,7 +581,7 @@ On the current Windows checkout, open PowerShell in the repository root and run:
 
 That interpreter was checked as Python 3.11.16 for this guide. On another machine, install Python 3.11 and the dependencies following the [README](../README.md), then use that machine's environment path. No Python environment is transferred with the project archive.
 
-For the steps below, **A** means `samples/t07/party-a` and **B** means `samples/t07/party-b`, both relative to the repository root. These are folder abbreviations, not commands.
+For the steps below, **A** means `samples/hash-manifest-v2/party-a` and **B** means `samples/hash-manifest-v2/party-b`, both relative to the repository root. These are folder abbreviations, not commands.
 
 ### First, verify something already prepared
 
@@ -668,7 +669,7 @@ Transfer the **stego file, matching manifest and public key**. The private key s
 
 If verification unexpectedly fails, check the file/manifest pairing, public key, start secret and passphrase before assuming a software bug. A locally copied folder is useful practice but is not evidence that another person performed the required receiver demonstration.
 
-The current bundle contains 18 indexed verification cases and two capacity checks. Capacity rejection demonstrates input validation; do not count it as a successful execution of one of the three required receiver negative cases. Section 17 maps your adopted presentation script to the missing live actions; this guide supplies the concepts needed to understand them.
+The current bundle contains 20 indexed verification cases and two capacity checks. Capacity rejection demonstrates input validation; do not count it as a successful execution of one of the three required receiver negative cases. Section 17 maps your adopted presentation script to the missing live actions; this guide supplies the concepts needed to understand them.
 
 ## 16. Lecture foundations and additional features
 
@@ -865,7 +866,7 @@ You do not need these sources open while studying. They identify where the requi
 
 - Adopted team script: `Project/INF2005_ACW1_Demo_Script_and_Presentation_Split_.pdf` in the course directory; all eight pages reviewed. Section 17 records its named roles/timings and the corrections needed to follow it. The PDF itself is unchanged.
 - [Earlier repository demo script](demo_plan.md): useful feature/action coverage, but its numbered-member allocation differs from the team's adopted PDF. Use section 17 for your current speaking preparation.
-- [Sample bundle guide](sample_bundle.md) and [case index](../samples/t07/CASE_INDEX.md): files, inputs and expected results.
+- [Sample bundle guide](sample_bundle.md) and [case index](../samples/hash-manifest-v2/CASE_INDEX.md): files, inputs and expected results.
 - [Implementation plan](IMPLEMENTATION_PLAN.md): authorised scope and historical/current evidence.
 - [Architecture](architecture.md) and [limitations](limitations.md): broader design background. Some historical sections describe backend experiments or earlier states rather than the current GUI.
 - [Evidence index](evidence_index.md): recorded validation and its limits. This guide does not claim a fresh full test run or a completed team rehearsal.

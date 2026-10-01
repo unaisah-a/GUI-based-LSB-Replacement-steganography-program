@@ -1,0 +1,131 @@
+Window: "Media Integrity & Steganography Tool - INF2005 ACW1", App: pythonw.exe.
+	0 window (settable, string) Media Integrity & Steganography Tool - INF2005 ACW1 Secondary Actions: Raise ID: QApplication.MainWindow
+		1 title bar (settable, string) Value: Media Integrity & Steganography Tool - INF2005 ACW1
+			2 menu bar System ID: MenuBar
+				3 menu item System
+			4 button Minimize
+			5 button Maximize
+			6 button Close
+		7 group (settable, string) ID: QApplication.MainWindow.mainTabs
+			8 custom (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget
+				87 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea
+					88 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport
+						89 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab
+							90 custom (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.dropZone
+								91 text image-short.png ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.dropZone.dropZonePrompt
+								92 text image / PNG - 122.52 kB ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.dropZone.dropZoneDetail
+								93 button (settable, string) Select File ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.dropZone.dropZoneBrowse
+								94 button (settable, string) Clear ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.dropZone.dropZoneClear
+							95 custom (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter
+								96 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget
+									97 group (settable, string) Verification Result ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel
+										98 text SIGNATURE_INVALID ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.verdictBanner
+										99 text A payload was found and read, but its signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified. ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.verdictDescription
+										100 text the payload signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.verdictReason
+										101 group (settable, string) Verification Result ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox
+											413 text yes ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.flagValue
+											414 text Payload found: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QLabel
+											415 text no ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.flagValue
+											416 text Signature valid: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QLabel
+											417 text not established ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.flagValue
+											418 text Message hash matches: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QLabel
+											419 text yes ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.flagValue
+											420 text Start location usable: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QLabel
+											421 text not established ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.flagValue
+											422 text Manifest agrees with record: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QLabel
+											423 text 37 ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QLabel
+											424 text Start location used: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QLabel
+										102 group (settable, string) Verification Result ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel
+											425 text The manifest hash is an unverified claim until it agrees with the authenticated signed record. Hashes describe the payload, not every cover sample. ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.fileInfoNotice
+											426 edit Expected payload SHA-256 - manifest: Value: 0000000000000000000000000000000000000000000000000000000000000000 ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.fileInfoValue
+												427 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.fileInfoValue.qt_scrollarea_viewport
+											428 text Expected payload SHA-256 - manifest: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.QLabel
+											429 text Unavailable ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.fileInfoValue
+											430 text Authenticated record SHA-256: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.QLabel
+											431 text Unavailable ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.fileInfoValue
+											432 text Recomputed payload SHA-256: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.QLabel
+											433 text Not performed ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.fileInfoValue
+											434 text Payload matches manifest: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.QLabel
+											435 text Not performed ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.fileInfoValue
+											436 text Manifest hash matches signed record: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.QLabel
+											437 text Not performed ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.fileInfoValue
+											438 text Payload hash matches signed record: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.fileInfoPanel.QLabel
+										104 text Verification Result ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.verdictNotes
+										105 group (settable, string) Verification Result ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox
+											106 text Recovered content is displayed as inert text or a hex dump, and a recognised image or audio file is previewed inside this application. It is never executed, and never handed to the operating system to open. ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.inertNotice
+											107 text Recovered message ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.payloadInfo
+											108 edit Recovered message ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.payloadView
+												109 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.payloadView.qt_scrollarea_viewport
+											110 button (disabled, settable, string) Show as text ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QPushButton
+											111 button (disabled, settable, string) Show as hex ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QPushButton
+											112 button (disabled, settable, string) Save recovered payload... ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.resultPanel.QGroupBox.QPushButton
+									113 group (settable, string) Comparison with the original ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox
+										114 edit Comparison with the original ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.payloadView
+											115 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.payloadView.qt_scrollarea_viewport
+								116 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget
+									117 group (settable, string) Receiver Inputs ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox
+										118 group (settable, string) Manifest: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QWidget
+											119 edit (settable, string) Value: A:\Code\GUI-based-LSB-Replacement-steganography-program\samples\hash-manifest-v2\party-b\tampered\image-manifest-hash-mismatch.manifest.json ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QWidget.QLineEdit
+											120 button (settable, string) Browse... ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QWidget.QPushButton
+										121 text Manifest: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QLabel
+										122 group (settable, string) Public key: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QWidget
+											123 edit (settable, string) Value: A:\Code\GUI-based-LSB-Replacement-steganography-program\samples\hash-manifest-v2\party-b\unrelated-public.pem ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QWidget.QLineEdit
+											124 button (settable, string) Browse... ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QWidget.QPushButton
+										125 text Public key: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QLabel
+										126 edit (disabled, settable, string) Start secret: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QLineEdit
+										127 text Start secret: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QLabel
+										128 edit (disabled, settable, string) Passphrase: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QLineEdit
+										129 text Passphrase: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QLabel
+										130 group (settable, string) Original cover: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QWidget
+											131 edit (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QWidget.QLineEdit
+											132 button (settable, string) Browse... ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QWidget.QPushButton
+										133 text Original cover: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.QGroupBox.QLabel
+									134 group (settable, string) Manifest (unverified) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel
+										307 text These values are the manifest's claims. Nothing here is authenticated until the signature over the verification record has been checked. ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoNotice
+										361 text image-short ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+										362 text Media ID: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+										363 text image ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+										364 text Media type: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+										365 text PNG ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+										366 text Container: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+										367 text 2 ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+										368 text LSB depth: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+										369 text manual ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+										370 text Start method: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+										371 text 37 ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+										372 text Start location: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+										373 text 927 B ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+										374 text Payload length: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+										375 text 105 B ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+										376 text Message length: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+										377 edit Payload SHA-256 (unverified): Value: 0000000000000000000000000000000000000000000000000000000000000000 ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+											378 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue.qt_scrollarea_viewport
+										379 text Payload SHA-256 (unverified): ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+										380 text no ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.fileInfoValue
+										381 text Encrypted: ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.fileInfoPanel.QLabel
+									136 button (settable, string) Verify ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.verifyButton
+									137 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.mediaPreview
+										138 text Received file ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.mediaPreview.mediaPreviewTitle
+										139 custom (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.mediaPreview.QStackedWidget
+											329 image ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.mediaPreview.QStackedWidget.mediaPreviewImage
+										141 text image-short.png - PNG, 122.52 kB ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.QWidget.mediaPreview.mediaPreviewCaption
+								142 thumb (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QSplitter.qt_splithandle_
+							143 text Public key SHA-256: c27c1879a7c79ddc1229514b62e7fafaddcaf7dccfc8bcd41bbf526739068588 Compare through an independently trusted channel. ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_viewport.verifyTab.QLabel
+					144 group (settable, string) ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_vcontainer
+						145 scroll bar (settable, float) Value: 239 ID: QApplication.MainWindow.mainTabs.qt_tabwidget_stackedwidget.QScrollArea.qt_scrollarea_vcontainer.QScrollBar
+			75 tab (settable, string) Verify ID: QApplication.MainWindow.mainTabs.qt_tabwidget_tabbar
+				76 tab item (selectable, settable, string) Protect ID: QApplication.MainWindow.mainTabs.qt_tabwidget_tabbar
+				77 tab item (selectable, settable, string) Verify ID: QApplication.MainWindow.mainTabs.qt_tabwidget_tabbar
+				78 tab item (selectable, settable, string) Attack Lab ID: QApplication.MainWindow.mainTabs.qt_tabwidget_tabbar
+				79 tab item (selectable, settable, string) Video ID: QApplication.MainWindow.mainTabs.qt_tabwidget_tabbar
+		80 menu bar (settable, string) ID: QApplication.MainWindow.QMenuBar
+			81 menu item (settable, string) Keys ID: QApplication.MainWindow.QMenuBar.QAction
+			82 menu item (settable, string) Help ID: QApplication.MainWindow.QMenuBar.QAction
+		83 status bar ID: QApplication.MainWindow.QStatusBar
+			84 thumb (settable, string) ID: QApplication.MainWindow.QStatusBar.QSizeGrip
+			85 text SIGNATURE_INVALID: the payload signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified ID: QApplication.MainWindow.QStatusBar.QLabel
+			86 text v1.0.0 ID: QApplication.MainWindow.QStatusBar.QLabel
+
+Document text: ```
+0000000000000000000000000000000000000000000000000000000000000000
+```

@@ -1,0 +1,1 @@
+FICTIONAL DEMONSTRATION ONLY. Team Member 1 shares the draft release note with Team Member 2: inspect the image and audio examples before tomorrow's practice. AES-GCM protects this message's confidentiality; the signature and SHA-256 digest authenticate the payload. These public demo credentials protect no real information.
