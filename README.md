@@ -26,6 +26,25 @@ Design and limits are documented in [`docs/`](docs/): start with
 Responsible use, originality and AI use are covered in
 [`ethics_and_ai_use.md`](docs/ethics_and_ai_use.md).
 
+## Planned external payload hash (not implemented)
+
+The current app uses manifest version 1: the original message/file SHA-256 is stored
+as `message_hash` in the embedded signed record. The manifest's `stego_sha256`
+instead hashes the entire output media file and is an informational transport check.
+The digital signature authenticates the record and stored message; it is not a hash file.
+
+The agreed version 2 design will also require `message_hash` in the external
+manifest, compare it with the recovered plaintext and authenticated record, and
+show expected/recomputed hashes and comparison results in Verify. Signature checks
+will still precede decryption; checks not reached will say **Not performed**.
+Version 1 manifests will be rejected only after that implementation is introduced.
+Existing samples and commands below still describe the current version 1 app.
+
+Only documentation has been authorised in this phase. The proposed
+`samples/hash-manifest-v2` bundle has not been generated. See
+[H01-H05 in the implementation plan](docs/IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
+for the contract, security limits, dependencies and acceptance criteria.
+
 ---
 
 ## Install

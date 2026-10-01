@@ -6,6 +6,29 @@ are separate folders. No private signing key is saved in either folder. The sign
 key is generated in memory and discarded; the corresponding public key travels
 with Party B. The unchanged application uses the Tristan envelope/manifest format.
 
+## Planned version 2 bundle (not generated)
+
+The agreed external-hash feature is documentation only at present. Existing
+`samples/t07` paths and commands below remain for the current version 1 application.
+Do not describe those manifests as containing an external `message_hash`.
+
+After H02-H03 are implemented, H04 will generate a fresh complete bundle at
+`samples/hash-manifest-v2` using the existing bundle generator. That directory and
+its evidence are planned, not delivered by this update. Retain original covers,
+existing fixtures, historical reports and user outputs; do not overwrite them.
+
+The future verifier will require version 2 manifests containing the original
+plaintext/file SHA-256. Regenerate outputs and companion manifests together; merely
+renaming a manifest or changing its version number is not an upgrade. Generated
+public keys must travel with their matching outputs; use the actual matching key
+and separately shared secrets for teammate outputs. Damaged cases must retain their
+appropriate baseline manifests, as specified by the new case index.
+
+Verify the new Party B folder in a fresh process without private keys and record all
+expected cases before changing current demo paths or packaging a new release.
+Missing-hash legacy files will not have a silent fallback in the future app. See
+[H01-H05](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented).
+
 ## Reproduce or verify
 
 From the repository root, using Python 3.11 with `requirements.txt` installed:

@@ -1,7 +1,7 @@
 # Architecture
 
-How the application is put together, and why. This describes what the code does
-now; where a design choice had a plausible alternative, the alternative and the
+How the application is put together, and why. Except for the explicitly labelled
+planned version 2 section, this describes what the code does now; where a design choice had a plausible alternative, the alternative and the
 reason for rejecting it are recorded next to it.
 
 ---
@@ -229,25 +229,49 @@ receiver needs in order to locate the payload at all: media ID, media type, nonc
 depth, envelope length, start method and location, container format, ECC parameters,
 and a SHA-256 of the stego file.
 
-It is **not signed**, and it does not need to be. Every field it publishes is also
-inside the signed record, so the verifier cross-checks the two after the signature
-verifies. An attacker can edit the manifest freely; what they cannot do is make the
-edit undetectable.
+It is **not independently signed in this implementation**. Relevant extraction
+settings are cross-checked against the embedded record after signature verification.
+Not every manifest field is signed: file names, creation information and the
+whole-file `stego_sha256` are not authenticated by that comparison. A separately
+signed manifest is possible, but is not implemented or part of the planned change.
 
 Which mechanism catches an edit depends on the field:
 
-- fields that feed the derivation (`media_id`, `media_type`, `nonce`, `lsb_depth`,
-  `envelope_length`, `start_location`) move where the receiver looks, so nothing is
-  found → `PAYLOAD_MISSING`
-- any other field leaves extraction working and the mismatch is caught by the
-  cross-check → `TAMPERED`
+- extraction-setting edits can prevent recovery, often producing `PAYLOAD_MISSING`;
+  input validation or later verification can reject them at other stages
+- if extraction and signature verification succeed, disagreements in cross-checked
+  fields produce `TAMPERED`
+- changes confined to unauthenticated informational fields need not change the verdict
 
-Both are detections. The distinction matters only when choosing a field to
-demonstrate one mechanism or the other.
+An extraction failure alone does not prove which input was changed.
 
 The recorded digest lets a receiver notice a truncated download before spending time
 on extraction. It is *not* an integrity guarantee — anyone who modifies the file can
 recompute it. The signature is the guarantee.
+
+### Planned version 2: external payload hash (not implemented)
+
+Current version 1 has no external `message_hash`. The agreed version 2 will require
+that field and copy the SHA-256 of the original plaintext/file bytes from the signed
+record. The embedded record and envelope format will remain unchanged. Distinguish:
+
+| Value | Meaning | Trust |
+| --- | --- | --- |
+| `message_hash` | Original payload bytes before encryption | Currently embedded and signed; planned external copy must agree with that record |
+| `stego_sha256` | Complete output media file | Unsigned informational check |
+| Digital signature | RSA-PSS authentication of record, stored message and framing | Checked against the receiver's trusted public key |
+
+Planned flow: Protect computes the message hash, includes it in the signed record
+and copies it to the version 2 manifest. Verify validates the manifest, extracts
+the envelope, verifies the signature, decrypts if needed, recomputes the plaintext
+hash and compares all three values. A manifest-only hash discrepancy will be
+`TAMPERED`; an earlier failure leaves the comparison **Not performed**. Hash evidence
+will be carried in result summaries and shown as full selectable values in the GUI.
+
+Version 1 manifests will be rejected by the future implementation, not the current
+app. No automatic missing-hash fallback or detached signature is planned. See the
+[implementation contract](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
+and [privacy limits](limitations.md#planned-external-message-hash-not-implemented).
 
 ---
 

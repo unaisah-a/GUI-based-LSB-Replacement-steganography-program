@@ -6,6 +6,32 @@ This guide assumes no knowledge of the lecture materials. It teaches the concept
 
 Checked against application revision `8922a743c86cb7bf6d86cd68d09fe60dba34e349`. Presenter preparation follows your team's adopted `INF2005_ACW1_Demo_Script_and_Presentation_Split_.pdf`, with the operational corrections in section 17. Examples marked **expected** describe intended results, not a claim that you or your team have rehearsed them.
 
+## Planned external payload hash (not implemented)
+
+The current app still uses version 1 manifests. Its message hash is inside the
+embedded signed record; the manifest's `stego_sha256` describes the entire output
+media file. These are different hashes. Current walkthroughs and fixtures below
+remain applicable; the new schema and GUI have not been implemented.
+
+The agreed version 2 will also put `message_hash` in the external manifest. Here,
+"payload hash" means SHA-256 of the original text/file bytes before encryption,
+not the complete envelope. After signature verification and any decryption, Verify
+will show the expected manifest hash and the recomputed plaintext hash, plus whether
+the manifest value agrees with the authenticated signed record. A mismatch in the
+manifest hash will reject verification. Checks not reached will say **Not performed**.
+
+Keeping a hash outside the media makes the reference easier to inspect; location
+alone does not authenticate it. The signature and cross-check prevent acceptance
+of an attacker-replaced message/hash pair. The new public plaintext digest also
+allows candidate-message guessing without extracting the hidden record, even when
+the message is encrypted. It does not protect every cover pixel or audio sample.
+
+The future verifier will reject old manifests and require fresh output/manifest
+pairs. The proposed `samples/hash-manifest-v2` bundle is not yet generated. See the
+[implementation plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
+for acceptance criteria. For the future demo, explain the expected-versus-recomputed
+comparison and signature separately; do not claim those new rows exist today.
+
 ## How to use this guide
 
 1. Read sections 1–10 in order. They build the foundations and explain the complete workflow.

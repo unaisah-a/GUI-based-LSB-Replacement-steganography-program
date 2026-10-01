@@ -4,9 +4,9 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorised execution scope: **F02: visibly fade and disable Protect's start location in secret-derived mode, then commit and push the change**, explicitly requested by the user. S01 remains complete and S02 remains unauthorised.
+- Latest authorised execution scope: **commit and push the completed H01 documentation-only update**, requested on 1 October 2026 after documentation validation. Publish only the 12 affected documentation files to `origin/integration/acw1-consolidated`. Application/test changes and sample regeneration remain unauthorised. S01 remains complete and S02 remains unauthorised.
 - Integration branch: `integration/acw1-consolidated`.
-- Current integration workspace: `A:/Code/GUI-based-LSB-Replacement-steganography-program` (historical setup used `C:/Code/INF2005-ACW1-consolidated`).
+- Current integration workspace: `C:/Code/INF2005-ACW1-consolidated`; the earlier `A:/Code/GUI-based-LSB-Replacement-steganography-program` location is historical.
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
 - Base: `Tristan`, commit `6167e72203e3a3045cdc4fa8ae36f4080689df34`.
 - Selective source: `gin`, commit `f3c267e10a47fa8bba7ace1078a7dce0e6d68f8e`.
@@ -58,7 +58,21 @@ Keep GUI image/audio LSB replacement and extraction, depths 1-8, manual and HMAC
 
 Retain AES-GCM encryption for confidentiality; typed text/file payloads; trusted recovered-payload preview/save; key generation and fingerprint presentation; drag-and-drop and picker equivalence; optional file-size matching with measured outcomes; and evidence export needed for the demo.
 
-Hashing/signing alone does not provide confidentiality. The payload hash authenticates the payload and signed settings rather than every cover byte, avoiding an invalid comparison against a cover changed by embedding. Public-key trust is external. Timestamp/nonce alone do not reject replay. An unsigned manifest file digest is informational.
+Hashing/signing alone does not provide confidentiality. The message hash checks the original payload bytes; the signature authenticates that hash, the verification record, stored message and signed framing rather than every cover byte. Public-key trust is external. Timestamp/nonce alone do not reject replay. The unsigned manifest's whole-file digest is informational.
+
+### External payload hash: agreed target, not implemented
+
+Current code writes and reads manifest version 1. Its `message_hash` exists only in the embedded signed record; the external manifest contains `stego_sha256`, a separate whole-media-file digest. Existing version 1 samples remain usable with the current app. H01 changes documentation only; H02-H05 below are TODO and require later implementation authorisation.
+
+- **Manifest contract:** version 2 will require `message_hash`, a 64-character hexadecimal SHA-256 digest normalised to lowercase. Copy it from the existing signed record during protection. It hashes the exact original text/file bytes before encryption, not ciphertext, the complete envelope or the cover. Keep the embedded envelope/signature format and `stego_sha256` unchanged.
+- **Strict compatibility:** once implemented, reject version 1 and missing, null or malformed `message_hash` values with `CANNOT_VERIFY` and an instruction to regenerate the protected output and matching manifest. Do not silently derive an absent expected hash from received content. This rejection is future behaviour, not current behaviour.
+- **Verification:** retain signature verification before decryption. Recompute the recovered plaintext hash and compare it with both the external manifest and authenticated record. Add `message_hash` to manifest cross-checking. An otherwise valid signed payload with a different manifest hash yields `TAMPERED`, identifies the manifest discrepancy and withholds plaintext preview/save. Preserve extraction, signature and decryption failure verdicts; unavailable comparisons are `Not performed`.
+- **Interfaces and evidence:** retain the computed digest in the recovered-message result and carry structured hash evidence in verification summaries and Attack Lab exports: algorithm, manifest hash, authenticated record hash, computed hash and separate comparison statuses. Never log plaintext, passphrases or keys. Before verification the manifest hash is an unverified claim. Clear hash evidence when inputs change.
+- **Planned display:** `Expected payload SHA-256 - manifest`, `Recomputed payload SHA-256`, `Payload matches manifest`, and `Manifest hash matches signed record`. Comparison statuses are `Yes`, `No` or `Not performed`. Preserve the existing signature and signed-message checks; show complete, selectable hashes in shared verification panels.
+- **Security boundary:** the manifest remains unsigned in this design; its expected hash gains authentication through agreement with the signed record. Do not add a detached signature or independently signed manifest. Publishing the plaintext digest permits equality comparisons and testing guesses of predictable messages, even when the message is encrypted. It does not expose an AES key or establish integrity of every cover sample.
+- **Samples and rollout:** plan a fresh complete bundle at `samples/hash-manifest-v2`, which has not been generated. Use the existing generator, matching public keys and positive/negative cases; save no private keys. Preserve old samples, evidence and user outputs. Update live demo paths only after the new bundle exists and is verified. Do not change the five attacks or remove retained features.
+
+Detailed acceptance scenarios are in [test_cases.md](test_cases.md#planned-external-payload-hash-acceptance-not-executed). The [sample guide](sample_bundle.md) and [handoff](submission_handoff.md) distinguish current fixtures from the future rollout.
 
 ### Optional challenges
 
@@ -133,6 +147,21 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 | V01 | Prepare forest video cover | User-supplied MP4 and retained video workflow | DONE | New short lossless MKV without modifying source; valid dimensions/timing, successful signed text round trip, exact recovery and frame-location check; actual evidence and GUI limits recorded |
 | D06 | Diagnose disabled Attack Lab secret fields | User's open app and current manifest | DONE | Inspect current native state and manifest; explain expected disabling or identify a reproducible defect |
 | F01 | Keep Attack Lab secret fields editable | User correction after D06 | DONE | No manifest-based locking; hints follow typed/picked manifests and clear; keyboard editing survives all manifest types and wrong-input actions; focused tests and lint pass |
+| H01 | Document external payload hash design | User's documentation-only instruction | DONE | Current/planned behaviour separated throughout affected docs; links, terminology and documentation-only diff checked |
+| H02 | Required version 2 manifest hash | H01 and later implementation authorisation | TODO | Required validated plaintext `message_hash`; protection publishes it; old/malformed manifests clearly rejected; focused schema tests pass |
+| H03 | Verification, GUI and hash evidence | H02 | TODO | External/computed/signed comparisons and accurate statuses; signature-first failure handling and preview gate preserved; GUI/evidence tests pass |
+| H04 | Fresh version 2 demo bundle | H02, H03 | TODO | New `samples/hash-manifest-v2` bundle with matching keys and expected cases; originals/old fixtures preserved; no saved private keys |
+| H05 | Validate and document implemented release | H02-H04 | TODO | Focused tests, Ruff, full suite, GUI inspection and independent receiver verification pass; actual revision/evidence recorded; live docs updated |
+
+### H01 work record
+
+- Status: DONE. Documentation-only implementation of the agreed plan; no application or test changes authorised.
+- Changes: document the version 2 contract, hash comparisons, planned display/evidence, strict future compatibility and fresh-bundle rollout. Correct overstatements about unsigned manifests and distinguish current instructions from future demo notes.
+- Evidence context: Windows PowerShell, base HEAD `24e35592f08352f1bdae82addf40a5cac0eb7703`; tracked working tree initially clean. The two untracked `samples/t07/party-a/original/image_stego.png` output files (media and manifest) are pre-existing and excluded. External Project-folder voice notes are excluded.
+- Executed validation: `git diff --check` passed. A PowerShell here-string through `.venv/Scripts/python.exe -` checked the 12-file documentation-only diff, all 15 added local links/anchors, balanced code fences, explicit future-status wording, H02-H05 TODO status, empty staging area and absence of the proposed bundle: PASS. No digest examples were added; the contract explicitly specifies 64 hexadecimal characters and lowercase normalisation. A targeted `rg` audit found no remaining current-document claims that a manifest must be unsigned or every manifest field/edit is authenticated. Reviewed the diff and the unaffected original requirements, historical planning reference, ethics and contribution documents; those do not need edits for this design.
+- Boundaries: no application tests run, test files changed, samples regenerated or historical evidence rewritten. The external voice notes and pre-existing untracked outputs were not edited. All 12 changed files are README/repository documentation; the documentation-preparation phase performed no staging, commit or push.
+- Publication follow-up: user subsequently authorised committing and pushing these 12 documentation files to the existing `origin/integration/acw1-consolidated` destination. Generated demo outputs remain excluded. Pre-commit `git diff --check` passed; the code and tests are unchanged from the documented baseline.
+- Remaining: H02-H05 remain TODO and require later implementation authorisation. Current application behaviour and version 1 compatibility are unchanged.
 
 ### F02 work record
 

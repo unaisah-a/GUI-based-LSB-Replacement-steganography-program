@@ -205,12 +205,17 @@ media. They measure distortion, not hidden-data detection or authenticity.
 
 ## 9. Limits of the manifest
 
-The manifest is unsigned and must be, because it publishes the parameters needed to
-*locate* the payload before anything can be verified.
+The manifest is unsigned in the current implementation. Needing extraction
+parameters before reading the payload does not require that design: a separately
+signed manifest could be verified with a trusted public key first. This app instead
+cross-checks relevant parameters against the embedded record after its signature
+verifies.
 
-- It can be edited freely. Every edit is detectable, because every field is also in the
-  signed record — but detection happens by one of two different routes depending on
-  the field, and one of them (`PAYLOAD_MISSING`) does not identify *what* was edited.
+- It can be edited freely. Extraction-setting edits may prevent recovery, and
+  disagreements in cross-checked fields are rejected after signature verification.
+  Not every field is authenticated; informational fields such as the file name and
+  whole-file digest can be replaced without necessarily changing the verdict.
+  `PAYLOAD_MISSING` alone does not identify what was changed.
 - Losing the manifest makes verification impossible in practice. The verdict is
   `CANNOT_VERIFY`.
 - The recorded SHA-256 of the stego file is a convenience for spotting a truncated
@@ -218,18 +223,37 @@ The manifest is unsigned and must be, because it publishes the parameters needed
   recompute it.
 - Pairing is by full file name, extension included, so a manifest cannot be silently
   paired with a different file that happens to share a stem. It can still be paired
-  with the wrong file deliberately, which produces `PAYLOAD_MISSING` or
-  `CANNOT_VERIFY`.
+  with the wrong file deliberately. The resulting verdict depends on which checks
+  fail; this naming convention alone does not authenticate the pairing.
 - **The manifest gives the hidden payload away.** The `.manifest.json` travels next to
   the stego file, in plain JSON, and says outright that the file carries a payload.
   Anyone who intercepts the pair can read the LSB depth (`lsb_depth`), the payload's
   exact size (`envelope_length`) and how its position was chosen (`start_method`),
-  along with the media ID and nonce. The only thing it keeps hidden is *where* the
-  payload starts, and only for the derived method: that position comes from the
+  along with the media ID and nonce. It omits the plaintext and shared secrets.
+  It also conceals *where* the payload starts for the derived method: that position comes from the
   start secret, which is never in the manifest. For a manually chosen position the
   manifest publishes the position itself. So the manifest makes this a tool for
   *verifying* media, not for hiding that a message exists: the steganography conceals
   where the payload sits, but not that there is one.
+
+### Planned external message hash (not implemented)
+
+Version 2 will publish the original plaintext/file SHA-256 as `message_hash` and
+require agreement with both the recovered payload and authenticated signed record.
+The external hash alone is not proof of authenticity: an attacker could replace an
+unsigned message/hash pair. The signature and cross-check provide the authentication.
+The existing `stego_sha256` remains an informational whole-file digest.
+
+Publishing the plaintext digest lets anyone compare candidate messages against it
+without first extracting the hidden record. This exposes equality and allows testing
+guesses of short or predictable messages even when AES encryption is enabled. It
+does not reveal an encryption key; do not describe it as preserving all message privacy.
+
+The planned UI will show **Not performed** when extraction, signature verification
+or decryption prevents the plaintext hash check. An external hash does not make
+damaged content recoverable or prove the cause of failure. The future verifier will
+reject old manifests; the current version 1 verifier remains unchanged. See the
+[agreed plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented).
 
 ---
 

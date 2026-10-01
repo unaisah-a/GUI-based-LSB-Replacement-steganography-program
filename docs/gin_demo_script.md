@@ -6,6 +6,28 @@ Use this for your part of the team demonstration. It includes what to prepare, t
 
 The main route uses your teammates' freshly protected image and audio. The prepared-sample route is provided for practice or a clearly announced fallback. All results below are expected outcomes, not a record of a completed rehearsal.
 
+## Future external-hash explanation (not implemented)
+
+This is a future-only supplement, not an instruction for the current app. The
+[version 2 plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
+will add the original message/file SHA-256 to the manifest and show expected versus
+recomputed hashes, with a cross-check against the signed record. Current version 1
+sample paths and actions below remain valid with the unchanged build.
+
+After implementation and fresh-sample validation, the proposed receiver explanation is:
+
+> "The expected payload hash is in the manifest. The app hashes the recovered message and compares the values, then checks their agreement with the authenticated signed record. The signature is what prevents someone from passing verification by replacing both the message and its expected hash."
+
+During the five attacks, do not promise a visible hash mismatch for every rejection.
+Message/signature corruption and wrong-key checks can stop at signature verification;
+wrong-secret extraction can fail earlier. Their plaintext-hash comparison will say
+**Not performed** when it was not reached. Outside-payload edits can still preserve
+both payload-hash agreement and `AUTHENTIC`. Explain the actual displayed result.
+
+Use new output/manifest/public-key pairs after the version 2 rollout. The proposed
+`samples/hash-manifest-v2` bundle has not been generated. This supplement is excluded
+from the existing narration counts and timing estimates; it has not been rehearsed.
+
 ## 1. Your role and timing
 
 Your job is to demonstrate five attack cases, export their evidence, then protect, verify and play a video and locate its payload frames. Explain what each result establishes and its limits.

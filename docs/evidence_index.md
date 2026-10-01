@@ -7,6 +7,22 @@ Application/test baseline: T08 commit `2aa68adf83f0e57cefa8cff10b4a78f3ac4c4f41`
 T09 changes documentation and delivery records. Historical reports apply to their
 recorded revisions, not separate current-suite totals. A live demo is still required.
 
+## Planned external-hash evidence (not executed)
+
+The [H01-H05 work plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
+adds an external payload-hash design. H01 is documentation only; none of the reports
+below proves version 2 manifest support or the new GUI comparison.
+
+Future evidence must include schema-validation results, expected/computed/signed
+hash comparisons, manifest-only hash modification, accurate Not performed states,
+GUI readability and input-reset checks, secret-free evidence exports, the full suite
+and independent verification of the proposed `samples/hash-manifest-v2` bundle.
+No new test report, screenshot, release archive or version 2 bundle is claimed here.
+H01's actual documentation checks belong in its ledger record, separate from
+application acceptance evidence. Existing records and counts remain historical.
+
+## Recorded implementation evidence
+
 | Claim/requirement | Evidence | Script time | Limit |
 | --- | --- | --- | --- |
 | FR1–FR2 image/audio input, picker/drop/playback | [T08 native checks](../evidence/t08/README.md), [T04 input tests](../evidence/t04/README.md) | 02–12 | Test actual demo hardware separately |

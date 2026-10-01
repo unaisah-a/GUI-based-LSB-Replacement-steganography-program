@@ -1,5 +1,26 @@
 # T05 challenge workflows
 
+## Planned external hash evidence (not implemented)
+
+The current workflows below still use version 1 manifests. The
+[version 2 plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
+will require an external `message_hash` and show/export its comparison with recovered
+plaintext and the signed record. This documentation update does not change an attack.
+
+Future acceptance must retain the five focused outcomes: message corruption,
+signature corruption and wrong-key checks fail at signature verification; the
+wrong-secret action fails according to extraction/verification evidence; outside-payload
+image edits can remain `AUTHENTIC`. Earlier failures show **Not performed** for the
+plaintext-hash comparison, not an invented mismatch. A separate manifest-hash edit
+is a planned validation case, not a sixth GUI attack.
+
+Repetition still acts on the signed envelope. Targeted message/signature attacks
+reapply coding after modification, so external hashing does not change their
+majority-vote behaviour. Future exported evidence must distinguish expected,
+computed and authenticated hashes without recording plaintext or secrets.
+
+## Current reproduction instructions
+
 Run from the repository root with Python 3.11 and the pinned dependencies:
 
 ```powershell

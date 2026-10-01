@@ -5,7 +5,36 @@
 
 The assignment requires at least **two positive** and **three negative**
 verification cases, with at least one of each for image and for audio. This document
-records what is actually implemented, where, and what each case is meant to establish.
+records implemented cases and, in the explicitly labelled section below, future
+acceptance scenarios. Planned scenarios are not executed tests or evidence.
+
+## Planned external payload hash acceptance (not executed)
+
+H02-H05 in the [implementation plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
+will introduce mandatory manifest version 2 `message_hash` and visible comparison.
+No schema, tests, GUI or new sample bundle have been implemented for this change.
+Version 1 manifests remain usable in the current app.
+
+| Planned scenario | Required result after implementation |
+| --- | --- |
+| Protect text/file payloads in image, audio and video | Manifest contains SHA-256 of exact original bytes, equal to the signed record |
+| Encrypt and/or apply repetition coding | Same plaintext-hash meaning; not a ciphertext or repeated-envelope digest |
+| Version 2 serialisation and parsing | Required 64-character hex digest; normalise valid uppercase hex to lowercase |
+| Version 1, missing/null hash, wrong type, wrong length or non-hex | `CANNOT_VERIFY` with actionable regeneration/invalid-manifest explanation; no inferred replacement hash |
+| Valid payload and matching manifest | `AUTHENTIC`; expected, computed and signed hashes agree; both new comparisons show Yes |
+| Change only manifest `message_hash` to another valid digest | `TAMPERED`; identify manifest discrepancy; signature may remain valid; withhold recovered preview/save |
+| Damaged message/signature or wrong public key | Preserve signature failure; plaintext comparison is Not performed |
+| Wrong start secret or failed extraction | Preserve existing failure mapping; comparison is Not performed |
+| Encrypted payload with wrong passphrase | Signature can pass; decryption fails; computed plaintext hash unavailable |
+| Change image samples outside payload | Payload remains `AUTHENTIC`; retain whole-file-change notice separately |
+| Change selected file, manifest, key or secrets | Clear stale GUI hashes and statuses; never reuse previous-file evidence |
+| GUI and evidence export | Complete selectable hashes, accurate tri-state comparisons, no plaintext/secrets/keys in logs |
+| New version 2 sample bundle | All expected receiver cases pass independently without sender private keys |
+
+After focused schema/verification/GUI regressions, run Ruff, the full suite and
+independent receiver verification. Record actual environment, revision and results;
+do not add planned checks to historical test totals. Also inspect hash readability
+in the GUI. Existing test instructions and historical inventory continue below.
 
 Insufficient capacity is kept **separate** as input validation rather than counted as
 a verification failure, because it is refused before anything is written and never

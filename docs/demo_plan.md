@@ -8,6 +8,26 @@ contribution cue with an accurate account of that person's work and checking.
 Use the [case index](../samples/t07/CASE_INDEX.md), [evidence index](evidence_index.md)
 and [delivery checklist](submission_handoff.md).
 
+## Future hash-comparison demonstration (not available yet)
+
+The [external-hash plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
+is documented but not implemented. Keep the current instructions and version 1
+sample paths below until the new build and fresh bundle are validated.
+
+In a future version 2 receiver demonstration, show the manifest's `message_hash`
+as the original plaintext/file SHA-256, then the GUI's recomputed hash after
+successful extraction, signature verification and any decryption. Explain both
+comparisons: recovered payload versus manifest, and manifest versus authenticated
+signed record. Show the signature result as well; matching unsigned hashes alone
+do not establish authenticity. Earlier failures must display **Not performed**.
+
+Proposed speaking line for that future build: "The manifest gives us the expected
+payload hash. We recompute the recovered payload's hash, compare them, and check
+that the manifest value agrees with the signed record."
+
+Do not claim this display exists or count this extra explanation as rehearsed time.
+All five attacks and the adopted presenter allocation remain unchanged.
+
 ## Prepare before starting the timer
 
 1. Install Python 3.11 and pinned dependencies on the actual demo machines using

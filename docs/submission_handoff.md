@@ -4,6 +4,26 @@ The technical handoff is prepared. **No submission, full timed team rehearsal or
 real A-to-B transfer is claimed.** T09 DONE means the script, evidence index and
 handoff are delivered; human obligations below remain open.
 
+## Planned external-hash follow-up (not implemented)
+
+H01 updates documentation only. Historical release checks below do not establish
+that manifest version 2, its hash display or its sample bundle works. Current version
+1 files remain usable with the unchanged application. The
+[implementation plan](IMPLEMENTATION_PLAN.md#external-payload-hash-agreed-target-not-implemented)
+records H02-H05 as TODO, requiring later implementation authorisation.
+
+Before delivering the future version 2 build:
+
+- [ ] Implement required external `message_hash`, signed-record cross-checking and visible expected/computed comparisons.
+- [ ] Confirm old/missing-hash manifests are rejected with a clear regeneration instruction.
+- [ ] Generate the fresh `samples/hash-manifest-v2` bundle; preserve historical samples and user outputs.
+- [ ] Verify receiver cases with matching manifests, public keys and actual secrets, without private keys.
+- [ ] Record focused/full tests, lint, GUI hash readability and independent receiver results for the actual revision.
+- [ ] Update live demo paths, exported evidence and release-package instructions only after validation.
+
+These are future acceptance items, not new human declarations or completed checks.
+No code changes, sample generation, commits, pushes or submissions are part of H01.
+
 ## Requirements checked against the brief
 
 The local `INF2005-ACW1-spec_v5-f2f.pdf`, pages 2–4, specifies **one day before
