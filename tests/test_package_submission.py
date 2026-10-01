@@ -38,8 +38,8 @@ def repository(tmp_path):
     _write(root, "evidence/logs/application.log")
     _write(root, "evidence/results/e2e_results.md")
     _write(root, "samples/r11/unrelated.txt")
-    _write(root, "samples/t07/party-b/sender-public.pem", PUBLIC_PEM)
-    _write(root, "scripts/release_samples.txt", b"samples/t07/party-b/sender-public.pem\n")
+    _write(root, "samples/protected/example.png")
+    _write(root, "scripts/release_samples.txt", b"samples/protected/example.png\n")
     return root
 
 
@@ -53,7 +53,7 @@ class TestCollect:
         assert "main.py" in names
         assert "keys/public/samples_public.pem" in names
         assert "evidence/results/e2e_results.md" in names
-        assert "samples/t07/party-b/sender-public.pem" in names
+        assert "samples/protected/example.png" in names
         assert ".gitattributes" in names
 
     @pytest.mark.parametrize(
@@ -76,10 +76,10 @@ class TestCollect:
         assert "evidence/logs/application.log" in _names(repository, include_logs=True)
 
     def test_local_practice_output_stays_out(self, repository):
-        _write(repository, "samples/t07/party-b/protected/attacked_payload.png")
-        _write(repository, "samples/hash-manifest-v2/personal-output.png")
-        assert "samples/t07/party-b/protected/attacked_payload.png" not in _names(repository)
-        assert "samples/hash-manifest-v2/personal-output.png" not in _names(repository)
+        _write(repository, "samples/tampered/attacked_payload.png")
+        _write(repository, "samples/protected/personal-output.png")
+        assert "samples/tampered/attacked_payload.png" not in _names(repository)
+        assert "samples/protected/personal-output.png" not in _names(repository)
 
     @pytest.mark.parametrize("entry", ["samples/missing.png", "samples/../main.py", "main.py",
                                        "samples/C:/private.pem", "samples\\file.png"])
@@ -106,16 +106,16 @@ class TestBuild:
         assert size == output.stat().st_size
 
     def test_a_private_key_anywhere_stops_the_build(self, repository, tmp_path):
-        _write(repository, "docs/leaked.pem", PRIVATE_PEM)
+        _write(repository, "app/leaked.pem", PRIVATE_PEM)
         output = tmp_path / "submission.zip"
 
-        with pytest.raises(PackagingError, match=r"docs/leaked.pem"):
+        with pytest.raises(PackagingError, match=r"app/leaked.pem"):
             build(output, root=repository)
         assert not output.exists()
 
     def test_the_output_cannot_be_inside_a_packaged_directory(self, repository):
         with pytest.raises(PackagingError, match="include itself"):
-            build(repository / "docs" / "submission.zip", root=repository)
+            build(repository / "app" / "submission.zip", root=repository)
 
 
 def test_the_real_repository_packages_without_private_keys():

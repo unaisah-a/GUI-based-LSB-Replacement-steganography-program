@@ -1,11 +1,11 @@
-"""Generate the committed demo WAV cover in ``samples/audio/original/``.
+"""Generate a development WAV cover in ``tmp/generated-samples/original/``.
 
 Run directly, or let ``generate_samples.py`` call it when the cover is missing:
 
     .venv\\Scripts\\python scripts/create_test_audio.py
 
 Paths are resolved from this file's location rather than the working directory, so
-the sample lands in the repository regardless of where the command is run.
+the sample lands under tmp regardless of where the command is run.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import numpy as np
 import soundfile as sf
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
-TARGET = REPOSITORY_ROOT / "samples" / "audio" / "original" / "original.wav"
+TARGET = REPOSITORY_ROOT / "tmp" / "generated-samples" / "original" / "original.wav"
 
 SAMPLE_RATE = 44_100
 DURATION_SECONDS = 10

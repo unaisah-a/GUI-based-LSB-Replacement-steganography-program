@@ -14,9 +14,8 @@ logs hold tracebacks from development runs with local paths in them; they are no
 evidence. Pass ``--include-logs`` to package them anyway.
 
 As a last check, the build refuses to finish if any packaged file contains a PEM
-private key. Current samples use ``samples/hash-manifest-v2/party-b/sender-public.pem``;
-historical samples and keys are retained for regression tests. A marker creates
-their own key pair from *Keys → Generate demo key pair*.
+private key. Samples are being replaced; archive creation alone does not establish
+submission readiness. Generate keys from *Keys → Generate demo key pair*.
 """
 
 from __future__ import annotations
@@ -35,7 +34,6 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 INCLUDED: tuple[str, ...] = (
     "app",
     "tests",
-    "docs",
     "samples",
     "scripts",
     "keys/public",
@@ -76,8 +74,6 @@ EXCLUDED_PATHS: frozenset[str] = frozenset(
         # packaged, so it could verify nothing and would only pre-fill the Verify tab
         # with a key the marker does not hold.
         "keys/public/demo_public.pem",
-        # Unrelated pre-existing work, explicitly outside the integration release.
-        "samples/r11",
     }
 )
 
@@ -118,7 +114,9 @@ def collect(root: Path, *, include_logs: bool = False) -> list[PurePosixPath]:
     samples = set(inventory.read_text(encoding="utf-8").splitlines())
     for name in samples:
         path = PurePosixPath(name)
-        if (not name.startswith("samples/") or ".." in path.parts or "\\" in name
+        if (len(path.parts) < 3 or path.parts[0] != "samples"
+                or path.parts[1] not in {"original", "protected", "tampered"}
+                or ".." in path.parts or "\\" in name
                 or ":" in name or path.as_posix() != name
                 or not (root / path).is_file()
                 or not (root / path).resolve().is_relative_to((root / "samples").resolve())):

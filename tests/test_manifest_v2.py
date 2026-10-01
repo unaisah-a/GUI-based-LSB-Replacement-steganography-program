@@ -178,11 +178,23 @@ def test_protection_publishes_original_byte_hash(
     assert evidence.payload_matches_record is True
 
 
-def test_historical_sample_is_rejected_without_modification(keys):
-    root = Path(__file__).resolve().parents[1]
-    stego = root / "samples/t07/party-b/protected/image-short.png"
-    outcome = verifier.verify_media(stego, f"{stego}.manifest.json", keys[1])
+def test_legacy_sample_is_rejected_without_modification(keys, tmp_path):
+    cover = write_cover(str(tmp_path), make_cover(128, 128, 3), "PNG", "cover")
+    result = protect_media(
+        cover, tmp_path / "protected.png", b"legacy regression", keys[0],
+        media_id="legacy", start_method=constants.START_METHOD_MANUAL,
+        manual_start_location=0, lsb_depth=2,
+    )
+    stego = Path(result.stego_path)
+    manifest_path = Path(result.manifest_path)
+    data = json.loads(manifest_path.read_text())
+    data["format_version"] = 1
+    data.pop("message_hash")
+    manifest_path.write_text(json.dumps(data))
+    before = (stego.read_bytes(), manifest_path.read_bytes())
+    outcome = verifier.verify_media(stego, manifest_path, keys[1])
     assert outcome.verdict == constants.VERDICT_CANNOT_VERIFY
     assert outcome.details["stage"] == "manifest"
     assert "format version 1" in outcome.reason
     assert "Regenerate" in outcome.reason
+    assert (stego.read_bytes(), manifest_path.read_bytes()) == before

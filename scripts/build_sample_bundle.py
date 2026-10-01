@@ -1,6 +1,6 @@
 """Build fresh version 2 samples; refuse existing destinations and save no private keys.
 
-python -m scripts.build_sample_bundle --output samples/hash-manifest-v2
+python -m scripts.build_sample_bundle --output tmp/generated-bundle
 """
 from __future__ import annotations
 
@@ -331,7 +331,7 @@ resistance to arbitrary lossy transforms. Video output is FFV1/MKV without audio
 The complete bundle also has party-a/original covers, party-a/messages inputs,
 protected/tampered outputs, a generation report and CASE_INDEX.md. Use fresh local
 keys only for newly protected outputs; keep private keys outside shared folders.
-The existing historical samples remain separate and are not upgraded in place.
+Generated fixtures are for development and do not populate the app sample folders.
 """
 
 

@@ -9,7 +9,7 @@ About the unencrypted private key
 demonstration and the automated tests can sign without prompting. That is the
 wrong arrangement for anything real, and the application says so rather than
 leaving it implied: :data:`app.utils.constants.DEMO_KEY_NOTICE` is displayed
-beside the key controls in the GUI and repeated in ``docs/limitations.md``. The
+beside the key controls in the GUI. The
 repository's ``.gitignore`` excludes ``keys/demo_private/`` and ``*.pem`` while
 re-including ``keys/public/*.pem``, so the public key can be shared for the
 receiver side of the A-to-B demonstration and the private key cannot be committed.

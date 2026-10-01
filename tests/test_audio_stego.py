@@ -152,7 +152,7 @@ def write_round_trip_evidence(evidence_directory):
         "and unauthenticated at this layer: a wrong depth or start location can decode a "
         "plausible length and return wrong bytes with no error at all. The envelope "
         "magic and the signature above this layer are what establish that a payload is "
-        "real. See `docs/limitations.md` §2.",
+        "real.",
         "",
     ]
     file_utils.write_text_atomic(

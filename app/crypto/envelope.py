@@ -22,7 +22,7 @@ digest of the plaintext.
 
 :func:`parse_envelope` validates structure only. Nothing in the record can be trusted
 until the signature has verified, so build a :class:`VerificationRecord` from it only
-after that. The design rationale is in ``docs/architecture.md`` section 2.
+after that.
 """
 
 from __future__ import annotations

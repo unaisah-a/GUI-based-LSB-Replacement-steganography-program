@@ -8,8 +8,7 @@ format, validation order, error hierarchy and public signature::
 
 PCM samples are signed, so the sample array is *reinterpreted* with
 ``view(np.uint16)`` rather than cast: LSB replacement must operate on the
-two's-complement bit pattern, and a cast would change the numbers. See
-``docs/architecture.md`` section 3.
+two's-complement bit pattern, and a cast would change the numbers.
 
 This module carries opaque bytes and returns no verdict. The length header is
 unauthenticated, and a mismatched depth or start location can decode a plausible

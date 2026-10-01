@@ -14,8 +14,7 @@ offset, and a payload longer than one frame runs on into the next.
 Output is always FFV1 in Matroska, because only a lossless codec preserves LSB data.
 Frames are streamed one at a time in both directions. :func:`embed_video` counts the
 frames it actually decodes rather than trusting the container, and reads its own
-output back to confirm the payload survives before moving the file into place. The
-reasoning behind each of these is in ``docs/architecture.md`` section 3.
+output back to confirm the payload survives before moving the file into place.
 
 This module carries opaque bytes and returns no verdict. Never treat a returned byte
 sequence as verified.

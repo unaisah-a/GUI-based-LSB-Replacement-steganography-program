@@ -1,7 +1,6 @@
 """LSB replacement embedding and extraction for PNG and BMP cover objects.
 
-Implements Requirements 2, 3, 4, 6, 7 and 14 of the image-steganography-analysis
-specification (``docs/image_layer_requirements.md``). The algorithm itself is shared
+The algorithm is shared
 with the other media and lives in :mod:`app.stego.lsb_core`; this module supplies the
 image's flat sample stream and writes the result back as the cover's own format.
 

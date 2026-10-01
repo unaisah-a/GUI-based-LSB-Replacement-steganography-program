@@ -1,1 +1,0 @@
-Explain how steganography can be used to embed hidden verification data in image and audio cover objects.

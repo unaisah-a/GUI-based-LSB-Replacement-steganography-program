@@ -1,4 +1,4 @@
-"""Audit and extract a release, then run its isolated receiver and startup probe."""
+"""Audit and extract a source archive, then check dependencies and app startup."""
 
 from __future__ import annotations
 
@@ -31,8 +31,10 @@ def inspect_archive(archive_path: Path, source: Path) -> dict[str, str]:
                 raise ValueError(f"Unsafe or duplicate archive member: {name}")
             if (any(p.startswith(".venv") or p in {".git", "__pycache__", ".pytest_cache",
                                                   ".hypothesis", ".ruff_cache"} for p in path.parts)
-                    or name.startswith(("keys/demo_private/", "keys/private/", "samples/r11/"))
-                    or (path.parts[0] == "samples" and name not in inventory)):
+                    or name.startswith(("keys/demo_private/", "keys/private/", "docs/"))
+                    or (path.parts[0] == "samples" and (name not in inventory
+                        or len(path.parts) < 3
+                        or path.parts[1] not in {"original", "protected", "tampered"}))):
                 raise ValueError(f"Excluded archive member: {name}")
             data = archive.read(member)
             if re.search(rb"(?m)^-----BEGIN [^-\r\n]*PRIVATE KEY-----", data):
@@ -43,14 +45,11 @@ def inspect_archive(archive_path: Path, source: Path) -> dict[str, str]:
                 raise ValueError(f"Archive differs from source: {name}")
             hashes[name] = hashlib.sha256(data).hexdigest()
         required = {"main.py", "AGENTS.md", ".gitattributes", "scripts/release_samples.txt",
-                    "scripts/probe_release.py", "scripts/check_receiver_isolation.py",
-                    "samples/hash-manifest-v2/party-b/sender-public.pem",
-                    "samples/hash-manifest-v2/party-b/case-index.json"} | inventory
+                    "scripts/probe_release.py", "README.md", "requirements.txt",
+                    "samples/original/.gitkeep", "samples/protected/.gitkeep",
+                    "samples/tampered/.gitkeep"} | inventory
         if not required <= hashes.keys():
             raise ValueError(f"Missing release members: {sorted(required - hashes.keys())}")
-        index = json.loads(archive.read("samples/hash-manifest-v2/party-b/case-index.json"))
-        if index.get("manifest_version") != 2:
-            raise ValueError("Release must contain the version 2 receiver bundle")
     return hashes
 
 
@@ -65,23 +64,27 @@ def check(archive_path: Path, output: Path, source: Path = ROOT) -> dict:
         archive.extractall(extracted)
     env = dict(os.environ, QT_QPA_PLATFORM="offscreen")
     env.pop("PYTHONPATH", None)
-    commands = [
-        [sys.executable, "-I", str(extracted / "scripts/check_receiver_isolation.py"),
-         "--bundle", str(extracted / "samples/hash-manifest-v2/party-b"),
-         "--output", str(output / "receiver")],
-        [sys.executable, "-I", str(extracted / "scripts/probe_release.py")],
-    ]
+    commands = [[sys.executable, "-I", str(extracted / "scripts/probe_release.py")]]
     runs = []
     for command in commands:
         result = subprocess.run(command, cwd=extracted, env=env, capture_output=True,
                                 text=True, timeout=120, check=True)
         runs.append({"command": command, "cwd": str(extracted), "returncode": result.returncode,
                      "stdout": result.stdout, "stderr": result.stderr})
-    receiver = json.loads((output / "receiver/isolation.json").read_text())
+    sample_files = [name for name in hashes
+                    if name.startswith("samples/") and not name.endswith("/.gitkeep")]
+    sample_validation = {
+        "status": "PENDING",
+        "reason": ("Sample verification has not been performed." if sample_files
+                   else "New original, protected and tampered samples have not been added."),
+        "files": len(sample_files),
+    }
     report = {"archive": str(archive_path), "archive_sha256": hashlib.sha256(
         archive_path.read_bytes()).hexdigest(), "files": len(hashes),
         "source": str(source.resolve()), "extracted": str(extracted),
-        "receiver": receiver, "commands": runs, "member_sha256": hashes, "passed": True}
+        "sample_validation": sample_validation, "submission_ready": False,
+        "commands": runs, "member_sha256": hashes, "passed": True,
+        "validation_scope": "Archive safety, source byte identity, dependencies and offscreen startup"}
     (output / "package-report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     return report
 
@@ -92,7 +95,8 @@ def main():
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
     report = check(args.archive, args.output)
-    print(json.dumps({key: report[key] for key in ("archive", "archive_sha256", "files", "passed")},
+    print(json.dumps({key: report[key] for key in ("archive", "archive_sha256", "files", "passed",
+                                                                  "sample_validation", "submission_ready")},
                      indent=2))
 
 

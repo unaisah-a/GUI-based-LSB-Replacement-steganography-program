@@ -1,6 +1,6 @@
 """Verify a transferred Party B folder without sender files or private keys.
 
-python -m scripts.verify_sample_bundle samples/hash-manifest-v2/party-b --report tmp/receiver.json
+python -m scripts.verify_sample_bundle tmp/generated-bundle/party-b --report tmp/receiver.json
 """
 from __future__ import annotations
 

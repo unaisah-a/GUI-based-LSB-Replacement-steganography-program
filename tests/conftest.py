@@ -316,7 +316,7 @@ def scratch():
 #
 # The audio layer works on 16-bit PCM WAV. These helpers mirror the image
 # helpers above: deterministic content, written into a caller-supplied temporary
-# directory, never into the repository. `samples/audio/` holds committed demo
+# directory, never into the repository. The sample folders are reserved for user-provided
 # media and must not be read by tests, because a test that depends on the
 # process working directory fails as soon as pytest is invoked from elsewhere.
 

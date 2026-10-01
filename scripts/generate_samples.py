@@ -1,15 +1,14 @@
-"""Generate the committed demo media in ``samples/``, with manifests.
+"""Generate development media in ``tmp/generated-samples/``, with manifests.
 
     .venv\\Scripts\\python scripts/generate_samples.py
 
-For each medium this writes a cover under ``samples/<media>/original/`` and a protected
-stego file with its ``.manifest.json`` under ``samples/<media>/stego/``, using the
+For each medium this writes a cover under ``original/`` and a protected
+stego file with its ``.manifest.json`` under ``protected/``, using the
 real protect workflow: sign, derive the start location, embed, publish the manifest.
 
 The stego files are signed with a key pair made for the samples. Its public half is
-written to ``keys/public/samples_public.pem`` and committed, so anyone can verify the
-samples; the private half is discarded. Running this again makes a new key pair and
-re-signs everything, so commit the key and the samples together.
+written inside the temporary output folder; the private half is discarded.
+Running this again makes a new key pair and re-signs the temporary samples.
 
 The audio cover is created by ``create_test_audio.py`` if it is missing. The image and
 video covers are synthetic and seeded, so they are identical on every run.
@@ -32,18 +31,18 @@ from app.verification.protect import protect_media  # noqa: E402
 from app.verification.verifier import verify_media  # noqa: E402
 from scripts import create_test_audio  # noqa: E402
 
-SAMPLES = REPOSITORY_ROOT / "samples"
-PUBLIC_KEY = REPOSITORY_ROOT / "keys" / "public" / "samples_public.pem"
+SAMPLES = REPOSITORY_ROOT / "tmp" / "generated-samples"
+PUBLIC_KEY = SAMPLES / "samples_public.pem"
 
 START_SECRET = "demo-start-secret"
 MESSAGE = b"INF2005 sample: this file was protected by party A and signed."
 
-IMAGE_COVER = SAMPLES / "images" / "original" / "cover.png"
-IMAGE_STEGO = SAMPLES / "images" / "stego" / "cover_stego.png"
-AUDIO_COVER = SAMPLES / "audio" / "original" / "original.wav"
-AUDIO_STEGO = SAMPLES / "audio" / "stego" / "stego.wav"
-VIDEO_COVER = SAMPLES / "video" / "original" / "cover.mkv"
-VIDEO_STEGO = SAMPLES / "video" / "stego" / "cover_stego.mkv"
+IMAGE_COVER = SAMPLES / "original" / "cover.png"
+IMAGE_STEGO = SAMPLES / "protected" / "cover_stego.png"
+AUDIO_COVER = SAMPLES / "original" / "original.wav"
+AUDIO_STEGO = SAMPLES / "protected" / "stego.wav"
+VIDEO_COVER = SAMPLES / "original" / "cover.mkv"
+VIDEO_STEGO = SAMPLES / "protected" / "cover_stego.mkv"
 
 
 def make_image_cover(path: Path) -> None:
