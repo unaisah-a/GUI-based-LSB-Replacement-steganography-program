@@ -1,0 +1,20 @@
+{
+  "container_format": "MKV",
+  "created": "2026-10-01T16:15:21+00:00",
+  "ecc": null,
+  "encrypted": false,
+  "encryption": null,
+  "envelope_length": 1424,
+  "format_version": 2,
+  "lsb_depth": 1,
+  "media_id": "video-text",
+  "media_type": "video",
+  "message_hash": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+  "message_length": 675,
+  "nonce": "0fd5a67a93d14d362d3e8181302a9f6a",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": null,
+  "start_method": "hmac_prf",
+  "stego_file": "video-text.mkv",
+  "stego_sha256": "6bb668f864fa534ad41a13293c1ee92bdbde8a86dff2d0cc6231ee338395e6f7"
+}

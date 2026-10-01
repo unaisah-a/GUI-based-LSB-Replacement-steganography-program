@@ -1,0 +1,132 @@
+[
+  {
+    "attack": "payload.message",
+    "label": "Corrupt the message",
+    "target": "media",
+    "outcome": {
+      "name": "corrupt message section",
+      "output": "image-message-corrupt.png",
+      "description": "Inverted byte 52 of the envelope's message section, which is covered by the signature.",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "target": "payload",
+      "details": {
+        "section": "message",
+        "byte_index": 52,
+        "original_byte": 110,
+        "modified_byte": 145,
+        "section_length": 105
+      }
+    },
+    "verdict_before": "AUTHENTIC",
+    "verdict_after": "SIGNATURE_INVALID",
+    "verdict_changed": true,
+    "matched_expectation": true,
+    "reason_after": "the payload signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified",
+    "hash_evidence_before": {
+      "algorithm": "SHA-256",
+      "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_matches_manifest": "Yes",
+      "manifest_matches_record": "Yes",
+      "payload_matches_record": "Yes"
+    },
+    "hash_evidence_after": {
+      "algorithm": "SHA-256",
+      "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "signed_record_hash": null,
+      "computed_hash": null,
+      "payload_matches_manifest": "Not performed",
+      "manifest_matches_record": "Not performed",
+      "payload_matches_record": "Not performed"
+    }
+  },
+  {
+    "attack": "payload.signature",
+    "label": "Corrupt the signature",
+    "target": "media",
+    "outcome": {
+      "name": "corrupt signature section",
+      "output": "audio-signature-corrupt.wav",
+      "description": "Inverted byte 192 of the envelope's signature section, which is covered by the signature.",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "target": "payload",
+      "details": {
+        "section": "signature",
+        "byte_index": 192,
+        "original_byte": 140,
+        "modified_byte": 115,
+        "section_length": 384
+      }
+    },
+    "verdict_before": "AUTHENTIC",
+    "verdict_after": "SIGNATURE_INVALID",
+    "verdict_changed": true,
+    "matched_expectation": true,
+    "reason_after": "the payload signature did not verify against the supplied public key. Either the key is not the sender's, or the signed bytes were modified",
+    "hash_evidence_before": {
+      "algorithm": "SHA-256",
+      "manifest_hash": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "signed_record_hash": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "computed_hash": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_matches_manifest": "Yes",
+      "manifest_matches_record": "Yes",
+      "payload_matches_record": "Yes"
+    },
+    "hash_evidence_after": {
+      "algorithm": "SHA-256",
+      "manifest_hash": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "signed_record_hash": null,
+      "computed_hash": null,
+      "payload_matches_manifest": "Not performed",
+      "manifest_matches_record": "Not performed",
+      "payload_matches_record": "Not performed"
+    }
+  },
+  {
+    "attack": "image.outside",
+    "label": "Modify pixels outside the payload",
+    "target": "media",
+    "outcome": {
+      "name": "modify pixels outside the payload",
+      "output": "image-outside-payload.png",
+      "description": "Inverted 64 samples starting at sample 6933, which is past the end of the payload region. Verification is expected to succeed: it authenticates the signed message, not the whole file.",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "target": "media",
+      "details": {
+        "samples_modified": 64,
+        "payload_end": 6933,
+        "limitation": "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file."
+      }
+    },
+    "verdict_before": "AUTHENTIC",
+    "verdict_after": "AUTHENTIC",
+    "verdict_changed": false,
+    "matched_expectation": true,
+    "reason_after": "the signature verified against the supplied public key and the recovered 105-byte message matches the digest that was signed",
+    "hash_evidence_before": {
+      "algorithm": "SHA-256",
+      "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_matches_manifest": "Yes",
+      "manifest_matches_record": "Yes",
+      "payload_matches_record": "Yes"
+    },
+    "hash_evidence_after": {
+      "algorithm": "SHA-256",
+      "manifest_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "signed_record_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "computed_hash": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_matches_manifest": "Yes",
+      "manifest_matches_record": "Yes",
+      "payload_matches_record": "Yes"
+    }
+  }
+]

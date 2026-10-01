@@ -1,0 +1,143 @@
+{
+  "mode": "Automated real Qt app captures using the offscreen platform",
+  "mocked_results": false,
+  "earlier_demo_evidence": false,
+  "native_playback_tested": false,
+  "captures": [
+    {
+      "id": "image-short-depth1",
+      "file": "image-short-depth1.png",
+      "result": "AUTHENTIC",
+      "width": 1620,
+      "height": 1868,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "image-file",
+      "file": "image-file.png",
+      "result": "AUTHENTIC",
+      "width": 1620,
+      "height": 2425,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "image-encrypted",
+      "file": "image-encrypted.png",
+      "result": "AUTHENTIC",
+      "width": 1610,
+      "height": 1841,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "image-audio-file",
+      "file": "image-audio-file.png",
+      "result": "AUTHENTIC",
+      "width": 1610,
+      "height": 2070,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "audio-long",
+      "file": "audio-long.png",
+      "result": "AUTHENTIC",
+      "width": 1610,
+      "height": 1793,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "video-text",
+      "file": "video-text.png",
+      "result": "AUTHENTIC",
+      "width": 1610,
+      "height": 1841,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "image-message-corrupt",
+      "file": "image-message-corrupt.png",
+      "result": "SIGNATURE_INVALID",
+      "width": 1620,
+      "height": 1868,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "audio-signature-corrupt",
+      "file": "audio-signature-corrupt.png",
+      "result": "SIGNATURE_INVALID",
+      "width": 1610,
+      "height": 1741,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "image-outside-payload",
+      "file": "image-outside-payload.png",
+      "result": "AUTHENTIC",
+      "width": 1610,
+      "height": 1924,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "audio-repetition3-damage1",
+      "file": "audio-repetition3-damage1.png",
+      "result": "AUTHENTIC",
+      "width": 1610,
+      "height": 1905,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "audio-repetition3-damage2",
+      "file": "audio-repetition3-damage2.png",
+      "result": "SIGNATURE_INVALID",
+      "width": 1610,
+      "height": 1741,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "image-short-depth1-hash-mismatch",
+      "file": "image-short-depth1-hash-mismatch.png",
+      "result": "TAMPERED",
+      "width": 1620,
+      "height": 1868,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "capacity-image",
+      "file": "capacity-image.png",
+      "result": "Does not fit; sender rejection separately verified",
+      "width": 1610,
+      "height": 1273,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "capacity-audio",
+      "file": "capacity-audio.png",
+      "result": "Does not fit; sender rejection separately verified",
+      "width": 1600,
+      "height": 1200,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    },
+    {
+      "id": "video-properties",
+      "file": "video-properties.png",
+      "result": "Payload span located; authentication captured separately",
+      "width": 1600,
+      "height": 1200,
+      "horizontal_overflow": 0,
+      "vertical_overflow": 0
+    }
+  ]
+}

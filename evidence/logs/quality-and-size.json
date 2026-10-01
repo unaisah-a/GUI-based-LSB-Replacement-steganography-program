@@ -1,0 +1,1006 @@
+[
+  {
+    "id": "image-short-depth1",
+    "quality": {
+      "media_type": "image",
+      "mse": 0.0012565910132966529,
+      "psnr_db": 77.13886411400476,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 1.0,
+      "changed_samples": 3508,
+      "total_samples": 2791680,
+      "changed_proportion": 0.0012565910132966529,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 1,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 0.001140173658872077,
+          "psnr_db": 77.56109357473476
+        },
+        {
+          "label": "green",
+          "mse": 0.0013357548143053644,
+          "psnr_db": 76.87353612733172
+        },
+        {
+          "label": "blue",
+          "mse": 0.0012938445667125171,
+          "psnr_db": 77.0119825445301
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-short-depth1.png",
+      "cover_size": 597679,
+      "stego_size": 605490,
+      "final_size": 605490,
+      "difference": 7811,
+      "growth_proportion": 0.013068888148989675,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 858,
+    "embedded_bytes": 858,
+    "manifest_bytes": 739
+  },
+  {
+    "id": "image-short-depth2",
+    "quality": {
+      "media_type": "image",
+      "mse": 0.0024662568775790923,
+      "psnr_db": 74.21042051501536,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 3.0,
+      "changed_samples": 2515,
+      "total_samples": 2791680,
+      "changed_proportion": 0.0009008912196240257,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 3,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 0.0038654143741403027,
+          "psnr_db": 72.25884303556305
+        },
+        {
+          "label": "green",
+          "mse": 0.0017999914030261347,
+          "psnr_db": 75.57809930001953
+        },
+        {
+          "label": "blue",
+          "mse": 0.001733364855570839,
+          "psnr_db": 75.74190373985856
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-short-depth2.png",
+      "cover_size": 597679,
+      "stego_size": 605335,
+      "final_size": 605335,
+      "difference": 7656,
+      "growth_proportion": 0.01280955161549929,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 858,
+    "embedded_bytes": 858,
+    "manifest_bytes": 739
+  },
+  {
+    "id": "image-short-depth3",
+    "quality": {
+      "media_type": "image",
+      "mse": 0.006418715612104539,
+      "psnr_db": 70.05632226627745,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 7.0,
+      "changed_samples": 2012,
+      "total_samples": 2791680,
+      "changed_proportion": 0.0007207129756992205,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 7,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 0.004826126203576341,
+          "psnr_db": 71.29481686312101
+        },
+        {
+          "label": "green",
+          "mse": 0.00610062757909216,
+          "psnr_db": 70.27705847149404
+        },
+        {
+          "label": "blue",
+          "mse": 0.008329393053645117,
+          "psnr_db": 68.92467004485886
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-short-depth3.png",
+      "cover_size": 597679,
+      "stego_size": 605204,
+      "final_size": 605204,
+      "difference": 7525,
+      "growth_proportion": 0.01259037041622677,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 858,
+    "embedded_bytes": 858,
+    "manifest_bytes": 739
+  },
+  {
+    "id": "image-short-depth4",
+    "quality": {
+      "media_type": "image",
+      "mse": 0.013198504126547455,
+      "psnr_db": 66.92555648328667,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 11.0,
+      "changed_samples": 1625,
+      "total_samples": 2791680,
+      "changed_proportion": 0.0005820867721228794,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 15,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 0.01236674690508941,
+          "psnr_db": 67.20824888156528
+        },
+        {
+          "label": "green",
+          "mse": 0.012203404401650618,
+          "psnr_db": 67.26599357520998
+        },
+        {
+          "label": "blue",
+          "mse": 0.015025361072902338,
+          "psnr_db": 66.36255443581828
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-short-depth4.png",
+      "cover_size": 597679,
+      "stego_size": 604875,
+      "final_size": 604875,
+      "difference": 7196,
+      "growth_proportion": 0.012039907709656857,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 858,
+    "embedded_bytes": 858,
+    "manifest_bytes": 739
+  },
+  {
+    "id": "image-short-depth5",
+    "quality": {
+      "media_type": "image",
+      "mse": 0.07830696928014672,
+      "psnr_db": 59.19279945103475,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 27.0,
+      "changed_samples": 1345,
+      "total_samples": 2791680,
+      "changed_proportion": 0.0004817887436955525,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 31,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 0.09701685006877579,
+          "psnr_db": 58.26233190969092
+        },
+        {
+          "label": "green",
+          "mse": 0.08351960110041265,
+          "psnr_db": 58.91291949447072
+        },
+        {
+          "label": "blue",
+          "mse": 0.05438445667125172,
+          "psnr_db": 60.77605566803169
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-short-depth5.png",
+      "cover_size": 597679,
+      "stego_size": 604719,
+      "final_size": 604719,
+      "difference": 7040,
+      "growth_proportion": 0.011778898037240726,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 858,
+    "embedded_bytes": 858,
+    "manifest_bytes": 739
+  },
+  {
+    "id": "image-short-depth6",
+    "quality": {
+      "media_type": "image",
+      "mse": 0.1670137694864741,
+      "psnr_db": 55.90328082741429,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 41.0,
+      "changed_samples": 1135,
+      "total_samples": 2791680,
+      "changed_proportion": 0.0004065652223750573,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 63,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 0.15588140474552958,
+          "psnr_db": 56.2028605002848
+        },
+        {
+          "label": "green",
+          "mse": 0.14769386176066024,
+          "psnr_db": 56.43717914701995
+        },
+        {
+          "label": "blue",
+          "mse": 0.19746604195323247,
+          "psnr_db": 55.175879396919456
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-short-depth6.png",
+      "cover_size": 597679,
+      "stego_size": 604547,
+      "final_size": 604547,
+      "difference": 6868,
+      "growth_proportion": 0.011491118142012686,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 858,
+    "embedded_bytes": 858,
+    "manifest_bytes": 739
+  },
+  {
+    "id": "image-short-depth7",
+    "quality": {
+      "media_type": "image",
+      "mse": 0.6278695982347547,
+      "psnr_db": 50.152109060601376,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 90.0,
+      "changed_samples": 977,
+      "total_samples": 2791680,
+      "changed_proportion": 0.00034996847776249426,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 127,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 0.5991574965612104,
+          "psnr_db": 50.35539363358812
+        },
+        {
+          "label": "green",
+          "mse": 0.678117477647868,
+          "psnr_db": 49.81775422938021
+        },
+        {
+          "label": "blue",
+          "mse": 0.6063338204951857,
+          "psnr_db": 50.303685675879386
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-short-depth7.png",
+      "cover_size": 597679,
+      "stego_size": 604482,
+      "final_size": 604482,
+      "difference": 6803,
+      "growth_proportion": 0.011382364111839299,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 858,
+    "embedded_bytes": 858,
+    "manifest_bytes": 739
+  },
+  {
+    "id": "image-short-depth8",
+    "quality": {
+      "media_type": "image",
+      "mse": 2.4286572959651536,
+      "psnr_db": 44.27714124354943,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 219.0,
+      "changed_samples": 862,
+      "total_samples": 2791680,
+      "changed_proportion": 0.00030877464465841356,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 255,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 2.4758500257909217,
+          "psnr_db": 44.19356027040064
+        },
+        {
+          "label": "green",
+          "mse": 2.361906808803301,
+          "psnr_db": 44.39817602738982
+        },
+        {
+          "label": "blue",
+          "mse": 2.448215053301238,
+          "psnr_db": 44.242307969205676
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-short-depth8.png",
+      "cover_size": 597679,
+      "stego_size": 604339,
+      "final_size": 604339,
+      "difference": 6660,
+      "growth_proportion": 0.011143105245457845,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 858,
+    "embedded_bytes": 858,
+    "manifest_bytes": 739
+  },
+  {
+    "id": "image-long",
+    "quality": {
+      "media_type": "image",
+      "mse": 0.002067930421824851,
+      "psnr_db": 74.97544438595848,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 1.0,
+      "changed_samples": 5773,
+      "total_samples": 2791680,
+      "changed_proportion": 0.002067930421824851,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 1,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 0.0020664975928473177,
+          "psnr_db": 74.97845457136337
+        },
+        {
+          "label": "green",
+          "mse": 0.0020697214580467677,
+          "psnr_db": 74.971684585863
+        },
+        {
+          "label": "blue",
+          "mse": 0.0020675722145804677,
+          "psnr_db": 74.97619673673023
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-long.png",
+      "cover_size": 597679,
+      "stego_size": 606441,
+      "final_size": 597679,
+      "difference": 0,
+      "growth_proportion": 0.0,
+      "exact": true,
+      "attempted": true,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "DEFLATE level 9 plus a 13596-byte stPd padding chunk",
+      "content_unchanged": true,
+      "notes": [
+        "The padding chunk is ancillary and private, so a conforming decoder skips it and the pixels are unchanged. It is also an unusual feature in an otherwise plain PNG, which makes the file arguably more conspicuous to an analyst than a size mismatch would."
+      ],
+      "details": {
+        "sizes_by_deflate_level": {
+          "0": 2793932,
+          "1": 688879,
+          "2": 675282,
+          "3": 648658,
+          "4": 636241,
+          "5": 623292,
+          "6": 606441,
+          "7": 600255,
+          "8": 589650,
+          "9": 584083
+        },
+        "exact_level": null,
+        "smallest_level": 9,
+        "padded_bytes": 13596,
+        "output": "image-long.png"
+      }
+    },
+    "envelope_bytes": 1424,
+    "embedded_bytes": 1424,
+    "manifest_bytes": 728
+  },
+  {
+    "id": "image-file",
+    "quality": {
+      "media_type": "image",
+      "mse": 1.2996149272122879,
+      "psnr_db": 46.992656699149585,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 3.0,
+      "changed_samples": 1096153,
+      "total_samples": 2791680,
+      "changed_proportion": 0.3926499455524989,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 3,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 1.2984912310866574,
+          "psnr_db": 46.99641339750903
+        },
+        {
+          "label": "green",
+          "mse": 1.297770159903714,
+          "psnr_db": 46.998825768196745
+        },
+        {
+          "label": "blue",
+          "mse": 1.3025833906464925,
+          "psnr_db": 46.98274824721053
+        }
+      ],
+      "extra": {
+        "height": 1280,
+        "width": 727,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "image_cover.png",
+      "stego": "image-file.png",
+      "cover_size": 597679,
+      "stego_size": 936619,
+      "final_size": 936619,
+      "difference": 338940,
+      "growth_proportion": 0.5670937074918142,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 365111,
+    "embedded_bytes": 365111,
+    "manifest_bytes": 733
+  },
+  {
+    "id": "image-encrypted",
+    "quality": {
+      "media_type": "image",
+      "mse": 0.003917100694444444,
+      "psnr_db": 72.20115625041389,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 3.0,
+      "changed_samples": 3204,
+      "total_samples": 2764800,
+      "changed_proportion": 0.0011588541666666668,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 3,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 0.003962673611111111,
+          "psnr_db": 72.15092058084787
+        },
+        {
+          "label": "green",
+          "mse": 0.003880208333333333,
+          "psnr_db": 72.24225316823167
+        },
+        {
+          "label": "blue",
+          "mse": 0.003908420138888889,
+          "psnr_db": 72.21079118463533
+        }
+      ],
+      "extra": {
+        "height": 720,
+        "width": 1280,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "encryption_cover.png",
+      "stego": "image-encrypted.png",
+      "cover_size": 1694443,
+      "stego_size": 1699890,
+      "final_size": 1699890,
+      "difference": 5447,
+      "growth_proportion": 0.003214625691156327,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 1063,
+    "embedded_bytes": 1063,
+    "manifest_bytes": 875
+  },
+  {
+    "id": "image-audio-file",
+    "quality": {
+      "media_type": "image",
+      "mse": 9.43055881076389,
+      "psnr_db": 38.38542933110354,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 7.0,
+      "changed_samples": 2058685,
+      "total_samples": 2764800,
+      "changed_proportion": 0.744605396412037,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 7,
+      "channels": [
+        {
+          "label": "red",
+          "mse": 9.466014539930555,
+          "psnr_db": 38.36913193653032
+        },
+        {
+          "label": "green",
+          "mse": 9.411381293402778,
+          "psnr_db": 38.3942699205508
+        },
+        {
+          "label": "blue",
+          "mse": 9.414280598958333,
+          "psnr_db": 38.392932222655986
+        }
+      ],
+      "extra": {
+        "height": 720,
+        "width": 1280,
+        "channel_count": 3,
+        "dimensions_equal": true,
+        "channel_count_equal": true
+      }
+    },
+    "size": {
+      "media_type": "image",
+      "container": "PNG",
+      "cover": "encryption_cover.png",
+      "stego": "image-audio-file.png",
+      "cover_size": 1694443,
+      "stego_size": 1854284,
+      "final_size": 1854284,
+      "difference": 159841,
+      "growth_proportion": 0.09433247385719083,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": true,
+      "strategy": "baseline, before any attempt",
+      "content_unchanged": null,
+      "notes": [
+        "PNG compresses its pixel data, so the size moves in whichever direction DEFLATE happens to take it. See preserve_png_size for the attempt to match it."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 882857,
+    "embedded_bytes": 882857,
+    "manifest_bytes": 745
+  },
+  {
+    "id": "audio-long",
+    "quality": {
+      "media_type": "audio",
+      "mse": 0.012829931972789116,
+      "psnr_db": 109.22649008630265,
+      "psnr_unbounded": false,
+      "snr_db": 95.75887056510636,
+      "max_absolute_difference": 1.0,
+      "changed_samples": 5658,
+      "total_samples": 441000,
+      "changed_proportion": 0.012829931972789116,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 1,
+      "channels": [],
+      "extra": {
+        "sample_rate": 44100,
+        "channels": 1,
+        "total_frames": 441000,
+        "duration_seconds": 10.0,
+        "rmse": 0.11326928962781181,
+        "mae": 0.012829931972789116,
+        "changed_percentage": 1.2829931972789117
+      }
+    },
+    "size": {
+      "media_type": "audio",
+      "container": "WAV",
+      "cover": "audio_cover.wav",
+      "stego": "audio-long.wav",
+      "cover_size": 882044,
+      "stego_size": 882044,
+      "final_size": 882044,
+      "difference": 0,
+      "growth_proportion": 0.0,
+      "exact": true,
+      "attempted": false,
+      "inherent": true,
+      "applicable": true,
+      "strategy": "none needed: fixed-width sample storage",
+      "content_unchanged": null,
+      "notes": [
+        "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 1420,
+    "embedded_bytes": 1420,
+    "manifest_bytes": 724
+  },
+  {
+    "id": "audio-large-file",
+    "quality": {
+      "media_type": "audio",
+      "mse": 0.14223809523809525,
+      "psnr_db": 98.77857434413188,
+      "psnr_unbounded": false,
+      "snr_db": 85.3109548229356,
+      "max_absolute_difference": 1.0,
+      "changed_samples": 62727,
+      "total_samples": 441000,
+      "changed_proportion": 0.14223809523809525,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 1,
+      "channels": [],
+      "extra": {
+        "sample_rate": 44100,
+        "channels": 1,
+        "total_frames": 441000,
+        "duration_seconds": 10.0,
+        "rmse": 0.37714466089034754,
+        "mae": 0.14223809523809525,
+        "changed_percentage": 14.223809523809525
+      }
+    },
+    "size": {
+      "media_type": "audio",
+      "container": "WAV",
+      "cover": "audio_cover.wav",
+      "stego": "audio-large-file.wav",
+      "cover_size": 882044,
+      "stego_size": 882044,
+      "final_size": 882044,
+      "difference": 0,
+      "growth_proportion": 0.0,
+      "exact": true,
+      "attempted": false,
+      "inherent": true,
+      "applicable": true,
+      "strategy": "none needed: fixed-width sample storage",
+      "content_unchanged": null,
+      "notes": [
+        "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 15672,
+    "embedded_bytes": 15672,
+    "manifest_bytes": 743
+  },
+  {
+    "id": "audio-robust",
+    "quality": {
+      "media_type": "audio",
+      "mse": 0.03953968253968254,
+      "psnr_db": 104.33840184200474,
+      "psnr_unbounded": false,
+      "snr_db": 90.87078232080844,
+      "max_absolute_difference": 1.0,
+      "changed_samples": 17437,
+      "total_samples": 441000,
+      "changed_proportion": 0.03953968253968254,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 1,
+      "channels": [],
+      "extra": {
+        "sample_rate": 44100,
+        "channels": 1,
+        "total_frames": 441000,
+        "duration_seconds": 10.0,
+        "rmse": 0.1988458763456827,
+        "mae": 0.03953968253968254,
+        "changed_percentage": 3.953968253968254
+      }
+    },
+    "size": {
+      "media_type": "audio",
+      "container": "WAV",
+      "cover": "audio_cover.wav",
+      "stego": "audio-robust.wav",
+      "cover_size": 882044,
+      "stego_size": 882044,
+      "final_size": 882044,
+      "difference": 0,
+      "growth_proportion": 0.0,
+      "exact": true,
+      "attempted": false,
+      "inherent": true,
+      "applicable": true,
+      "strategy": "none needed: fixed-width sample storage",
+      "content_unchanged": null,
+      "notes": [
+        "Sample storage has fixed width. Re-encoding can remove metadata or padding and normalise headers, so whole-file size is not guaranteed. No size adjustment is attempted for WAV or BMP."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 1452,
+    "embedded_bytes": 4356,
+    "manifest_bytes": 773
+  },
+  {
+    "id": "video-text",
+    "quality": {
+      "media_type": "video",
+      "mse": 6.613425925925926e-05,
+      "psnr_db": 89.92653867300079,
+      "psnr_unbounded": false,
+      "snr_db": null,
+      "max_absolute_difference": 1.0,
+      "changed_samples": 5714,
+      "total_samples": 86400000,
+      "changed_proportion": 6.613425925925926e-05,
+      "identical": false,
+      "within_distortion_bound": true,
+      "expected_distortion_bound": 1,
+      "channels": [],
+      "extra": {
+        "width": 640,
+        "height": 360,
+        "frame_count": 125,
+        "frame_rate": 25.0,
+        "cover_codec": "ffv1",
+        "stego_codec": "ffv1",
+        "frames_changed": 1,
+        "worst_frame_index": 22,
+        "worst_frame_mse": 0.008266782407407407,
+        "worst_frame_psnr_db": 68.95743854292023
+      }
+    },
+    "size": {
+      "media_type": "video",
+      "container": "MKV",
+      "cover": "forest-cover.mkv",
+      "stego": "video-text.mkv",
+      "cover_size": 10545753,
+      "stego_size": 10498229,
+      "final_size": 10498229,
+      "difference": -47524,
+      "growth_proportion": -0.0045064586663465375,
+      "exact": false,
+      "attempted": false,
+      "inherent": false,
+      "applicable": false,
+      "strategy": "not applicable: the output is a full re-encode",
+      "content_unchanged": null,
+      "notes": [
+        "A protected clip is re-encoded as FFV1 from the decoded frames, so its size reflects both re-encoding and embedding. A lossy source codec can produce substantially larger lossless output. Source audio is omitted. Exact size matching is not supported for video."
+      ],
+      "details": {}
+    },
+    "envelope_bytes": 1424,
+    "embedded_bytes": 1424,
+    "manifest_bytes": 728
+  }
+]

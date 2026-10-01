@@ -1,0 +1,27 @@
+{
+  "container_format": "PNG",
+  "created": "2026-10-01T16:15:20+00:00",
+  "ecc": null,
+  "encrypted": true,
+  "encryption": {
+    "cipher": "AES-256-GCM",
+    "kdf": "scrypt",
+    "n": 32768,
+    "p": 1,
+    "r": 8,
+    "salt": "9cc015bd0dfaafa0768d108ba0603fc1"
+  },
+  "envelope_length": 1063,
+  "format_version": 2,
+  "lsb_depth": 2,
+  "media_id": "image-encrypted",
+  "media_type": "image",
+  "message_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "message_length": 182,
+  "nonce": "ef7283d4e2ba2e8c3072b974affd4ea2",
+  "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
+  "start_location": null,
+  "start_method": "hmac_prf",
+  "stego_file": "image-encrypted.png",
+  "stego_sha256": "0a5b399b23cfef143b880465bd5bd13ee873f0aef369637f692888541a3f41e6"
+}

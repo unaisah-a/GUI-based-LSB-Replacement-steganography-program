@@ -1,0 +1,55 @@
+{
+  "created_utc": "2026-10-01T16:15:23.640514+00:00",
+  "python": "3.11.16",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "base_revision": "31a508225f270499cf75d395d2c186506305f4e7",
+  "state": "Uncommitted submission generation changes",
+  "originals_sha256": {
+    "audio_cover.wav": "d4e6e7f243ef1218a76dd1183a4f645c19b9a8a2fa05d146095318f5f59c16a7",
+    "encryption_cover.png": "16abdd2605267eaceec3bcf62d01eef689ffd8739debadb6c0111e459eee6c93",
+    "forest-cover.mkv": "f03684e3c5a8a45387cb2419f697c26e993b5ae9727f596937a1b3061a330928",
+    "huge_text_payload .txt": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
+    "image_cover.png": "b3a971752508825d2e76d65fe53cc4fe7aae4373381a0391c55dda455333dc4c",
+    "image_payload.png": "5ba600fef574e1e932331e2e66c8694074a2f57ce969cb8f34505d26b60997d4",
+    "text_payload.txt": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9"
+  },
+  "sender_fingerprint": "54513eac0deaa78903b1c6d07a5fac10f06df1b30610f7891f03bb9532a9be16",
+  "protected_unchanged_by_attacks": true,
+  "capacity_checks": [
+    {
+      "id": "capacity-image",
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/image_payload.png",
+      "depth": 1,
+      "start": 37,
+      "rejected": true,
+      "output_created": false,
+      "reason": "the message does not fit: a 364302-byte message becomes a 365111-byte signed payload, but image_cover.png holds at most 348951 bytes at depth 1 from start 37. The largest message that fits at this depth is about 348142 bytes; a greater depth or a larger cover would raise that"
+    },
+    {
+      "id": "capacity-audio",
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/image_payload.png",
+      "depth": 1,
+      "start": 37,
+      "rejected": true,
+      "output_created": false,
+      "reason": "the message does not fit: a 364302-byte message becomes a 365111-byte signed payload, but audio_cover.wav holds at most 55116 bytes at depth 1 from start 37. The largest message that fits at this depth is about 54307 bytes; a greater depth or a larger cover would raise that"
+    }
+  ],
+  "video": {
+    "width": 640,
+    "height": 360,
+    "frames": 125,
+    "fps": 25.0,
+    "changed_frames": [
+      22
+    ],
+    "claimed_span": [
+      22,
+      22
+    ],
+    "output_video_only": true,
+    "native_playback_tested": false
+  }
+}

@@ -1,0 +1,771 @@
+{
+  "schema": "submission-samples-v1",
+  "notice": "Public demonstration inputs only; not real secrets.",
+  "cases": [
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-short-depth1",
+      "media": "samples/protected/image-short-depth1.png",
+      "manifest": "samples/protected/image-short-depth1.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      },
+      "screenshot": "screenshots/image-short-depth1.png"
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 2,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-short-depth2",
+      "media": "samples/protected/image-short-depth2.png",
+      "manifest": "samples/protected/image-short-depth2.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 3,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-short-depth3",
+      "media": "samples/protected/image-short-depth3.png",
+      "manifest": "samples/protected/image-short-depth3.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 4,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-short-depth4",
+      "media": "samples/protected/image-short-depth4.png",
+      "manifest": "samples/protected/image-short-depth4.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 5,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-short-depth5",
+      "media": "samples/protected/image-short-depth5.png",
+      "manifest": "samples/protected/image-short-depth5.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 6,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-short-depth6",
+      "media": "samples/protected/image-short-depth6.png",
+      "manifest": "samples/protected/image-short-depth6.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 7,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-short-depth7",
+      "media": "samples/protected/image-short-depth7.png",
+      "manifest": "samples/protected/image-short-depth7.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 8,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-short-depth8",
+      "media": "samples/protected/image-short-depth8.png",
+      "manifest": "samples/protected/image-short-depth8.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/text_payload.txt",
+      "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_bytes": 675,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "hmac_prf",
+      "start_location": 982449,
+      "start_secret": "sample-start-2026",
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-long",
+      "media": "samples/protected/image-long.png",
+      "manifest": "samples/protected/image-long.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/image_payload.png",
+      "payload_sha256": "5ba600fef574e1e932331e2e66c8694074a2f57ce969cb8f34505d26b60997d4",
+      "payload_bytes": 364302,
+      "file_payload": true,
+      "lsb_depth": 2,
+      "start_method": "hmac_prf",
+      "start_location": 237964,
+      "start_secret": "sample-start-2026",
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-file",
+      "media": "samples/protected/image-file.png",
+      "manifest": "samples/protected/image-file.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      },
+      "screenshot": "screenshots/image-file.png"
+    },
+    {
+      "cover": "samples/original/encryption_cover.png",
+      "payload": "samples/original/custom_text_payload.txt",
+      "payload_sha256": "de2ce1ac82970e8946604d6cfba8ed196e779e041f21e164f55dff644bb1c0fd",
+      "payload_bytes": 182,
+      "file_payload": false,
+      "lsb_depth": 2,
+      "start_method": "hmac_prf",
+      "start_location": 1086912,
+      "start_secret": "sample-start-2026",
+      "passphrase": "sample-encryption-2026",
+      "repetition": 1,
+      "id": "image-encrypted",
+      "media": "samples/protected/image-encrypted.png",
+      "manifest": "samples/protected/image-encrypted.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      },
+      "screenshot": "screenshots/image-encrypted.png"
+    },
+    {
+      "cover": "samples/original/encryption_cover.png",
+      "payload": "samples/original/audio_cover.wav",
+      "payload_sha256": "d4e6e7f243ef1218a76dd1183a4f645c19b9a8a2fa05d146095318f5f59c16a7",
+      "payload_bytes": 882044,
+      "file_payload": true,
+      "lsb_depth": 3,
+      "start_method": "hmac_prf",
+      "start_location": 73172,
+      "start_secret": "sample-start-2026",
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-audio-file",
+      "media": "samples/protected/image-audio-file.png",
+      "manifest": "samples/protected/image-audio-file.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      },
+      "screenshot": "screenshots/image-audio-file.png"
+    },
+    {
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/text_payload.txt",
+      "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_bytes": 675,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "audio-long",
+      "media": "samples/protected/audio-long.wav",
+      "manifest": "samples/protected/audio-long.wav.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      },
+      "screenshot": "screenshots/audio-long.png"
+    },
+    {
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/huge_text_payload .txt",
+      "payload_sha256": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
+      "payload_bytes": 14852,
+      "file_payload": true,
+      "lsb_depth": 1,
+      "start_method": "hmac_prf",
+      "start_location": 88574,
+      "start_secret": "sample-start-2026",
+      "passphrase": null,
+      "repetition": 1,
+      "id": "audio-large-file",
+      "media": "samples/protected/audio-large-file.wav",
+      "manifest": "samples/protected/audio-large-file.wav.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/text_payload.txt",
+      "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_bytes": 675,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 3,
+      "id": "audio-robust",
+      "media": "samples/protected/audio-robust.wav",
+      "manifest": "samples/protected/audio-robust.wav.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/forest-cover.mkv",
+      "payload": "samples/original/text_payload.txt",
+      "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_bytes": 675,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "hmac_prf",
+      "start_location": 15872274,
+      "start_secret": "sample-start-2026",
+      "passphrase": null,
+      "repetition": 1,
+      "id": "video-text",
+      "media": "samples/protected/video-text.mkv",
+      "manifest": "samples/protected/video-text.mkv.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Protected positive",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      },
+      "screenshot": "screenshots/video-text.png"
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-message-corrupt",
+      "media": "samples/tampered/image-message-corrupt.png",
+      "manifest": "samples/protected/image-short-depth1.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Inverted byte 52 of the envelope's message section, which is covered by the signature.",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Not performed",
+        "manifest_matches_record": "Not performed",
+        "payload_matches_record": "Not performed"
+      },
+      "screenshot": "screenshots/image-message-corrupt.png"
+    },
+    {
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/text_payload.txt",
+      "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_bytes": 675,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "audio-signature-corrupt",
+      "media": "samples/tampered/audio-signature-corrupt.wav",
+      "manifest": "samples/protected/audio-long.wav.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Inverted byte 192 of the envelope's signature section, which is covered by the signature.",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Not performed",
+        "manifest_matches_record": "Not performed",
+        "payload_matches_record": "Not performed"
+      },
+      "screenshot": "screenshots/audio-signature-corrupt.png"
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-outside-payload",
+      "media": "samples/tampered/image-outside-payload.png",
+      "manifest": "samples/protected/image-short-depth1.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Inverted 64 samples starting at sample 6933, which is past the end of the payload region. Verification is expected to succeed: it authenticates the signed message, not the whole file.",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      },
+      "screenshot": "screenshots/image-outside-payload.png"
+    },
+    {
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/text_payload.txt",
+      "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_bytes": 675,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "audio-repetition1-damage1",
+      "media": "samples/tampered/audio-repetition1-damage1.wav",
+      "manifest": "samples/protected/audio-long.wav.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Last signature bit flipped in 1 stored copies",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Not performed",
+        "manifest_matches_record": "Not performed",
+        "payload_matches_record": "Not performed"
+      }
+    },
+    {
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/text_payload.txt",
+      "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_bytes": 675,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 3,
+      "id": "audio-repetition3-damage1",
+      "media": "samples/tampered/audio-repetition3-damage1.wav",
+      "manifest": "samples/protected/audio-robust.wav.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "AUTHENTIC"
+      ],
+      "minimum_corrections": 1,
+      "purpose": "Last signature bit flipped in 1 stored copies",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Yes",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Yes"
+      },
+      "screenshot": "screenshots/audio-repetition3-damage1.png"
+    },
+    {
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/text_payload.txt",
+      "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_bytes": 675,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 3,
+      "id": "audio-repetition3-damage2",
+      "media": "samples/tampered/audio-repetition3-damage2.wav",
+      "manifest": "samples/protected/audio-robust.wav.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Last signature bit flipped in 2 stored copies",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Not performed",
+        "manifest_matches_record": "Not performed",
+        "payload_matches_record": "Not performed"
+      },
+      "screenshot": "screenshots/audio-repetition3-damage2.png"
+    },
+    {
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/short_text_payload.txt",
+      "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
+      "payload_bytes": 105,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "image-short-depth1-hash-mismatch",
+      "media": "samples/protected/image-short-depth1.png",
+      "manifest": "samples/tampered/image-short-depth1-hash-mismatch.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "TAMPERED"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Only external message hash changed",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "No",
+        "manifest_matches_record": "No",
+        "payload_matches_record": "Yes"
+      },
+      "screenshot": "screenshots/image-short-depth1-hash-mismatch.png"
+    },
+    {
+      "cover": "samples/original/encryption_cover.png",
+      "payload": "samples/original/custom_text_payload.txt",
+      "payload_sha256": "de2ce1ac82970e8946604d6cfba8ed196e779e041f21e164f55dff644bb1c0fd",
+      "payload_bytes": 182,
+      "file_payload": false,
+      "lsb_depth": 2,
+      "start_method": "hmac_prf",
+      "start_location": 1086912,
+      "start_secret": "sample-start-2026",
+      "passphrase": "sample-encryption-2026",
+      "repetition": 1,
+      "id": "image-encrypted-hash-mismatch",
+      "media": "samples/protected/image-encrypted.png",
+      "manifest": "samples/tampered/image-encrypted-hash-mismatch.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "TAMPERED"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Only external message hash changed",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "No",
+        "manifest_matches_record": "No",
+        "payload_matches_record": "Yes"
+      }
+    },
+    {
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/text_payload.txt",
+      "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
+      "payload_bytes": 675,
+      "file_payload": false,
+      "lsb_depth": 1,
+      "start_method": "manual",
+      "start_location": 37,
+      "start_secret": null,
+      "passphrase": null,
+      "repetition": 1,
+      "id": "audio-wrong-key",
+      "media": "samples/protected/audio-long.wav",
+      "manifest": "samples/protected/audio-long.wav.manifest.json",
+      "public_key": "keys/public/unrelated_public.pem",
+      "expected_verdicts": [
+        "SIGNATURE_INVALID"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Unchanged media; unrelated key",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Not performed",
+        "manifest_matches_record": "Not performed",
+        "payload_matches_record": "Not performed"
+      }
+    },
+    {
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/huge_text_payload .txt",
+      "payload_sha256": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
+      "payload_bytes": 14852,
+      "file_payload": true,
+      "lsb_depth": 1,
+      "start_method": "hmac_prf",
+      "start_location": 88574,
+      "start_secret": "sample-wrong-start-0",
+      "passphrase": null,
+      "repetition": 1,
+      "id": "audio-wrong-start",
+      "media": "samples/protected/audio-large-file.wav",
+      "manifest": "samples/protected/audio-large-file.wav.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "PAYLOAD_MISSING",
+        "CANNOT_VERIFY",
+        "SIGNATURE_INVALID"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Unchanged media; distinct derived location",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Not performed",
+        "manifest_matches_record": "Not performed",
+        "payload_matches_record": "Not performed"
+      }
+    },
+    {
+      "cover": "samples/original/encryption_cover.png",
+      "payload": "samples/original/custom_text_payload.txt",
+      "payload_sha256": "de2ce1ac82970e8946604d6cfba8ed196e779e041f21e164f55dff644bb1c0fd",
+      "payload_bytes": 182,
+      "file_payload": false,
+      "lsb_depth": 2,
+      "start_method": "hmac_prf",
+      "start_location": 1086912,
+      "start_secret": "sample-start-2026",
+      "passphrase": "sample-wrong-passphrase",
+      "repetition": 1,
+      "id": "image-wrong-passphrase",
+      "media": "samples/protected/image-encrypted.png",
+      "manifest": "samples/protected/image-encrypted.png.manifest.json",
+      "public_key": "keys/public/submission_public.pem",
+      "expected_verdicts": [
+        "CANNOT_VERIFY"
+      ],
+      "minimum_corrections": 0,
+      "purpose": "Unchanged media; wrong decryption passphrase",
+      "expected_hash_checks": {
+        "payload_matches_manifest": "Not performed",
+        "manifest_matches_record": "Yes",
+        "payload_matches_record": "Not performed"
+      }
+    }
+  ],
+  "capacity_cases": [
+    {
+      "id": "capacity-image",
+      "cover": "samples/original/image_cover.png",
+      "payload": "samples/original/image_payload.png",
+      "depth": 1,
+      "start": 37,
+      "rejected": true,
+      "output_created": false,
+      "reason": "the message does not fit: a 364302-byte message becomes a 365111-byte signed payload, but image_cover.png holds at most 348951 bytes at depth 1 from start 37. The largest message that fits at this depth is about 348142 bytes; a greater depth or a larger cover would raise that"
+    },
+    {
+      "id": "capacity-audio",
+      "cover": "samples/original/audio_cover.wav",
+      "payload": "samples/original/image_payload.png",
+      "depth": 1,
+      "start": 37,
+      "rejected": true,
+      "output_created": false,
+      "reason": "the message does not fit: a 364302-byte message becomes a 365111-byte signed payload, but audio_cover.wav holds at most 55116 bytes at depth 1 from start 37. The largest message that fits at this depth is about 54307 bytes; a greater depth or a larger cover would raise that"
+    }
+  ]
+}

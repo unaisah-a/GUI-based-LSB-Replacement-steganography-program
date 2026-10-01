@@ -1,2 +1,5 @@
 # Preserve sample and manifest bytes.
 samples/** -text whitespace=cr-at-eol
+# Preserve checksummed evidence and public-key bytes across checkouts.
+evidence/** -text whitespace=cr-at-eol
+keys/public/*.pem -text whitespace=cr-at-eol

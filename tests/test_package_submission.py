@@ -28,7 +28,7 @@ def repository(tmp_path):
              ".gitignore", ".gitattributes", "AGENTS.md"}
     for entry in package_submission.INCLUDED:
         _write(root, entry if entry in files else f"{entry}/placeholder.txt")
-    _write(root, "keys/public/samples_public.pem", PUBLIC_PEM)
+    _write(root, "keys/public/fixture_public.pem", PUBLIC_PEM)
     _write(root, "keys/public/demo_public.pem", PUBLIC_PEM)
     _write(root, "keys/demo_private/demo_private.pem", PRIVATE_PEM)
     _write(root, ".venv/Lib/site-packages/numpy/big.dll")
@@ -37,6 +37,7 @@ def repository(tmp_path):
     _write(root, ".pytest_out.txt")
     _write(root, "evidence/logs/application.log")
     _write(root, "evidence/results/e2e_results.md")
+    _write(root, "evidence/logs/verification.json", b"{}")
     _write(root, "samples/r11/unrelated.txt")
     _write(root, "samples/protected/example.png")
     _write(root, "scripts/release_samples.txt", b"samples/protected/example.png\n")
@@ -51,10 +52,11 @@ class TestCollect:
     def test_the_included_content_is_packaged(self, repository):
         names = _names(repository)
         assert "main.py" in names
-        assert "keys/public/samples_public.pem" in names
+        assert "keys/public/fixture_public.pem" in names
         assert "evidence/results/e2e_results.md" in names
+        assert "evidence/logs/verification.json" in names
         assert "samples/protected/example.png" in names
-        assert ".gitattributes" in names
+        assert "requirements.txt" in names
 
     @pytest.mark.parametrize(
         "excluded",
@@ -67,9 +69,19 @@ class TestCollect:
             ".pytest_out.txt",
             "evidence/logs/application.log",
             "samples/r11/unrelated.txt",
+            "tests/test_example.py",
+            "AGENTS.md",
+            "pytest.ini",
+            ".github/workflows/ci.yml",
+            ".git/config",
+            ".gitignore",
+            ".gitattributes",
+            "app/AGENTS.md",
+            "scripts/.github/workflows/ci.yml",
         ],
     )
     def test_everything_else_stays_out(self, repository, excluded):
+        _write(repository, excluded)
         assert excluded not in _names(repository)
 
     def test_logs_only_on_request(self, repository):
@@ -89,8 +101,8 @@ class TestCollect:
             collect(repository)
 
     def test_a_missing_root_is_an_error(self, repository):
-        (repository / "pytest.ini").unlink()
-        with pytest.raises(PackagingError, match=r"pytest.ini"):
+        (repository / "requirements.txt").unlink()
+        with pytest.raises(PackagingError, match=r"requirements.txt"):
             collect(repository)
 
 
@@ -124,4 +136,5 @@ def test_the_real_repository_packages_without_private_keys():
     package_submission.check_no_private_keys(package_submission.REPOSITORY_ROOT, files)
     names = {path.as_posix() for path in files}
     assert not any(name.startswith(("keys/demo_private", ".venv", ".git/")) for name in names)
-    assert "keys/public/samples_public.pem" in names
+    assert "keys/public/.gitkeep" in names
+    assert "keys/public/samples_public.pem" not in names

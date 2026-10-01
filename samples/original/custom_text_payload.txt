@@ -1,0 +1,1 @@
+FICTIONAL DEMONSTRATION: the release team shares a draft media approval message. Encryption keeps the message confidential, while its signature and SHA-256 hash verify its integrity.

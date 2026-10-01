@@ -13,6 +13,15 @@ from scripts.check_release_package import check, inspect_archive
     ("C:/absolute", b"x", "Unsafe"),
     ("samples/practice.png", b"x", "Excluded"),
     (".venv-x/secret", b"x", "Excluded"),
+    ("tests/test_example.py", b"x", "Excluded"),
+    ("AGENTS.md", b"x", "Excluded"),
+    ("pytest.ini", b"x", "Excluded"),
+    (".github/workflows/ci.yml", b"x", "Excluded"),
+    (".git/config", b"x", "Excluded"),
+    (".gitignore", b"x", "Excluded"),
+    (".gitattributes", b"x", "Excluded"),
+    ("app/AGENTS.md", b"x", "Excluded"),
+    ("scripts/.github/workflows/ci.yml", b"x", "Excluded"),
     ("app/key", b"-----BEGIN RSA PRIVATE KEY-----", "Private key"),
     ("main.py", b"stale", "differs"),
 ])
@@ -51,11 +60,12 @@ def test_empty_sample_archive_passes_source_checks_but_is_not_submission_ready(t
     # Copy application inputs but construct empty samples independently of real samples.
     source = tmp_path / "source"
     for relative in collect(REPOSITORY_ROOT):
-        if relative.parts[0] == "samples":
+        if relative.parts[0] in {"samples", "evidence"}:
             continue
         destination = source / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(REPOSITORY_ROOT / relative, destination)
+    (source / "evidence").mkdir()
     inventory = []
     for name in ("original", "protected", "tampered"):
         relative = f"samples/{name}/.gitkeep"

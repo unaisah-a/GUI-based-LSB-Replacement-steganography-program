@@ -102,8 +102,80 @@ samples/
   tampered/    Modified copies for verification tests
 ```
 
-Use the matching public key from `keys/public/` when verifying a sample. Select
-the protected file's matching `.manifest.json` when verifying a tampered copy.
+Use **`keys/public/submission_public.pem`** for all supplied samples. The separate
+`unrelated_public.pem` is deliberately incorrect and is used only for the wrong-key
+test. You do not need the private key to verify or recover these payloads.
+
+These are **public demonstration inputs**, not passwords for real information:
+
+- Derived start secret: `sample-start-2026`.
+- Encryption passphrase: `sample-encryption-2026` (only `image-encrypted`).
+- Manual-start examples use location 37, recorded in their manifests.
+
+Each protected file has a same-named `.manifest.json` beside it. All rows below
+should return **AUTHENTIC**, with matching payload hashes:
+
+| Protected filename (without extension) | Original cover | Payload | Settings |
+| --- | --- | --- | --- |
+| `image-short-depth1` through `image-short-depth8` | `image_cover.png` | `short_text_payload.txt` | Depth 1–8, manual start |
+| `image-long` | `image_cover.png` | `text_payload.txt` | Depth 1, derived start, size matching requested |
+| `image-file` | `image_cover.png` | `image_payload.png` | Depth 2, derived start, image file recovery |
+| `image-encrypted` | `encryption_cover.png` | `custom_text_payload.txt` | Depth 2, derived start, encrypted text |
+| `image-audio-file` | `encryption_cover.png` | `audio_cover.wav` | Depth 3, derived start, audio file recovery |
+| `audio-long` | `audio_cover.wav` | `text_payload.txt` | Depth 1, manual start |
+| `audio-large-file` | `audio_cover.wav` | `huge_text_payload .txt` | Depth 1, derived start, exact file recovery |
+| `audio-robust` | `audio_cover.wav` | `text_payload.txt` | Depth 1, manual start, repetition-3 |
+| `video-text` | `forest-cover.mkv` | `text_payload.txt` | Depth 1, derived start |
+
+Image outputs use `.png`, audio outputs `.wav` and video output `.mkv`. The space
+before `.txt` in `huge_text_payload .txt` is intentional: the supplied filename is
+preserved. Payload source files and cover files are both under `samples/original/`.
+Size matching is a request, not a guarantee; actual sizes are in the evidence.
+
+### Tampered examples
+
+Choose the original protected file's manifest explicitly after selecting a tampered
+media file. Use the same public key and demonstration inputs as the protected source.
+
+| Tampered filename (without extension) | Protected source / manifest | Expected result |
+| --- | --- | --- |
+| `image-message-corrupt` | `image-short-depth1` | SIGNATURE_INVALID |
+| `audio-signature-corrupt` | `audio-long` | SIGNATURE_INVALID |
+| `audio-repetition1-damage1` | `audio-long` | SIGNATURE_INVALID |
+| `audio-repetition3-damage1` | `audio-robust` | AUTHENTIC, one corrected bit |
+| `audio-repetition3-damage2` | `audio-robust` | SIGNATURE_INVALID |
+| `image-outside-payload` | `image-short-depth1` | AUTHENTIC; edit is outside the signed payload |
+
+The two `*-hash-mismatch.manifest.json` files in `samples/tampered/` are modified
+manifests. Pair each with its named, unchanged protected media file. Both produce
+**TAMPERED** and withhold recovery, even though the embedded signature remains valid.
+
+Additional cases verify unchanged media with an unrelated key, a wrong derived-start
+secret (`sample-wrong-start-0`) or a wrong encryption passphrase
+(`sample-wrong-passphrase`). See the case index for the exact settings and recorded
+failure verdicts. For capacity rejection, select `image_payload.png` as a file
+payload in either `image_cover.png` or `audio_cover.wav` at depth 1 and manual start
+37. Neither attempt fits; no protected output is created.
+
+### Check all samples
+
+From the project folder, using the installed environment:
+
+```powershell
+.venv/Scripts/python -m scripts.verify_submission_samples --report tmp/sample-check.json --recovered tmp/recovered-samples
+```
+
+On macOS/Linux, use `.venv/bin/python`. Choose new report and recovery paths on each
+run. Expected: **27 verification cases and two capacity checks pass**, with 18
+exact recovered payloads and no private-key use.
+
+[evidence/verification-results.csv](evidence/verification-results.csv) lists each
+expected and actual result. [evidence/case-index.json](evidence/case-index.json)
+maps files, manifests, keys and inputs. Detailed logs and screenshots are under
+`evidence/logs/` and `evidence/screenshots/`. Screenshots are fresh automated
+captures of the real app; they do not document the earlier demo or establish native
+media playback. File checksums detect changed submission inputs; key trust still
+requires checking the sender's fingerprint.
 
 ## Verification limits
 

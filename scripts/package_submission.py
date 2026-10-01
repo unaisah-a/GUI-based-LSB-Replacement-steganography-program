@@ -10,12 +10,12 @@ Only the paths in :data:`INCLUDED` are packaged. Samples must also appear in
 the included paths, anything matching
 :data:`EXCLUDED_NAMES` or :data:`EXCLUDED_PATHS` is left out: the virtual
 environment, caches, the local demo key pair, and the local application logs. The
-logs hold tracebacks from development runs with local paths in them; they are not
-evidence. Pass ``--include-logs`` to package them anyway.
+runtime application log holds local diagnostics. Pass ``--include-logs`` to package
+it anyway. Fresh verification reports under evidence/logs are always included.
 
 As a last check, the build refuses to finish if any packaged file contains a PEM
-private key. Samples are being replaced; archive creation alone does not establish
-submission readiness. Generate keys from *Keys → Generate demo key pair*.
+private key. Archive creation alone does not establish submission readiness;
+run the release checker to validate the packaged samples and application.
 """
 
 from __future__ import annotations
@@ -33,21 +33,15 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 #: Directories and files packaged, relative to the repository root.
 INCLUDED: tuple[str, ...] = (
     "app",
-    "tests",
     "samples",
     "scripts",
     "keys/public",
     "evidence",
     "assets",
-    ".github",
     "main.py",
     "requirements.txt",
     "pyproject.toml",
-    "pytest.ini",
     "README.md",
-    ".gitignore",
-    ".gitattributes",
-    "AGENTS.md",
 )
 
 #: Any path component with one of these names is skipped wherever it appears.
@@ -55,6 +49,11 @@ EXCLUDED_NAMES: frozenset[str] = frozenset(
     {
         ".venv",
         ".git",
+        ".github",
+        ".gitignore",
+        ".gitattributes",
+        "AGENTS.md",
+        "pytest.ini",
         ".hypothesis",
         ".ruff_cache",
         ".pytest_cache",
@@ -69,10 +68,9 @@ EXCLUDED_NAMES: frozenset[str] = frozenset(
 #: Specific paths skipped, relative to the root, in POSIX form.
 EXCLUDED_PATHS: frozenset[str] = frozenset(
     {
+        "tests",
         "keys/demo_private",
-        # The public half of the local demo key pair. Its private half is not
-        # packaged, so it could verify nothing and would only pre-fill the Verify tab
-        # with a key the marker does not hold.
+        # The local default is copied to submission_public.pem for receiver use.
         "keys/public/demo_public.pem",
     }
 )
@@ -103,7 +101,7 @@ def collect(root: Path, *, include_logs: bool = False) -> list[PurePosixPath]:
 
     :raises PackagingError: an included path does not exist.
     """
-    excluded_paths = EXCLUDED_PATHS | (frozenset() if include_logs else {LOG_DIRECTORY})
+    excluded_paths = EXCLUDED_PATHS | (frozenset() if include_logs else {f"{LOG_DIRECTORY}/application.log"})
     missing = [entry for entry in INCLUDED if not (root / entry).exists()]
     if missing:
         raise PackagingError(f"missing from the repository: {', '.join(missing)}")
@@ -181,7 +179,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--include-logs",
         action="store_true",
-        help=f"also package {LOG_DIRECTORY}/ (local runs; off by default)",
+        help=f"also package {LOG_DIRECTORY}/application.log (off by default)",
     )
     arguments = parser.parse_args(argv)
 
