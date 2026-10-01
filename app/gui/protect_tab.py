@@ -37,6 +37,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
     QFormLayout,
+    QGraphicsOpacityEffect,
     QGroupBox,
     QHBoxLayout,
     QLabel,
@@ -236,8 +237,11 @@ class ProtectTab(QWidget):
         self.start_location_spin = QSpinBox(settings)
         self.start_location_spin.setRange(0, 2_000_000_000)
         self.start_location_spin.setValue(0)
+        self.start_location_opacity = QGraphicsOpacityEffect(self.start_location_spin)
+        self.start_location_spin.setGraphicsEffect(self.start_location_opacity)
         self.start_location_spin.valueChanged.connect(self._update_readout)
-        form.addRow("Start location:", self.start_location_spin)
+        self.start_location_label = QLabel("Start location:", settings)
+        form.addRow(self.start_location_label, self.start_location_spin)
 
         self.encrypt_check = QCheckBox("Encrypt the message (AES-256-GCM)", settings)
         self.encrypt_check.toggled.connect(self._refresh_encryption_controls)
@@ -452,6 +456,12 @@ class ProtectTab(QWidget):
     def _refresh_start_controls(self) -> None:
         manual = self.start_method == constants.START_METHOD_MANUAL
         self.start_location_spin.setEnabled(manual)
+        self.start_location_label.setEnabled(manual)
+        self.start_location_opacity.setOpacity(1.0 if manual else 0.4)
+        self.start_location_spin.setToolTip(
+            "Choose the sample where embedding begins."
+            if manual else "Calculated automatically from your start secret."
+        )
         self.start_secret_edit.setEnabled(not manual)
         self._update_readout()
 

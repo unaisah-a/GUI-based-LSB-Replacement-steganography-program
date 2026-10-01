@@ -4,7 +4,7 @@ This is the living source of truth for the agreed consolidation scope and implem
 
 ## Current authorization and state
 
-- Latest authorised execution scope: **P01: commit and push the completed F01 fix and demo documentation**, explicitly requested by the user. Preserve generated practice outputs locally. S01 remains complete and S02 remains unauthorised.
+- Latest authorised execution scope: **F02: visibly fade and disable Protect's start location in secret-derived mode, then commit and push the change**, explicitly requested by the user. S01 remains complete and S02 remains unauthorised.
 - Integration branch: `integration/acw1-consolidated`.
 - Current integration workspace: `A:/Code/GUI-based-LSB-Replacement-steganography-program` (historical setup used `C:/Code/INF2005-ACW1-consolidated`).
 - Original worktree: `C:/Code/GUI-based-LSB-Replacement-steganography-program`, on `gin`.
@@ -133,6 +133,15 @@ Allowed statuses: TODO, IN_PROGRESS, BLOCKED, DONE. DONE requires acceptance evi
 | V01 | Prepare forest video cover | User-supplied MP4 and retained video workflow | DONE | New short lossless MKV without modifying source; valid dimensions/timing, successful signed text round trip, exact recovery and frame-location check; actual evidence and GUI limits recorded |
 | D06 | Diagnose disabled Attack Lab secret fields | User's open app and current manifest | DONE | Inspect current native state and manifest; explain expected disabling or identify a reproducible defect |
 | F01 | Keep Attack Lab secret fields editable | User correction after D06 | DONE | No manifest-based locking; hints follow typed/picked manifests and clear; keyboard editing survives all manifest types and wrong-input actions; focused tests and lint pass |
+
+### F02 work record
+
+- Status: DONE. The already-disabled start-location control is visibly faded in derived mode and restored in manual mode.
+- Changes: added explicit opacity for the number box, disabled its label alongside it, and added a mode-specific tooltip.
+- Publication scope: user authorised commit and push on 1 October 2026; include only `app/gui/protect_tab.py` and this ledger. The untracked `samples/t07/party-a/original/image_stego.png` and its manifest are generated user outputs and remain local.
+- Evidence: Windows PowerShell, `.venv` Python 3.11.16, base HEAD `567cced2ddfa9aeb50b6690a92d5bc4ae48a3cf6` plus this application/documentation patch in `C:/Code/INF2005-ACW1-consolidated` (initial working tree clean). `.venv/Scripts/python.exe -m pytest tests/test_gui_tabs.py -q -p no:cacheprovider`: 75 passed in 8.66s. Initial run reached the end but failed writing the existing pytest cache with WinError 5; disabling cache resolved it. `.venv/Scripts/python.exe -m ruff check app/gui/protect_tab.py` and `git diff --check`: PASS.
+- Visual check: rendered both modes using offscreen Qt and inspected `tmp/f02-derived.png` and `tmp/f02-manual.png`; field/label fading and restoration are visible. Offscreen fonts rendered as boxes, so this does not establish native text appearance.
+- Remaining: no implementation work. Restart an already-running app to load the change. No native app restart or full-suite run performed.
 
 ### P01 publication record
 
