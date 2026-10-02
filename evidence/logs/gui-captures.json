@@ -139,5 +139,12 @@
       "horizontal_overflow": 0,
       "vertical_overflow": 0
     }
-  ]
+  ],
+  "payload_refresh": {
+    "created_utc": "2026-10-02T08:03:08.048869+00:00",
+    "updated_capture": "capacity-audio",
+    "all_15_operations_rerun": true,
+    "other_published_captures": "Retained unchanged; their inputs are unchanged",
+    "command": ".venv-t08/Scripts/python.exe -m scripts.capture_submission_evidence --output tmp/payload-reconciliation-632eb93-v2/screenshots --report tmp/payload-reconciliation-632eb93-v2/gui-captures.json"
+  }
 }

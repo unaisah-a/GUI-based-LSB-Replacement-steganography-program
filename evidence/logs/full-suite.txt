@@ -25,4 +25,4 @@
 ........................................................................ [ 96%]
 ...........................................................              [100%]
 - generated xml file: A:\Code\GUI-based-LSB-Replacement-steganography-program\evidence\logs\full-suite.xml -
-1859 passed in 52.32s
+1859 passed in 54.09s

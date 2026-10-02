@@ -851,26 +851,26 @@
     "id": "audio-large-file",
     "quality": {
       "media_type": "audio",
-      "mse": 0.14223809523809525,
-      "psnr_db": 98.77857434413188,
+      "mse": 1.2600521541950114,
+      "psnr_db": 89.30484841125882,
       "psnr_unbounded": false,
-      "snr_db": 85.3109548229356,
-      "max_absolute_difference": 1.0,
-      "changed_samples": 62727,
+      "snr_db": 75.83722889006252,
+      "max_absolute_difference": 3.0,
+      "changed_samples": 184379,
       "total_samples": 441000,
-      "changed_proportion": 0.14223809523809525,
+      "changed_proportion": 0.41809297052154193,
       "identical": false,
       "within_distortion_bound": true,
-      "expected_distortion_bound": 1,
+      "expected_distortion_bound": 3,
       "channels": [],
       "extra": {
         "sample_rate": 44100,
         "channels": 1,
         "total_frames": 441000,
         "duration_seconds": 10.0,
-        "rmse": 0.37714466089034754,
-        "mae": 0.14223809523809525,
-        "changed_percentage": 14.223809523809525
+        "rmse": 1.1225204471166712,
+        "mae": 0.6630408163265306,
+        "changed_percentage": 41.80929705215419
       }
     },
     "size": {
@@ -894,8 +894,8 @@
       ],
       "details": {}
     },
-    "envelope_bytes": 15672,
-    "embedded_bytes": 15672,
+    "envelope_bytes": 61588,
+    "embedded_bytes": 61588,
     "manifest_bytes": 743
   },
   {

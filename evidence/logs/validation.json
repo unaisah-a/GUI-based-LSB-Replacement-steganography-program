@@ -1,16 +1,16 @@
 {
   "passed": true,
-  "created_utc": "2026-10-01T16:39:16.370104+00:00",
+  "created_utc": "2026-10-02T08:03:08.049638+00:00",
   "python": "3.11.16",
   "platform": "Windows-10-10.0.26200-SP0",
-  "base_revision": "31a508225f270499cf75d395d2c186506305f4e7",
-  "working_tree": "Uncommitted submission sample/evidence implementation and requested packaging exclusions",
+  "base_revision": "632eb93",
+  "working_tree": "Uncommitted sample reconciliation for the new 60,768-byte text payload; application code unchanged",
   "full_suite": {
     "command": ".venv-t08/Scripts/python.exe -m pytest --no-qt-log -q --junitxml=evidence/logs/full-suite.xml",
     "tests": 1859,
     "failures": 0,
     "errors": 0,
-    "seconds": 52.32
+    "seconds": 54.09
   },
   "checks": [
     {
@@ -111,14 +111,14 @@
     "requirements.txt": "9d70523ca22f0f76ca8c72ac6e35fc581774b0b62fbf823d7f407de3cedef2d0",
     "scripts/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "scripts/build_sample_bundle.py": "a1f83eb0d315ebaf12fff171e283fc4076cc3c43605d648f4506697955fca74c",
-    "scripts/capture_submission_evidence.py": "bd08dc7bb5a0be2cc7470c4519854cd2e4731312d573d9fd1e04129960a1e94d",
+    "scripts/capture_submission_evidence.py": "e8789a0a29e5fba9b511954d5b25aef332336582b8e5f70673c932eac8214735",
     "scripts/check_receiver_isolation.py": "3d1526ea1904ff6b7c850c20789c0c63add09847e48709a282f7c4d76e8d7030",
     "scripts/check_release_package.py": "6b5fcdc49eac31c89a64dcfc753730684fca4bf291ddb0427d0342351591221c",
     "scripts/create_test_audio.py": "a10e2f12c901f0a689878dc8f10c42e0c181f7be8b7cb00dfe89269732324021",
     "scripts/evaluate_challenges.py": "8552cb53543169bdad26715caee956fe7c5c6ffbad763e5bedf2d75a1669cc35",
     "scripts/evaluate_preservation.py": "e85437e8caf29bf633703818467aff8640a90f641298b8ba4d4f0ef727d4faef",
     "scripts/generate_samples.py": "643c4e1d157294db49654d8517f1661e9c61b8edfdb23db7cc34f1be652a7d69",
-    "scripts/generate_submission_samples.py": "cdf50916c4d271bcf7d8e7816f8306c5cb82e2809facfc57c4c520c6bb92b6e5",
+    "scripts/generate_submission_samples.py": "7bf3b468b89d58cfa37fdfdbc19f7300c91ed60bb377355d08f1f90e4b2b690d",
     "scripts/package_submission.py": "70bd2e7c0e4f901ca7bc15dfc4ab7aaf4691d27089cbb781fcfcf86fb65942f9",
     "scripts/probe_release.py": "35e09c1ae3fba6122e5ffaf86b5b79fcee45029ef24024c5eb11b264c58c75ae",
     "scripts/verify_sample_bundle.py": "67f9df7d1764f3bd48c4a8ed4821a68b9d18ac10e6bd31806be9563003630bb4",
@@ -165,7 +165,7 @@
   "existing_key_pair_unchanged": true,
   "public_key_copy_byte_identical": true,
   "screenshots_visually_reviewed": true,
-  "screenshot_review": "All 15 layouts reviewed in an overview; encrypted recovery, image payload, capacity and repetition examples inspected at full resolution. Offscreen Windows fonts explicitly loaded; tab overflow is zero. Native playback was not tested.",
+  "screenshot_review": "All 15 layouts reviewed in an overview; encrypted recovery, image payload, capacity and repetition examples inspected at full resolution. Offscreen Windows fonts explicitly loaded; tab overflow is zero. Native playback was not tested. Payload refresh: replaced only capacity-audio after viewing the new full-size capture; 60,768-byte file, depth 1, capacity refusal and controls are readable with zero tab overflow. Other published screenshots are unchanged.",
   "private_key_in_submission": false,
   "historical_evidence_backup": "tmp/submission-backup-20261002 (excluded from submission)",
   "notes": [
@@ -173,5 +173,15 @@
     "Clean dependency installation not repeated; existing pinned environment reused.",
     "Archive verification report is external to the archive and records its final hash.",
     "Tests, pytest.ini, AGENTS.md and Git/GitHub configuration are excluded from the submission archive. Test source hashes remain as development validation evidence; archive source matching checks distributed source only."
-  ]
+  ],
+  "payload_refresh": {
+    "original_matches_commit": "632eb93",
+    "original_bytes": 60768,
+    "audio_large_file_depth": 2,
+    "exact_recovery": true,
+    "wrong_start_verdict": "PAYLOAD_MISSING",
+    "capacity_depth1_rejected_without_outputs": true,
+    "other_samples_and_public_keys_unchanged": true,
+    "backup": "tmp/payload-reconciliation-632eb93-v2/backup"
+  }
 }

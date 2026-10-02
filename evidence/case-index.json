@@ -361,12 +361,12 @@
     {
       "cover": "samples/original/audio_cover.wav",
       "payload": "samples/original/huge_text_payload .txt",
-      "payload_sha256": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
-      "payload_bytes": 14852,
+      "payload_sha256": "99c574c147dc2341cffe329d67a884ac23b7f71d2772a54bd76d9e84929162e7",
+      "payload_bytes": 60768,
       "file_payload": true,
-      "lsb_depth": 1,
+      "lsb_depth": 2,
       "start_method": "hmac_prf",
-      "start_location": 88574,
+      "start_location": 69865,
       "start_secret": "sample-start-2026",
       "passphrase": null,
       "repetition": 1,
@@ -692,12 +692,12 @@
     {
       "cover": "samples/original/audio_cover.wav",
       "payload": "samples/original/huge_text_payload .txt",
-      "payload_sha256": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
-      "payload_bytes": 14852,
+      "payload_sha256": "99c574c147dc2341cffe329d67a884ac23b7f71d2772a54bd76d9e84929162e7",
+      "payload_bytes": 60768,
       "file_payload": true,
-      "lsb_depth": 1,
+      "lsb_depth": 2,
       "start_method": "hmac_prf",
-      "start_location": 88574,
+      "start_location": 69865,
       "start_secret": "sample-wrong-start-0",
       "passphrase": null,
       "repetition": 1,
@@ -760,12 +760,12 @@
     {
       "id": "capacity-audio",
       "cover": "samples/original/audio_cover.wav",
-      "payload": "samples/original/image_payload.png",
+      "payload": "samples/original/huge_text_payload .txt",
       "depth": 1,
       "start": 37,
       "rejected": true,
       "output_created": false,
-      "reason": "the message does not fit: a 364302-byte message becomes a 365111-byte signed payload, but audio_cover.wav holds at most 55116 bytes at depth 1 from start 37. The largest message that fits at this depth is about 54307 bytes; a greater depth or a larger cover would raise that"
+      "reason": "the message does not fit: a 60768-byte message becomes a 61582-byte signed payload, but audio_cover.wav holds at most 55116 bytes at depth 1 from start 37. The largest message that fits at this depth is about 54302 bytes; a greater depth or a larger cover would raise that"
     }
   ]
 }

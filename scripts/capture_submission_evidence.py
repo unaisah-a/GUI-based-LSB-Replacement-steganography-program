@@ -19,7 +19,7 @@ from main import load_stylesheet
 from scripts.verify_submission_samples import ROOT, write_json
 
 
-def capture(root=ROOT, output=None):
+def capture(root=ROOT, output=None, report_path=None):
     root = Path(root).resolve()
     output = Path(output or root / "evidence/screenshots")
     output.mkdir(parents=True, exist_ok=True)
@@ -124,7 +124,7 @@ def capture(root=ROOT, output=None):
     report = dict(mode="Automated real Qt app captures using the offscreen platform",
                   mocked_results=False, earlier_demo_evidence=False, native_playback_tested=False,
                   captures=captures)
-    write_json(root / "evidence/logs/gui-captures.json", report)
+    write_json(report_path or root / "evidence/logs/gui-captures.json", report)
     return report
 
 
@@ -132,5 +132,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--report", type=Path)
     args = parser.parse_args()
-    print(json.dumps(dict(captures=len(capture(args.root, args.output)["captures"]))))
+    print(json.dumps(dict(captures=len(capture(args.root, args.output, args.report)["captures"]))))

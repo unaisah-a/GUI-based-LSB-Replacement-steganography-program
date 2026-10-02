@@ -49,7 +49,7 @@
       "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-short-depth1.txt"
     },
     {
       "id": "image-short-depth2",
@@ -96,7 +96,7 @@
       "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-short-depth2.txt"
     },
     {
       "id": "image-short-depth3",
@@ -143,7 +143,7 @@
       "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-short-depth3.txt"
     },
     {
       "id": "image-short-depth4",
@@ -190,7 +190,7 @@
       "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-short-depth4.txt"
     },
     {
       "id": "image-short-depth5",
@@ -237,7 +237,7 @@
       "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-short-depth5.txt"
     },
     {
       "id": "image-short-depth6",
@@ -284,7 +284,7 @@
       "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-short-depth6.txt"
     },
     {
       "id": "image-short-depth7",
@@ -331,7 +331,7 @@
       "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-short-depth7.txt"
     },
     {
       "id": "image-short-depth8",
@@ -378,7 +378,7 @@
       "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-short-depth8.txt"
     },
     {
       "id": "image-long",
@@ -426,7 +426,7 @@
       "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-long.txt"
     },
     {
       "id": "image-file",
@@ -474,7 +474,7 @@
       "payload_sha256": "5ba600fef574e1e932331e2e66c8694074a2f57ce969cb8f34505d26b60997d4",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-file.png"
     },
     {
       "id": "image-encrypted",
@@ -522,7 +522,7 @@
       "payload_sha256": "de2ce1ac82970e8946604d6cfba8ed196e779e041f21e164f55dff644bb1c0fd",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-encrypted.txt"
     },
     {
       "id": "image-audio-file",
@@ -570,7 +570,7 @@
       "payload_sha256": "d4e6e7f243ef1218a76dd1183a4f645c19b9a8a2fa05d146095318f5f59c16a7",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-audio-file.wav"
     },
     {
       "id": "audio-long",
@@ -617,7 +617,7 @@
       "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "audio-long.txt"
     },
     {
       "id": "audio-large-file",
@@ -627,16 +627,16 @@
       ],
       "actual": {
         "verdict": "AUTHENTIC",
-        "reason": "the signature verified against the supplied public key and the recovered 14852-byte message matches the digest that was signed",
+        "reason": "the signature verified against the supplied public key and the recovered 60768-byte message matches the digest that was signed",
         "description": "The signature verified against the supplied public key and the recovered message matches the digest that was signed.",
         "payload_found": true,
         "signature_valid": true,
         "hash_valid": true,
         "hash_evidence": {
           "algorithm": "SHA-256",
-          "manifest_hash": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
-          "signed_record_hash": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
-          "computed_hash": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
+          "manifest_hash": "99c574c147dc2341cffe329d67a884ac23b7f71d2772a54bd76d9e84929162e7",
+          "signed_record_hash": "99c574c147dc2341cffe329d67a884ac23b7f71d2772a54bd76d9e84929162e7",
+          "computed_hash": "99c574c147dc2341cffe329d67a884ac23b7f71d2772a54bd76d9e84929162e7",
           "payload_matches_manifest": "Yes",
           "manifest_matches_record": "Yes",
           "payload_matches_record": "Yes"
@@ -644,11 +644,11 @@
         "start_location_valid": true,
         "manifest_consistent": true,
         "mismatched_fields": [],
-        "start_location": 88574,
-        "message_length": 14852,
+        "start_location": 69865,
+        "message_length": 60768,
         "media_id": "audio-large-file",
         "media_type": "audio",
-        "timestamp": "2026-10-01T16:15:20+00:00",
+        "timestamp": "2026-10-02T08:00:29+00:00",
         "encrypted": false,
         "notes": [
           "AUTHENTIC means the signed verification record and the recovered message match, and the signature verified against the supplied public key. It does not mean every part of the cover media is unchanged, and it does not by itself reject a replayed file.",
@@ -658,14 +658,14 @@
         "details": {
           "stage": "complete",
           "was_encrypted": false,
-          "envelope_length": 15672,
+          "envelope_length": 61588,
           "file_digest_matches": true
         }
       },
-      "payload_sha256": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
+      "payload_sha256": "99c574c147dc2341cffe329d67a884ac23b7f71d2772a54bd76d9e84929162e7",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "audio-large-file.txt"
     },
     {
       "id": "audio-robust",
@@ -721,7 +721,7 @@
       "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "audio-robust.txt"
     },
     {
       "id": "video-text",
@@ -769,7 +769,7 @@
       "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "video-text.txt"
     },
     {
       "id": "image-message-corrupt",
@@ -905,7 +905,7 @@
       "payload_sha256": "165cc628962b784801a52d1fa396a7cd6272a7cb22a08438ed63a4e4047b2f5d",
       "recovered_bytes_match": true,
       "corrections": 0,
-      "saved": null
+      "saved": "image-outside-payload.txt"
     },
     {
       "id": "audio-repetition1-damage1",
@@ -1007,7 +1007,7 @@
       "payload_sha256": "ecb15bebf29baa6cb65b8591be4a8ffdccefb86e6eb8baee0f5f9050b9479ca9",
       "recovered_bytes_match": true,
       "corrections": 1,
-      "saved": null
+      "saved": "audio-repetition3-damage1.txt"
     },
     {
       "id": "audio-repetition3-damage2",
@@ -1193,14 +1193,14 @@
       ],
       "actual": {
         "verdict": "PAYLOAD_MISSING",
-        "reason": "the manifest declares a 15,672-byte payload at start location 148,506, but the 4-byte length field read there decodes to 4,142,008,071, which cannot be used. It differs from the declared length in 20 of 32 bits. The length field is not covered by the signature, so this cannot say why: it is consistent with the file having been modified at that location, and also with a wrong start secret or depth, or with no payload having been embedded.",
+        "reason": "the manifest declares a 61,588-byte payload at start location 42,933, but the 4-byte length field read there decodes to 3,762,800,473, which cannot be used. It differs from the declared length in 17 of 32 bits. The length field is not covered by the signature, so this cannot say why: it is consistent with the file having been modified at that location, and also with a wrong start secret or depth, or with no payload having been embedded.",
         "description": "No payload envelope was found at the location and settings given. This is equally consistent with an unprotected file, incorrect settings, an incorrect secret, and modified media.",
         "payload_found": false,
         "signature_valid": null,
         "hash_valid": null,
         "hash_evidence": {
           "algorithm": "SHA-256",
-          "manifest_hash": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
+          "manifest_hash": "99c574c147dc2341cffe329d67a884ac23b7f71d2772a54bd76d9e84929162e7",
           "signed_record_hash": null,
           "computed_hash": null,
           "payload_matches_manifest": "Not performed",
@@ -1210,7 +1210,7 @@
         "start_location_valid": true,
         "manifest_consistent": null,
         "mismatched_fields": [],
-        "start_location": 148506,
+        "start_location": 42933,
         "message_length": null,
         "media_id": null,
         "media_type": null,
@@ -1222,8 +1222,8 @@
         "details": {
           "stage": "length_header",
           "stego_file": "audio-large-file.wav",
-          "decoded_length": 4142008071,
-          "expected_length": 15672,
+          "decoded_length": 3762800473,
+          "expected_length": 61588,
           "file_digest_matches": true
         }
       },
@@ -1286,7 +1286,7 @@
     {
       "id": "capacity-audio",
       "passed": true,
-      "message_bytes": 364302,
+      "message_bytes": 60768,
       "maximum_raw_payload_bytes": 55116,
       "note": "Receiver capacity check; sender rejection is recorded in generation.json"
     }

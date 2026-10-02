@@ -123,7 +123,7 @@ should return **AUTHENTIC**, with matching payload hashes:
 | `image-encrypted` | `encryption_cover.png` | `custom_text_payload.txt` | Depth 2, derived start, encrypted text |
 | `image-audio-file` | `encryption_cover.png` | `audio_cover.wav` | Depth 3, derived start, audio file recovery |
 | `audio-long` | `audio_cover.wav` | `text_payload.txt` | Depth 1, manual start |
-| `audio-large-file` | `audio_cover.wav` | `huge_text_payload .txt` | Depth 1, derived start, exact file recovery |
+| `audio-large-file` | `audio_cover.wav` | `huge_text_payload .txt` | Depth 2, derived start, exact file recovery |
 | `audio-robust` | `audio_cover.wav` | `text_payload.txt` | Depth 1, manual start, repetition-3 |
 | `video-text` | `forest-cover.mkv` | `text_payload.txt` | Depth 1, derived start |
 
@@ -153,9 +153,11 @@ manifests. Pair each with its named, unchanged protected media file. Both produc
 Additional cases verify unchanged media with an unrelated key, a wrong derived-start
 secret (`sample-wrong-start-0`) or a wrong encryption passphrase
 (`sample-wrong-passphrase`). See the case index for the exact settings and recorded
-failure verdicts. For capacity rejection, select `image_payload.png` as a file
-payload in either `image_cover.png` or `audio_cover.wav` at depth 1 and manual start
-37. Neither attempt fits; no protected output is created.
+failure verdicts. For capacity rejection at depth 1 and manual start 37, select
+`image_payload.png` as a file payload in `image_cover.png`, or select
+`huge_text_payload .txt` as a file payload in `audio_cover.wav`. Neither attempt
+fits; no protected output is created. The same huge text fits the audio cover at
+depth 2, as demonstrated by `audio-large-file`.
 
 ### Check all samples
 

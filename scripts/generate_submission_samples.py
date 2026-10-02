@@ -120,7 +120,7 @@ def build(root=ROOT, private_path=None, public_path=None):
     protect("image-encrypted", "encryption_cover.png", "custom_text_payload.txt", 2, encrypt=True)
     protect("image-audio-file", "encryption_cover.png", "audio_cover.wav", 3, file_payload=True)
     protect("audio-long", "audio_cover.wav", "text_payload.txt", 1, manual=True)
-    protect("audio-large-file", "audio_cover.wav", "huge_text_payload .txt", 1, file_payload=True)
+    protect("audio-large-file", "audio_cover.wav", "huge_text_payload .txt", 2, file_payload=True)
     protect("audio-robust", "audio_cover.wav", "text_payload.txt", 1, manual=True, repetition=True)
     protect("video-text", "forest-cover.mkv", "text_payload.txt", 1)
     protected_hashes = {rel(p): digest(p) for p in protected.iterdir() if p.is_file()}
@@ -177,15 +177,17 @@ def build(root=ROOT, private_path=None, public_path=None):
 
     for kind, name in (("image", "image_cover.png"), ("audio", "audio_cover.wav")):
         target = protected / ("capacity-rejected" + Path(name).suffix)
+        payload = original / ("image_payload.png" if kind == "image" else "huge_text_payload .txt")
+        message = payload.read_bytes()
         try:
-            protect_media(original / name, target, (original / "image_payload.png").read_bytes(), private,
+            protect_media(original / name, target, message, private,
                           media_id=f"capacity-{kind}", lsb_depth=1, start_method=constants.START_METHOD_MANUAL,
-                          manual_start_location=37, metadata=payload_files.metadata_for_file(original / "image_payload.png", (original / "image_payload.png").read_bytes()))
+                          manual_start_location=37, metadata=payload_files.metadata_for_file(payload, message))
         except CapacityError as exc:
             if target.exists() or Path(str(target) + ".manifest.json").exists():
                 raise RuntimeError("Rejected capacity attempt created output") from exc
             capacities.append(dict(id=f"capacity-{kind}", cover=rel(original / name),
-                                   payload=rel(original / "image_payload.png"), depth=1, start=37,
+                                   payload=rel(payload), depth=1, start=37,
                                    rejected=True, output_created=False, reason=str(exc)))
         else:
             raise RuntimeError("Capacity case unexpectedly fitted")

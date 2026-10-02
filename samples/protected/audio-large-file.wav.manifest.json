@@ -1,20 +1,20 @@
 {
   "container_format": "WAV",
-  "created": "2026-10-01T16:15:20+00:00",
+  "created": "2026-10-02T08:00:29+00:00",
   "ecc": null,
   "encrypted": false,
   "encryption": null,
-  "envelope_length": 15672,
+  "envelope_length": 61588,
   "format_version": 2,
-  "lsb_depth": 1,
+  "lsb_depth": 2,
   "media_id": "audio-large-file",
   "media_type": "audio",
-  "message_hash": "e7d33dd9f4321637a8fce1f1cfa5a93db9539ac14a67b189d39cec187b566d9e",
-  "message_length": 14852,
-  "nonce": "096be736726b5a29e8a7427049a1a1c3",
+  "message_hash": "99c574c147dc2341cffe329d67a884ac23b7f71d2772a54bd76d9e84929162e7",
+  "message_length": 60768,
+  "nonce": "261a79203f28e26236ffc109563bae5a",
   "notice": "A derived start location conceals where the payload begins. It is not encryption and provides no confidentiality on its own.",
   "start_location": null,
   "start_method": "hmac_prf",
   "stego_file": "audio-large-file.wav",
-  "stego_sha256": "b6eb21ecd3eb842f55bf4f71e389d85eec702176999fa067dde65cd42d1776da"
+  "stego_sha256": "a7a11e33bba255c91ab0ff789354bc13fc1efdcc42e3dee653444755801c5c6c"
 }
