@@ -1,46 +1,466 @@
-This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+The Limits of Digital Capacity: Why Storage Constraints Matter
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.
-This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Digital systems often appear almost limitless because modern computers can store millions of files and process large amounts of information quickly. However, every system still has a fixed capacity. A storage device, an image, a network packet, or a steganographic carrier can only hold a certain amount of data before the available space is exhausted. Understanding this limit is important because exceeding capacity does not simply make a system slower; in many cases, it prevents the operation from completing at all.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Steganography provides a useful example of this idea. In least significant bit, or LSB, steganography, information is hidden inside the binary representation of another file, commonly an image or an audio file. The system changes selected least significant bits so that the hidden data can be stored without causing an obvious change to the carrier. Although this method can hide information effectively, the carrier does not provide unlimited storage. The number of usable samples or pixels determines the maximum amount of payload that can be embedded.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Section 1
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+A capacity calculation allows the program to determine whether a payload can fit before embedding begins. This is important because the payload includes not only the visible text but also any metadata, headers, length values, checksums, and redundancy added by the program. If the carrier has a maximum capacity of approximately fifty-five kilobytes, then a payload larger than that limit cannot be safely inserted. A well-designed program should detect the problem immediately and stop the process rather than attempting a partial write.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Section 2
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+When a payload exceeds the available capacity, several outcomes are possible depending on the implementation. The safest behavior is to reject the payload and display a clear error message explaining that the carrier is too small. This protects the original file and prevents the user from assuming that the hidden message was stored successfully. A weaker implementation may truncate the payload, overwrite unrelated data, or create a corrupted output file. These outcomes demonstrate why capacity checking is a fundamental validation step rather than an optional feature.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Section 3
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+The relationship between carrier size and payload size also affects practical usability. A small image may be visually suitable for hiding a short note but completely unsuitable for a large document. Increasing the dimensions of the image can increase the number of available bits, but this also changes the characteristics of the carrier. Similarly, using additional colour channels may increase capacity, while using more bits per channel can increase the risk of visible distortion. The design therefore involves a trade-off between capacity, imperceptibility, and robustness.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Section 4
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Redundancy introduces another important capacity cost. If repetition coding is used, the system stores multiple copies of the same information so that damaged bits can be recovered later. With a repetition factor of three, every payload bit is represented three times. This can improve recovery from limited corruption, but it also means that the same original payload requires roughly three times as much embedding space. A message that easily fits without repetition coding may therefore fail the capacity check when redundancy is enabled.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Section 5
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Capacity failure is useful to demonstrate during testing because it proves that the program enforces its boundaries. A successful test should first show a payload that fits within the carrier and can be embedded normally. The next test should use a payload that exceeds the stated limit. Instead of producing a misleading output, the program should prevent embedding and inform the user that the selected file does not have sufficient capacity. This is an example of negative testing because the test intentionally supplies invalid input.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Section 6
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Negative testing helps confirm that software behaves correctly under conditions that users may encounter in practice. Users do not always know the internal limitations of a system, and they may select a file that is far too large. The application therefore needs to validate input before performing an operation. Clear feedback is especially important in graphical interfaces, where users expect the program to explain why an action cannot be completed. A message such as “Payload exceeds carrier capacity” is more useful than a generic failure message.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Section 7
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+The difference between bytes, kilobytes, and bits can also cause confusion during capacity testing. A displayed capacity may be shown in kilobytes for readability while the application performs the actual comparison in bytes or bits. For example, a capacity shown as about fifty-five kilobytes may correspond to slightly more than fifty-five thousand bytes. The test payload should therefore be comfortably larger than the exact byte limit rather than only a few characters over the displayed rounded value.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Section 8
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+File encoding also influences the number of bytes used by a text payload. Plain English text stored using UTF-8 normally uses one byte for most common characters, but other characters can require multiple bytes. Line breaks and punctuation also contribute to the total file size. As a result, the number of visible characters is not always identical to the number of bytes. Measuring the final file size is the most reliable way to confirm that the payload really exceeds the carrier capacity.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+Section 9
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.This undergraduate project requires student teams to design, implement and demonstrate a GUI-based LSB Replacement steganography program (window-based or web-based) that protects and verifies both image and audio cover objects using steganography, hashing and digital signatures.
+A capacity limit is not a flaw by itself. Every storage mechanism has a finite boundary, and the important question is whether the software handles that boundary predictably. A program that clearly reports its maximum capacity and prevents oversized payloads is behaving correctly. In contrast, a program that silently accepts data it cannot fully store creates a reliability problem because the extracted message may later be incomplete or corrupted.
 
-The project focuses on practical cybersecurity concepts: hiding a verification payload inside an image and an audio file, signing relevant verification data, extracting the hidden payload, checking the digital signature, and demonstrating positive and negative verification cases. Video as a cover object is not required for the main assignment, but may be attempted as an optional challenge.
+Section 10
+
+The same principle appears throughout computing. Databases have field limits, network protocols have maximum packet sizes, memory buffers have fixed bounds, and storage devices have finite space. Capacity validation prevents data loss and unexpected behavior in all of these environments. Steganography therefore provides a simple but meaningful example of a broader software engineering principle: inputs should be checked against system constraints before expensive or irreversible processing begins.
+
+Section 11
+
+From a testing perspective, boundary values are particularly important. It is useful to test a payload that is clearly below the limit, a payload that is very close to the maximum, a payload that exactly matches the maximum if the program allows it, and a payload that is slightly above the limit. These tests can reveal off-by-one errors or mistakes in the capacity calculation. A much larger payload is also useful for demonstrations because the expected failure is obvious and easy to explain.
+
+Section 12
+
+A robust interface should make the relationship between payload and capacity visible to the user. Displaying the total carrier capacity, the payload size, the percentage of capacity used, and whether the payload fits gives immediate feedback. If the percentage exceeds one hundred percent, the program can disable the embedding action or display an error before any data is written. This makes the failure understandable rather than surprising.
+
+Section 13
+
+The payload used for a capacity-failure demonstration does not need to contain meaningful confidential information. Its purpose is simply to exceed the available space. A long essay, repeated test text, or generated document is appropriate because it creates a predictable file size without exposing private data. What matters is that the final byte size is verified before the test is performed.
+
+Section 14
+
+If an oversized payload is rejected, that result should be described as expected behavior rather than as a crash. The capacity test is successful when the software refuses an impossible operation safely. This distinction is important in demonstrations and reports. The objective is not to make the application fail unpredictably, but to show that it detects a condition that would otherwise produce an invalid steganographic output.
+
+Section 15
+
+The capacity requirement also helps users choose suitable carrier files. If a user needs to hide a larger message, they can select a larger image or reduce the size of the payload. They may also choose a lower redundancy setting if robustness is less important than storage efficiency. These decisions illustrate that capacity is part of a wider design trade-off rather than an isolated technical number.
+
+Section 16
+
+In conclusion, capacity checking is one of the simplest protections a steganography program can implement, but it has a major effect on reliability. The carrier has a fixed number of usable bits, and the payload must remain within that boundary after all overhead and redundancy are considered. A payload that exceeds the limit should be rejected clearly and safely. Demonstrating this behavior with an intentionally oversized text file provides direct evidence that the program understands and enforces its storage constraints.
+
+Section 17
+
+A capacity calculation allows the program to determine whether a payload can fit before embedding begins. This is important because the payload includes not only the visible text but also any metadata, headers, length values, checksums, and redundancy added by the program. If the carrier has a maximum capacity of approximately fifty-five kilobytes, then a payload larger than that limit cannot be safely inserted. A well-designed program should detect the problem immediately and stop the process rather than attempting a partial write.
+
+Section 18
+
+When a payload exceeds the available capacity, several outcomes are possible depending on the implementation. The safest behavior is to reject the payload and display a clear error message explaining that the carrier is too small. This protects the original file and prevents the user from assuming that the hidden message was stored successfully. A weaker implementation may truncate the payload, overwrite unrelated data, or create a corrupted output file. These outcomes demonstrate why capacity checking is a fundamental validation step rather than an optional feature.
+
+Section 19
+
+The relationship between carrier size and payload size also affects practical usability. A small image may be visually suitable for hiding a short note but completely unsuitable for a large document. Increasing the dimensions of the image can increase the number of available bits, but this also changes the characteristics of the carrier. Similarly, using additional colour channels may increase capacity, while using more bits per channel can increase the risk of visible distortion. The design therefore involves a trade-off between capacity, imperceptibility, and robustness.
+
+Section 20
+
+Redundancy introduces another important capacity cost. If repetition coding is used, the system stores multiple copies of the same information so that damaged bits can be recovered later. With a repetition factor of three, every payload bit is represented three times. This can improve recovery from limited corruption, but it also means that the same original payload requires roughly three times as much embedding space. A message that easily fits without repetition coding may therefore fail the capacity check when redundancy is enabled.
+
+Section 21
+
+Capacity failure is useful to demonstrate during testing because it proves that the program enforces its boundaries. A successful test should first show a payload that fits within the carrier and can be embedded normally. The next test should use a payload that exceeds the stated limit. Instead of producing a misleading output, the program should prevent embedding and inform the user that the selected file does not have sufficient capacity. This is an example of negative testing because the test intentionally supplies invalid input.
+
+Section 22
+
+Negative testing helps confirm that software behaves correctly under conditions that users may encounter in practice. Users do not always know the internal limitations of a system, and they may select a file that is far too large. The application therefore needs to validate input before performing an operation. Clear feedback is especially important in graphical interfaces, where users expect the program to explain why an action cannot be completed. A message such as “Payload exceeds carrier capacity” is more useful than a generic failure message.
+
+Section 23
+
+The difference between bytes, kilobytes, and bits can also cause confusion during capacity testing. A displayed capacity may be shown in kilobytes for readability while the application performs the actual comparison in bytes or bits. For example, a capacity shown as about fifty-five kilobytes may correspond to slightly more than fifty-five thousand bytes. The test payload should therefore be comfortably larger than the exact byte limit rather than only a few characters over the displayed rounded value.
+
+Section 24
+
+File encoding also influences the number of bytes used by a text payload. Plain English text stored using UTF-8 normally uses one byte for most common characters, but other characters can require multiple bytes. Line breaks and punctuation also contribute to the total file size. As a result, the number of visible characters is not always identical to the number of bytes. Measuring the final file size is the most reliable way to confirm that the payload really exceeds the carrier capacity.
+
+Section 25
+
+A capacity limit is not a flaw by itself. Every storage mechanism has a finite boundary, and the important question is whether the software handles that boundary predictably. A program that clearly reports its maximum capacity and prevents oversized payloads is behaving correctly. In contrast, a program that silently accepts data it cannot fully store creates a reliability problem because the extracted message may later be incomplete or corrupted.
+
+Section 26
+
+The same principle appears throughout computing. Databases have field limits, network protocols have maximum packet sizes, memory buffers have fixed bounds, and storage devices have finite space. Capacity validation prevents data loss and unexpected behavior in all of these environments. Steganography therefore provides a simple but meaningful example of a broader software engineering principle: inputs should be checked against system constraints before expensive or irreversible processing begins.
+
+Section 27
+
+From a testing perspective, boundary values are particularly important. It is useful to test a payload that is clearly below the limit, a payload that is very close to the maximum, a payload that exactly matches the maximum if the program allows it, and a payload that is slightly above the limit. These tests can reveal off-by-one errors or mistakes in the capacity calculation. A much larger payload is also useful for demonstrations because the expected failure is obvious and easy to explain.
+
+Section 28
+
+A robust interface should make the relationship between payload and capacity visible to the user. Displaying the total carrier capacity, the payload size, the percentage of capacity used, and whether the payload fits gives immediate feedback. If the percentage exceeds one hundred percent, the program can disable the embedding action or display an error before any data is written. This makes the failure understandable rather than surprising.
+
+Section 29
+
+The payload used for a capacity-failure demonstration does not need to contain meaningful confidential information. Its purpose is simply to exceed the available space. A long essay, repeated test text, or generated document is appropriate because it creates a predictable file size without exposing private data. What matters is that the final byte size is verified before the test is performed.
+
+Section 30
+
+If an oversized payload is rejected, that result should be described as expected behavior rather than as a crash. The capacity test is successful when the software refuses an impossible operation safely. This distinction is important in demonstrations and reports. The objective is not to make the application fail unpredictably, but to show that it detects a condition that would otherwise produce an invalid steganographic output.
+
+Section 31
+
+The capacity requirement also helps users choose suitable carrier files. If a user needs to hide a larger message, they can select a larger image or reduce the size of the payload. They may also choose a lower redundancy setting if robustness is less important than storage efficiency. These decisions illustrate that capacity is part of a wider design trade-off rather than an isolated technical number.
+
+Section 32
+
+In conclusion, capacity checking is one of the simplest protections a steganography program can implement, but it has a major effect on reliability. The carrier has a fixed number of usable bits, and the payload must remain within that boundary after all overhead and redundancy are considered. A payload that exceeds the limit should be rejected clearly and safely. Demonstrating this behavior with an intentionally oversized text file provides direct evidence that the program understands and enforces its storage constraints.
+
+Section 33
+
+A capacity calculation allows the program to determine whether a payload can fit before embedding begins. This is important because the payload includes not only the visible text but also any metadata, headers, length values, checksums, and redundancy added by the program. If the carrier has a maximum capacity of approximately fifty-five kilobytes, then a payload larger than that limit cannot be safely inserted. A well-designed program should detect the problem immediately and stop the process rather than attempting a partial write.
+
+Section 34
+
+When a payload exceeds the available capacity, several outcomes are possible depending on the implementation. The safest behavior is to reject the payload and display a clear error message explaining that the carrier is too small. This protects the original file and prevents the user from assuming that the hidden message was stored successfully. A weaker implementation may truncate the payload, overwrite unrelated data, or create a corrupted output file. These outcomes demonstrate why capacity checking is a fundamental validation step rather than an optional feature.
+
+Section 35
+
+The relationship between carrier size and payload size also affects practical usability. A small image may be visually suitable for hiding a short note but completely unsuitable for a large document. Increasing the dimensions of the image can increase the number of available bits, but this also changes the characteristics of the carrier. Similarly, using additional colour channels may increase capacity, while using more bits per channel can increase the risk of visible distortion. The design therefore involves a trade-off between capacity, imperceptibility, and robustness.
+
+Section 36
+
+Redundancy introduces another important capacity cost. If repetition coding is used, the system stores multiple copies of the same information so that damaged bits can be recovered later. With a repetition factor of three, every payload bit is represented three times. This can improve recovery from limited corruption, but it also means that the same original payload requires roughly three times as much embedding space. A message that easily fits without repetition coding may therefore fail the capacity check when redundancy is enabled.
+
+Section 37
+
+Capacity failure is useful to demonstrate during testing because it proves that the program enforces its boundaries. A successful test should first show a payload that fits within the carrier and can be embedded normally. The next test should use a payload that exceeds the stated limit. Instead of producing a misleading output, the program should prevent embedding and inform the user that the selected file does not have sufficient capacity. This is an example of negative testing because the test intentionally supplies invalid input.
+
+Section 38
+
+Negative testing helps confirm that software behaves correctly under conditions that users may encounter in practice. Users do not always know the internal limitations of a system, and they may select a file that is far too large. The application therefore needs to validate input before performing an operation. Clear feedback is especially important in graphical interfaces, where users expect the program to explain why an action cannot be completed. A message such as “Payload exceeds carrier capacity” is more useful than a generic failure message.
+
+Section 39
+
+The difference between bytes, kilobytes, and bits can also cause confusion during capacity testing. A displayed capacity may be shown in kilobytes for readability while the application performs the actual comparison in bytes or bits. For example, a capacity shown as about fifty-five kilobytes may correspond to slightly more than fifty-five thousand bytes. The test payload should therefore be comfortably larger than the exact byte limit rather than only a few characters over the displayed rounded value.
+
+Section 40
+
+File encoding also influences the number of bytes used by a text payload. Plain English text stored using UTF-8 normally uses one byte for most common characters, but other characters can require multiple bytes. Line breaks and punctuation also contribute to the total file size. As a result, the number of visible characters is not always identical to the number of bytes. Measuring the final file size is the most reliable way to confirm that the payload really exceeds the carrier capacity.
+
+Section 41
+
+A capacity limit is not a flaw by itself. Every storage mechanism has a finite boundary, and the important question is whether the software handles that boundary predictably. A program that clearly reports its maximum capacity and prevents oversized payloads is behaving correctly. In contrast, a program that silently accepts data it cannot fully store creates a reliability problem because the extracted message may later be incomplete or corrupted.
+
+Section 42
+
+The same principle appears throughout computing. Databases have field limits, network protocols have maximum packet sizes, memory buffers have fixed bounds, and storage devices have finite space. Capacity validation prevents data loss and unexpected behavior in all of these environments. Steganography therefore provides a simple but meaningful example of a broader software engineering principle: inputs should be checked against system constraints before expensive or irreversible processing begins.
+
+Section 43
+
+From a testing perspective, boundary values are particularly important. It is useful to test a payload that is clearly below the limit, a payload that is very close to the maximum, a payload that exactly matches the maximum if the program allows it, and a payload that is slightly above the limit. These tests can reveal off-by-one errors or mistakes in the capacity calculation. A much larger payload is also useful for demonstrations because the expected failure is obvious and easy to explain.
+
+Section 44
+
+A robust interface should make the relationship between payload and capacity visible to the user. Displaying the total carrier capacity, the payload size, the percentage of capacity used, and whether the payload fits gives immediate feedback. If the percentage exceeds one hundred percent, the program can disable the embedding action or display an error before any data is written. This makes the failure understandable rather than surprising.
+
+Section 45
+
+The payload used for a capacity-failure demonstration does not need to contain meaningful confidential information. Its purpose is simply to exceed the available space. A long essay, repeated test text, or generated document is appropriate because it creates a predictable file size without exposing private data. What matters is that the final byte size is verified before the test is performed.
+
+Section 46
+
+If an oversized payload is rejected, that result should be described as expected behavior rather than as a crash. The capacity test is successful when the software refuses an impossible operation safely. This distinction is important in demonstrations and reports. The objective is not to make the application fail unpredictably, but to show that it detects a condition that would otherwise produce an invalid steganographic output.
+
+Section 47
+
+The capacity requirement also helps users choose suitable carrier files. If a user needs to hide a larger message, they can select a larger image or reduce the size of the payload. They may also choose a lower redundancy setting if robustness is less important than storage efficiency. These decisions illustrate that capacity is part of a wider design trade-off rather than an isolated technical number.
+
+Section 48
+
+In conclusion, capacity checking is one of the simplest protections a steganography program can implement, but it has a major effect on reliability. The carrier has a fixed number of usable bits, and the payload must remain within that boundary after all overhead and redundancy are considered. A payload that exceeds the limit should be rejected clearly and safely. Demonstrating this behavior with an intentionally oversized text file provides direct evidence that the program understands and enforces its storage constraints.
+
+Section 49
+
+A capacity calculation allows the program to determine whether a payload can fit before embedding begins. This is important because the payload includes not only the visible text but also any metadata, headers, length values, checksums, and redundancy added by the program. If the carrier has a maximum capacity of approximately fifty-five kilobytes, then a payload larger than that limit cannot be safely inserted. A well-designed program should detect the problem immediately and stop the process rather than attempting a partial write.
+
+Section 50
+
+When a payload exceeds the available capacity, several outcomes are possible depending on the implementation. The safest behavior is to reject the payload and display a clear error message explaining that the carrier is too small. This protects the original file and prevents the user from assuming that the hidden message was stored successfully. A weaker implementation may truncate the payload, overwrite unrelated data, or create a corrupted output file. These outcomes demonstrate why capacity checking is a fundamental validation step rather than an optional feature.
+
+Section 51
+
+The relationship between carrier size and payload size also affects practical usability. A small image may be visually suitable for hiding a short note but completely unsuitable for a large document. Increasing the dimensions of the image can increase the number of available bits, but this also changes the characteristics of the carrier. Similarly, using additional colour channels may increase capacity, while using more bits per channel can increase the risk of visible distortion. The design therefore involves a trade-off between capacity, imperceptibility, and robustness.
+
+Section 52
+
+Redundancy introduces another important capacity cost. If repetition coding is used, the system stores multiple copies of the same information so that damaged bits can be recovered later. With a repetition factor of three, every payload bit is represented three times. This can improve recovery from limited corruption, but it also means that the same original payload requires roughly three times as much embedding space. A message that easily fits without repetition coding may therefore fail the capacity check when redundancy is enabled.
+
+Section 53
+
+Capacity failure is useful to demonstrate during testing because it proves that the program enforces its boundaries. A successful test should first show a payload that fits within the carrier and can be embedded normally. The next test should use a payload that exceeds the stated limit. Instead of producing a misleading output, the program should prevent embedding and inform the user that the selected file does not have sufficient capacity. This is an example of negative testing because the test intentionally supplies invalid input.
+
+Section 54
+
+Negative testing helps confirm that software behaves correctly under conditions that users may encounter in practice. Users do not always know the internal limitations of a system, and they may select a file that is far too large. The application therefore needs to validate input before performing an operation. Clear feedback is especially important in graphical interfaces, where users expect the program to explain why an action cannot be completed. A message such as “Payload exceeds carrier capacity” is more useful than a generic failure message.
+
+Section 55
+
+The difference between bytes, kilobytes, and bits can also cause confusion during capacity testing. A displayed capacity may be shown in kilobytes for readability while the application performs the actual comparison in bytes or bits. For example, a capacity shown as about fifty-five kilobytes may correspond to slightly more than fifty-five thousand bytes. The test payload should therefore be comfortably larger than the exact byte limit rather than only a few characters over the displayed rounded value.
+
+Section 56
+
+File encoding also influences the number of bytes used by a text payload. Plain English text stored using UTF-8 normally uses one byte for most common characters, but other characters can require multiple bytes. Line breaks and punctuation also contribute to the total file size. As a result, the number of visible characters is not always identical to the number of bytes. Measuring the final file size is the most reliable way to confirm that the payload really exceeds the carrier capacity.
+
+Section 57
+
+A capacity limit is not a flaw by itself. Every storage mechanism has a finite boundary, and the important question is whether the software handles that boundary predictably. A program that clearly reports its maximum capacity and prevents oversized payloads is behaving correctly. In contrast, a program that silently accepts data it cannot fully store creates a reliability problem because the extracted message may later be incomplete or corrupted.
+
+Section 58
+
+The same principle appears throughout computing. Databases have field limits, network protocols have maximum packet sizes, memory buffers have fixed bounds, and storage devices have finite space. Capacity validation prevents data loss and unexpected behavior in all of these environments. Steganography therefore provides a simple but meaningful example of a broader software engineering principle: inputs should be checked against system constraints before expensive or irreversible processing begins.
+
+Section 59
+
+From a testing perspective, boundary values are particularly important. It is useful to test a payload that is clearly below the limit, a payload that is very close to the maximum, a payload that exactly matches the maximum if the program allows it, and a payload that is slightly above the limit. These tests can reveal off-by-one errors or mistakes in the capacity calculation. A much larger payload is also useful for demonstrations because the expected failure is obvious and easy to explain.
+
+Section 60
+
+A robust interface should make the relationship between payload and capacity visible to the user. Displaying the total carrier capacity, the payload size, the percentage of capacity used, and whether the payload fits gives immediate feedback. If the percentage exceeds one hundred percent, the program can disable the embedding action or display an error before any data is written. This makes the failure understandable rather than surprising.
+
+Section 61
+
+The payload used for a capacity-failure demonstration does not need to contain meaningful confidential information. Its purpose is simply to exceed the available space. A long essay, repeated test text, or generated document is appropriate because it creates a predictable file size without exposing private data. What matters is that the final byte size is verified before the test is performed.
+
+Section 62
+
+If an oversized payload is rejected, that result should be described as expected behavior rather than as a crash. The capacity test is successful when the software refuses an impossible operation safely. This distinction is important in demonstrations and reports. The objective is not to make the application fail unpredictably, but to show that it detects a condition that would otherwise produce an invalid steganographic output.
+
+Section 63
+
+The capacity requirement also helps users choose suitable carrier files. If a user needs to hide a larger message, they can select a larger image or reduce the size of the payload. They may also choose a lower redundancy setting if robustness is less important than storage efficiency. These decisions illustrate that capacity is part of a wider design trade-off rather than an isolated technical number.
+
+Section 64
+
+In conclusion, capacity checking is one of the simplest protections a steganography program can implement, but it has a major effect on reliability. The carrier has a fixed number of usable bits, and the payload must remain within that boundary after all overhead and redundancy are considered. A payload that exceeds the limit should be rejected clearly and safely. Demonstrating this behavior with an intentionally oversized text file provides direct evidence that the program understands and enforces its storage constraints.
+
+Section 65
+
+A capacity calculation allows the program to determine whether a payload can fit before embedding begins. This is important because the payload includes not only the visible text but also any metadata, headers, length values, checksums, and redundancy added by the program. If the carrier has a maximum capacity of approximately fifty-five kilobytes, then a payload larger than that limit cannot be safely inserted. A well-designed program should detect the problem immediately and stop the process rather than attempting a partial write.
+
+Section 66
+
+When a payload exceeds the available capacity, several outcomes are possible depending on the implementation. The safest behavior is to reject the payload and display a clear error message explaining that the carrier is too small. This protects the original file and prevents the user from assuming that the hidden message was stored successfully. A weaker implementation may truncate the payload, overwrite unrelated data, or create a corrupted output file. These outcomes demonstrate why capacity checking is a fundamental validation step rather than an optional feature.
+
+Section 67
+
+The relationship between carrier size and payload size also affects practical usability. A small image may be visually suitable for hiding a short note but completely unsuitable for a large document. Increasing the dimensions of the image can increase the number of available bits, but this also changes the characteristics of the carrier. Similarly, using additional colour channels may increase capacity, while using more bits per channel can increase the risk of visible distortion. The design therefore involves a trade-off between capacity, imperceptibility, and robustness.
+
+Section 68
+
+Redundancy introduces another important capacity cost. If repetition coding is used, the system stores multiple copies of the same information so that damaged bits can be recovered later. With a repetition factor of three, every payload bit is represented three times. This can improve recovery from limited corruption, but it also means that the same original payload requires roughly three times as much embedding space. A message that easily fits without repetition coding may therefore fail the capacity check when redundancy is enabled.
+
+Section 69
+
+Capacity failure is useful to demonstrate during testing because it proves that the program enforces its boundaries. A successful test should first show a payload that fits within the carrier and can be embedded normally. The next test should use a payload that exceeds the stated limit. Instead of producing a misleading output, the program should prevent embedding and inform the user that the selected file does not have sufficient capacity. This is an example of negative testing because the test intentionally supplies invalid input.
+
+Section 70
+
+Negative testing helps confirm that software behaves correctly under conditions that users may encounter in practice. Users do not always know the internal limitations of a system, and they may select a file that is far too large. The application therefore needs to validate input before performing an operation. Clear feedback is especially important in graphical interfaces, where users expect the program to explain why an action cannot be completed. A message such as “Payload exceeds carrier capacity” is more useful than a generic failure message.
+
+Section 71
+
+The difference between bytes, kilobytes, and bits can also cause confusion during capacity testing. A displayed capacity may be shown in kilobytes for readability while the application performs the actual comparison in bytes or bits. For example, a capacity shown as about fifty-five kilobytes may correspond to slightly more than fifty-five thousand bytes. The test payload should therefore be comfortably larger than the exact byte limit rather than only a few characters over the displayed rounded value.
+
+Section 72
+
+File encoding also influences the number of bytes used by a text payload. Plain English text stored using UTF-8 normally uses one byte for most common characters, but other characters can require multiple bytes. Line breaks and punctuation also contribute to the total file size. As a result, the number of visible characters is not always identical to the number of bytes. Measuring the final file size is the most reliable way to confirm that the payload really exceeds the carrier capacity.
+
+Section 73
+
+A capacity limit is not a flaw by itself. Every storage mechanism has a finite boundary, and the important question is whether the software handles that boundary predictably. A program that clearly reports its maximum capacity and prevents oversized payloads is behaving correctly. In contrast, a program that silently accepts data it cannot fully store creates a reliability problem because the extracted message may later be incomplete or corrupted.
+
+Section 74
+
+The same principle appears throughout computing. Databases have field limits, network protocols have maximum packet sizes, memory buffers have fixed bounds, and storage devices have finite space. Capacity validation prevents data loss and unexpected behavior in all of these environments. Steganography therefore provides a simple but meaningful example of a broader software engineering principle: inputs should be checked against system constraints before expensive or irreversible processing begins.
+
+Section 75
+
+From a testing perspective, boundary values are particularly important. It is useful to test a payload that is clearly below the limit, a payload that is very close to the maximum, a payload that exactly matches the maximum if the program allows it, and a payload that is slightly above the limit. These tests can reveal off-by-one errors or mistakes in the capacity calculation. A much larger payload is also useful for demonstrations because the expected failure is obvious and easy to explain.
+
+Section 76
+
+A robust interface should make the relationship between payload and capacity visible to the user. Displaying the total carrier capacity, the payload size, the percentage of capacity used, and whether the payload fits gives immediate feedback. If the percentage exceeds one hundred percent, the program can disable the embedding action or display an error before any data is written. This makes the failure understandable rather than surprising.
+
+Section 77
+
+The payload used for a capacity-failure demonstration does not need to contain meaningful confidential information. Its purpose is simply to exceed the available space. A long essay, repeated test text, or generated document is appropriate because it creates a predictable file size without exposing private data. What matters is that the final byte size is verified before the test is performed.
+
+Section 78
+
+If an oversized payload is rejected, that result should be described as expected behavior rather than as a crash. The capacity test is successful when the software refuses an impossible operation safely. This distinction is important in demonstrations and reports. The objective is not to make the application fail unpredictably, but to show that it detects a condition that would otherwise produce an invalid steganographic output.
+
+Section 79
+
+The capacity requirement also helps users choose suitable carrier files. If a user needs to hide a larger message, they can select a larger image or reduce the size of the payload. They may also choose a lower redundancy setting if robustness is less important than storage efficiency. These decisions illustrate that capacity is part of a wider design trade-off rather than an isolated technical number.
+
+Section 80
+
+In conclusion, capacity checking is one of the simplest protections a steganography program can implement, but it has a major effect on reliability. The carrier has a fixed number of usable bits, and the payload must remain within that boundary after all overhead and redundancy are considered. A payload that exceeds the limit should be rejected clearly and safely. Demonstrating this behavior with an intentionally oversized text file provides direct evidence that the program understands and enforces its storage constraints.
+
+Section 81
+
+A capacity calculation allows the program to determine whether a payload can fit before embedding begins. This is important because the payload includes not only the visible text but also any metadata, headers, length values, checksums, and redundancy added by the program. If the carrier has a maximum capacity of approximately fifty-five kilobytes, then a payload larger than that limit cannot be safely inserted. A well-designed program should detect the problem immediately and stop the process rather than attempting a partial write.
+
+Section 82
+
+When a payload exceeds the available capacity, several outcomes are possible depending on the implementation. The safest behavior is to reject the payload and display a clear error message explaining that the carrier is too small. This protects the original file and prevents the user from assuming that the hidden message was stored successfully. A weaker implementation may truncate the payload, overwrite unrelated data, or create a corrupted output file. These outcomes demonstrate why capacity checking is a fundamental validation step rather than an optional feature.
+
+Section 83
+
+The relationship between carrier size and payload size also affects practical usability. A small image may be visually suitable for hiding a short note but completely unsuitable for a large document. Increasing the dimensions of the image can increase the number of available bits, but this also changes the characteristics of the carrier. Similarly, using additional colour channels may increase capacity, while using more bits per channel can increase the risk of visible distortion. The design therefore involves a trade-off between capacity, imperceptibility, and robustness.
+
+Section 84
+
+Redundancy introduces another important capacity cost. If repetition coding is used, the system stores multiple copies of the same information so that damaged bits can be recovered later. With a repetition factor of three, every payload bit is represented three times. This can improve recovery from limited corruption, but it also means that the same original payload requires roughly three times as much embedding space. A message that easily fits without repetition coding may therefore fail the capacity check when redundancy is enabled.
+
+Section 85
+
+Capacity failure is useful to demonstrate during testing because it proves that the program enforces its boundaries. A successful test should first show a payload that fits within the carrier and can be embedded normally. The next test should use a payload that exceeds the stated limit. Instead of producing a misleading output, the program should prevent embedding and inform the user that the selected file does not have sufficient capacity. This is an example of negative testing because the test intentionally supplies invalid input.
+
+Section 86
+
+Negative testing helps confirm that software behaves correctly under conditions that users may encounter in practice. Users do not always know the internal limitations of a system, and they may select a file that is far too large. The application therefore needs to validate input before performing an operation. Clear feedback is especially important in graphical interfaces, where users expect the program to explain why an action cannot be completed. A message such as “Payload exceeds carrier capacity” is more useful than a generic failure message.
+
+Section 87
+
+The difference between bytes, kilobytes, and bits can also cause confusion during capacity testing. A displayed capacity may be shown in kilobytes for readability while the application performs the actual comparison in bytes or bits. For example, a capacity shown as about fifty-five kilobytes may correspond to slightly more than fifty-five thousand bytes. The test payload should therefore be comfortably larger than the exact byte limit rather than only a few characters over the displayed rounded value.
+
+Section 88
+
+File encoding also influences the number of bytes used by a text payload. Plain English text stored using UTF-8 normally uses one byte for most common characters, but other characters can require multiple bytes. Line breaks and punctuation also contribute to the total file size. As a result, the number of visible characters is not always identical to the number of bytes. Measuring the final file size is the most reliable way to confirm that the payload really exceeds the carrier capacity.
+
+Section 89
+
+A capacity limit is not a flaw by itself. Every storage mechanism has a finite boundary, and the important question is whether the software handles that boundary predictably. A program that clearly reports its maximum capacity and prevents oversized payloads is behaving correctly. In contrast, a program that silently accepts data it cannot fully store creates a reliability problem because the extracted message may later be incomplete or corrupted.
+
+Section 90
+
+The same principle appears throughout computing. Databases have field limits, network protocols have maximum packet sizes, memory buffers have fixed bounds, and storage devices have finite space. Capacity validation prevents data loss and unexpected behavior in all of these environments. Steganography therefore provides a simple but meaningful example of a broader software engineering principle: inputs should be checked against system constraints before expensive or irreversible processing begins.
+
+Section 91
+
+From a testing perspective, boundary values are particularly important. It is useful to test a payload that is clearly below the limit, a payload that is very close to the maximum, a payload that exactly matches the maximum if the program allows it, and a payload that is slightly above the limit. These tests can reveal off-by-one errors or mistakes in the capacity calculation. A much larger payload is also useful for demonstrations because the expected failure is obvious and easy to explain.
+
+Section 92
+
+A robust interface should make the relationship between payload and capacity visible to the user. Displaying the total carrier capacity, the payload size, the percentage of capacity used, and whether the payload fits gives immediate feedback. If the percentage exceeds one hundred percent, the program can disable the embedding action or display an error before any data is written. This makes the failure understandable rather than surprising.
+
+Section 93
+
+The payload used for a capacity-failure demonstration does not need to contain meaningful confidential information. Its purpose is simply to exceed the available space. A long essay, repeated test text, or generated document is appropriate because it creates a predictable file size without exposing private data. What matters is that the final byte size is verified before the test is performed.
+
+Section 94
+
+If an oversized payload is rejected, that result should be described as expected behavior rather than as a crash. The capacity test is successful when the software refuses an impossible operation safely. This distinction is important in demonstrations and reports. The objective is not to make the application fail unpredictably, but to show that it detects a condition that would otherwise produce an invalid steganographic output.
+
+Section 95
+
+The capacity requirement also helps users choose suitable carrier files. If a user needs to hide a larger message, they can select a larger image or reduce the size of the payload. They may also choose a lower redundancy setting if robustness is less important than storage efficiency. These decisions illustrate that capacity is part of a wider design trade-off rather than an isolated technical number.
+
+Section 96
+
+In conclusion, capacity checking is one of the simplest protections a steganography program can implement, but it has a major effect on reliability. The carrier has a fixed number of usable bits, and the payload must remain within that boundary after all overhead and redundancy are considered. A payload that exceeds the limit should be rejected clearly and safely. Demonstrating this behavior with an intentionally oversized text file provides direct evidence that the program understands and enforces its storage constraints.
+
+Section 97
+
+A capacity calculation allows the program to determine whether a payload can fit before embedding begins. This is important because the payload includes not only the visible text but also any metadata, headers, length values, checksums, and redundancy added by the program. If the carrier has a maximum capacity of approximately fifty-five kilobytes, then a payload larger than that limit cannot be safely inserted. A well-designed program should detect the problem immediately and stop the process rather than attempting a partial write.
+
+Section 98
+
+When a payload exceeds the available capacity, several outcomes are possible depending on the implementation. The safest behavior is to reject the payload and display a clear error message explaining that the carrier is too small. This protects the original file and prevents the user from assuming that the hidden message was stored successfully. A weaker implementation may truncate the payload, overwrite unrelated data, or create a corrupted output file. These outcomes demonstrate why capacity checking is a fundamental validation step rather than an optional feature.
+
+Section 99
+
+The relationship between carrier size and payload size also affects practical usability. A small image may be visually suitable for hiding a short note but completely unsuitable for a large document. Increasing the dimensions of the image can increase the number of available bits, but this also changes the characteristics of the carrier. Similarly, using additional colour channels may increase capacity, while using more bits per channel can increase the risk of visible distortion. The design therefore involves a trade-off between capacity, imperceptibility, and robustness.
+
+Section 100
+
+Redundancy introduces another important capacity cost. If repetition coding is used, the system stores multiple copies of the same information so that damaged bits can be recovered later. With a repetition factor of three, every payload bit is represented three times. This can improve recovery from limited corruption, but it also means that the same original payload requires roughly three times as much embedding space. A message that easily fits without repetition coding may therefore fail the capacity check when redundancy is enabled.
+
+Section 101
+
+Capacity failure is useful to demonstrate during testing because it proves that the program enforces its boundaries. A successful test should first show a payload that fits within the carrier and can be embedded normally. The next test should use a payload that exceeds the stated limit. Instead of producing a misleading output, the program should prevent embedding and inform the user that the selected file does not have sufficient capacity. This is an example of negative testing because the test intentionally supplies invalid input.
+
+Section 102
+
+Negative testing helps confirm that software behaves correctly under conditions that users may encounter in practice. Users do not always know the internal limitations of a system, and they may select a file that is far too large. The application therefore needs to validate input before performing an operation. Clear feedback is especially important in graphical interfaces, where users expect the program to explain why an action cannot be completed. A message such as “Payload exceeds carrier capacity” is more useful than a generic failure message.
+
+Section 103
+
+The difference between bytes, kilobytes, and bits can also cause confusion during capacity testing. A displayed capacity may be shown in kilobytes for readability while the application performs the actual comparison in bytes or bits. For example, a capacity shown as about fifty-five kilobytes may correspond to slightly more than fifty-five thousand bytes. The test payload should therefore be comfortably larger than the exact byte limit rather than only a few characters over the displayed rounded value.
+
+Section 104
+
+File encoding also influences the number of bytes used by a text payload. Plain English text stored using UTF-8 normally uses one byte for most common characters, but other characters can require multiple bytes. Line breaks and punctuation also contribute to the total file size. As a result, the number of visible characters is not always identical to the number of bytes. Measuring the final file size is the most reliable way to confirm that the payload really exceeds the carrier capacity.
+
+Section 105
+
+A capacity limit is not a flaw by itself. Every storage mechanism has a finite boundary, and the important question is whether the software handles that boundary predictably. A program that clearly reports its maximum capacity and prevents oversized payloads is behaving correctly. In contrast, a program that silently accepts data it cannot fully store creates a reliability problem because the extracted message may later be incomplete or corrupted.
+
+Section 106
+
+The same principle appears throughout computing. Databases have field limits, network protocols have maximum packet sizes, memory buffers have fixed bounds, and storage devices have finite space. Capacity validation prevents data loss and unexpected behavior in all of these environments. Steganography therefore provides a simple but meaningful example of a broader software engineering principle: inputs should be checked against system constraints before expensive or irreversible processing begins.
+
+Section 107
+
+From a testing perspective, boundary values are particularly important. It is useful to test a payload that is clearly below the limit, a payload that is very close to the maximum, a payload that exactly matches the maximum if the program allows it, and a payload that is slightly above the limit. These tests can reveal off-by-one errors or mistakes in the capacity calculation. A much larger payload is also useful for demonstrations because the expected failure is obvious and easy to explain.
+
+Section 108
+
+A robust interface should make the relationship between payload and capacity visible to the user. Displaying the total carrier capacity, the payload size, the percentage of capacity used, and whether the payload fits gives immediate feedback. If the percentage exceeds one hundred percent, the program can disable the embedding action or display an error before any data is written. This makes the failure understandable rather than surprising.
+
+Section 109
+
+The payload used for a capacity-failure demonstration does not need to contain meaningful confidential information. Its purpose is simply to exceed the available space. A long essay, repeated test text, or generated document is appropriate because it creates a predictable file size without exposing private data. What matters is that the final byte size is verified before the test is performed.
+
+Section 110
+
+If an oversized payload is rejected, that result should be described as expected behavior rather than as a crash. The capacity test is successful when the software refuses an impossible operation safely. This distinction is important in demonstrations and reports. The objective is not to make the application fail unpredictably, but to show that it detects a condition that would otherwise produce an invalid steganographic output.
+
+Section 111
+
+The capacity requirement also helps users choose suitable carrier files. If a user needs to hide a larger message, they can select a larger image or reduce the size of the payload. They may also choose a lower redundancy setting if robustness is less important than storage efficiency. These decisions illustrate that capacity is part of a wider design trade-off rather than an isolated technical number.
+
+Section 112
+
+In conclusion, capacity checking is one of the simplest protections a steganography program can implement, but it has a major effect on reliability. The carrier has a fixed number of usable bits, and the payload must remain within that boundary after all overhead and redundancy are considered. A payload that exceeds the limit should be rejected clearly and safely. Demonstrating this behavior with an intentionally oversized text file provides direct evidence that the program understands and enforces its storage constraints.
+
+Section 113
+
+A capacity calculation allows the program to determine whether a payload can fit before embedding begins. This is important because the payload includes not only the visible text but also any metadata, headers, length values, checksums, and redundancy added by the program. If the carrier has a maximum capacity of approximately fifty-five kilobytes, then a payload larger than that limit cannot be safely inserted. A well-designed program should detect the problem immediately and stop the process rather than attempting a partial write.
+
+Section 114
+
+When a payload exceeds the available capacity, several outcomes are possible depending on the implementation. The safest behavior is to reject the payload and display a clear error message explaining that the carrier is too small. This protects the original file and prevents the user from assuming that the hidden message was stored successfully. A weaker implementation may truncate the payload, overwrite unrelated data, or create a corrupted output file. These outcomes demonstrate why capacity checking is a fundamental validation step rather than an optional feature.
+
+Section 115
+
+The relationship between carrier size and payload size also affects practical usability. A small image may be visually suitable for hiding a short note but completely unsuitable for a large document. Increasing the dimensions of the image can increase the number of available bits, but this also changes the characteristics of the carrier. Similarly, using additional colour channels may increase capacity, while using more bits per channel can increase the risk of visible distortion. The design therefore involves a trade-off between capacity, imperceptibility, and robustness.
